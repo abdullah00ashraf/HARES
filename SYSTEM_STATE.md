@@ -169,3 +169,13 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **Hermetic Test Suite** | `tests/conftest.py`, `tests/test_security.py`, `tests/test_webhook.py`, `tests/test_tasks.py` | 11 automated unit tests verifying signature, challenge, webhook post, and worker task | 11/11 tests PASSED (100%) |
 | **Security Audit Skill** | `.agents/skills/security-audit/` | Cloudflare defensive source-first vulnerability audit skill suite (20 assets) | Integrated & Active |
 
+---
+
+## 5. Source Control & Repository State
+
+* **Remote Origin:** `https://github.com/abdullah00ashraf/HARES.git`
+* **Default Branch:** `main` (tracked and synchronized with `origin/main`)
+* **Working Tree:** Clean, zero untracked runtime artifacts
+* **Secret Protection:** Local `.env` and credentials strictly excluded via `.gitignore`
+* **Commit History:** 8 conventional, semantic commits mapping each architectural layer
+
