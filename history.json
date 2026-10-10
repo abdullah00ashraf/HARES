@@ -264,10 +264,40 @@
       "files_count": 2854
     },
     {
+      "hash": "a654794",
+      "scope": "docs(sync)",
+      "message": "docs(sync): update dual ledgers and history tracking Milestone 18 Git publication",
+      "files_count": 3
+    },
+    {
+      "hash": "2653992",
+      "scope": "docs(audit)",
+      "message": "docs(audit): complete comprehensive Phase 5 defensive security audit (Audit 5)",
+      "files_count": 2
+    },
+    {
       "hash": "52126f6",
       "scope": "feat(phase6)",
       "message": "feat(phase6): production hardening, GPU topology, Prometheus metrics, and 200 QPS load benchmark",
       "files_count": 28
+    },
+    {
+      "hash": "91d3e5d",
+      "scope": "docs(ledger)",
+      "message": "docs(ledger): record commit 52126f6 in dual-ledger memory",
+      "files_count": 4
+    },
+    {
+      "hash": "7ee553c",
+      "scope": "docs(audit)",
+      "message": "docs(audit): publish Phase 6 comprehensive defensive security audit (Audit 6)",
+      "files_count": 2
+    },
+    {
+      "hash": "32ded09",
+      "scope": "feat(datasets)",
+      "message": "feat(datasets): populate 100k UAE smishing corpus and 20k audio deepfake evaluation suite",
+      "files_count": 11
     }
   ],
   "dual_ledger_state": {

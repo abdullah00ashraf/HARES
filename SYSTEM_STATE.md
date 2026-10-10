@@ -205,6 +205,8 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **Locust 200 QPS Harness** | `benchmarks/locustfile.py` | Pure Python load generator with 85/15 text/audio split, nanosecond timestamps, and dynamic HMAC signatures | Verified (100% tests passing) |
 | **Benchmark Orchestrator**| `benchmarks/run_stress_test.py` | Stepped load runner (50 -> 100 -> 200 QPS) and automated SLA markdown report generator | Verified (CLI runs cleanly) |
 | **Hermetic Test Suite (v6)** | `tests/` | 89 automated unit & integration tests across security hardening, Prometheus metrics, concurrent load benchmarks, AI, media, and threat feeds | 89/89 tests PASSED (100%) |
+| **UAE Smishing Corpus (100K)**| `opensource/datasets/localized_fraud_corpus/` | 100,000 paired ChatML records (87.72 MB), 40% Emirati, 30% MSA, 20% Expat English, 10% Arabizi; 70% Malicious, 30% Benign | Verified (Schema validated) |
+| **Audio Deepfake Suite (20K)**| `opensource/datasets/synthetic_voice_eval/` | 20,000 files (19.99 hrs), 16 kHz mono Opus (.ogg), 50% Genuine (CV Arabic, English, Urdu) / 50% Synthetic (F5-TTS, CosyVoice, XTTS-v2, ElevenLabs) | Verified (100% encoded) |
 
 ---
 
@@ -214,8 +216,8 @@ MAX_AUDIO_DURATION_SECONDS=120
 * **Default Branch:** `main` (tracked and synchronized with `origin/main`)
 * **Working Tree:** Clean, zero untracked runtime artifacts
 * **Secret Protection:** Local `.env` and credentials strictly excluded via `.gitignore`
-* **Commit History:** 11 conventional, semantic commits mapping each architectural layer (Latest: `52126f6` covering Phase 6 production hardening, GPU topology, Prometheus metrics, and 200 QPS load benchmark suite)
-* **Remote Sync Status:** Fully synchronized with `origin/main` at `52126f6`
+* **Commit History:** 15 conventional, semantic commits mapping each architectural layer (Latest: `32ded09` covering Milestone 22 local dataset population: 100K ChatML smishing records and 20K WhatsApp 16 kHz mono Opus deepfake evaluation suite)
+* **Remote Sync Status:** Fully synchronized with `origin/main` at `32ded09`
 
 ---
 

@@ -175,19 +175,23 @@ Downloaded all 20 assets of Cloudflare's defensive source-first `security-audit`
 ---
 
 ### Phase 6: Systematic Git Commit & Publication to GitHub
-Initialized local Git repository on branch `main` and executed a semantic, 8-commit conventional progression pushed to **`https://github.com/abdullah00ashraf/HARES`**:
+Initialized local Git repository on branch `main` and executed a semantic, 15-commit conventional progression pushed to **`https://github.com/abdullah00ashraf/HARES`**:
 
-1. `cdac05a`: `docs: initialize foundational specifications and architectural blueprints`
-2. `4adff43`: `feat(agent): configure governance rules, skills, and security audit frameworks`
-3. `6de700e`: `feat(core): implement packaging, configuration, and cryptographic security layer`
-4. `5850068`: `feat(infra): add multi-stage Dockerfile and tri-network docker-compose topology`
-5. `629fcf4`: `feat(webhook): implement sub-50ms FastAPI ingress and Celery worker triage pipeline`
-6. `ebb36fd`: `test(unit): add hermetic unit and integration test suite`
-7. `0224667`: `docs(ledger): record system blueprint and development history ledger`
-8. `316eb4f`: `docs(ledger): record repository publication to GitHub in development history`
-9. `5eacc55`: `docs(blueprint): record source control state in SYSTEM_STATE.md`
-10. `268b75a`: `docs(history): record Session 1 context in history.md and history.json`
-11. `48a50b5`: `feat(core): complete Phases 2-5, Next.js dashboard, security audits, and open-source registry`
+1. `6de700e`: `feat(core): implement packaging, configuration, and cryptographic security layer`
+2. `5850068`: `feat(infra): add multi-stage Dockerfile and tri-network docker-compose topology`
+3. `629fcf4`: `feat(webhook): implement sub-50ms FastAPI ingress and Celery worker triage pipeline`
+4. `ebb36fd`: `test(unit): add hermetic unit and integration test suite`
+5. `0224667`: `docs(ledger): record system blueprint and development history ledger`
+6. `316eb4f`: `docs(ledger): record repository publication to GitHub in development history`
+7. `5eacc55`: `docs(blueprint): record source control state in SYSTEM_STATE.md`
+8. `268b75a`: `docs(history): record Session 1 context in history.md and history.json`
+9. `48a50b5`: `feat(core): complete Phases 2-5, Next.js dashboard, security audits, and open-source registry`
+10. `a654794`: `docs(sync): update dual ledgers and history tracking Milestone 18 Git publication`
+11. `2653992`: `docs(audit): complete comprehensive Phase 5 defensive security audit (Audit 5)`
+12. `52126f6`: `feat(phase6): production hardening, GPU topology, Prometheus metrics, and 200 QPS load benchmark`
+13. `91d3e5d`: `docs(ledger): record commit 52126f6 in dual-ledger memory`
+14. `7ee553c`: `docs(audit): publish Phase 6 comprehensive defensive security audit (Audit 6)`
+15. `32ded09`: `feat(datasets): populate 100k UAE smishing corpus and 20k audio deepfake evaluation suite`
 
 All commits tracked on remote `origin/main` with zero secret leakage (`.env` strictly ignored).
 
