@@ -186,6 +186,8 @@ Initialized local Git repository on branch `main` and executed a semantic, 8-com
 7. `0224667`: `docs(ledger): record system blueprint and development history ledger`
 8. `316eb4f`: `docs(ledger): record repository publication to GitHub in development history`
 9. `5eacc55`: `docs(blueprint): record source control state in SYSTEM_STATE.md`
+10. `268b75a`: `docs(history): record Session 1 context in history.md and history.json`
+11. `48a50b5`: `feat(core): complete Phases 2-5, Next.js dashboard, security audits, and open-source registry`
 
 All commits tracked on remote `origin/main` with zero secret leakage (`.env` strictly ignored).
 
