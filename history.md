@@ -279,10 +279,12 @@ c:/HARES/
 │   ├── audit_4.md                           # Formal Audit 4 Markdown report (AUDIT-004-PHASE4-MUNICIPAL-DASHBOARD)
 │   ├── audit_4.json                         # Formal Audit 4 machine-readable structured findings
 │   ├── audit_5.md                           # Formal Audit 5 Markdown report (AUDIT-005-PHASE5-SOVEREIGN-AI-AND-MEDIA)
-│   └── audit_5.json                         # Formal Audit 5 machine-readable structured findings
+│   ├── audit_5.json                         # Formal Audit 5 machine-readable structured findings
+│   ├── audit_6.md                           # Formal Audit 6 Markdown report (AUDIT-006-PHASE6-PRODUCTION-HARDENING)
+│   └── audit_6.json                         # Formal Audit 6 machine-readable structured findings
 ├── README.md                                # Project overview & quickstart guide
 ├── SYSTEM_STATE.md                          # Living technical blueprint (v1.6.0-phase6-complete)
-├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history (Milestones 1-20)
+├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history (Milestones 1-21)
 ├── history.md                               # Complete Session 1, 2 & 3 markdown context ledger
 └── history.json                             # Complete Session 1, 2 & 3 structured JSON ledger
 ```
@@ -292,9 +294,10 @@ c:/HARES/
 ## 5. Architectural Memory & State Ledger Summary
 
 All persistent ledgers in the root directory remain synchronized with this history:
-- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000, 9090, 8001), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1 through 6 inventory, and formal audit history (Audits 1 through 5).
-- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 20 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline, Audit 5, and Phase 6 Production Hardening, Multi-Container GPU Orchestration, Observability & 200 QPS Stress Testing.
-- **Phase 6 Production Suite:** Production multi-container Docker topology with NVIDIA GPU passthrough (`docker-compose.prod.yml`), Prometheus telemetry (`/metrics`, `monitoring/prometheus.yml`, `monitoring/grafana_dashboard.json`), Mock Meta Egress Sink (`benchmarks/mock_meta_sink.py`), Locust 200 QPS load test (`benchmarks/locustfile.py`), stepped load runner (`benchmarks/run_stress_test.py`), and full remediation of all 7 audit observations (`AUDIT-OBS-14` through `AUDIT-OBS-20`).
+- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000, 9090, 8001), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1 through 6 inventory, and formal audit history (Audits 1 through 6).
+- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 21 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline, Audit 5, Phase 6 Production Hardening, Multi-Container GPU Orchestration, Observability & 200 QPS Stress Testing, and Audit 6.
+- **Phase 6 Production Suite:** Production multi-container Docker topology with NVIDIA GPU passthrough (`docker-compose.prod.yml`), Prometheus telemetry (`/metrics`, `monitoring/prometheus.yml`, `monitoring/grafana_dashboard.json`), Mock Meta Egress Sink (`benchmarks/mock_meta_sink.py`), Locust 200 QPS load test (`benchmarks/locustfile.py`), stepped load runner (`benchmarks/run_stress_test.py`), and 100% resolution of all 20 audit observations (`AUDIT-OBS-01` through `AUDIT-OBS-20`).
+- **Audit 6 Certification:** [`audit/audit_6.md`](file:///c:/HARES/audit/audit_6.md) & [`audit/audit_6.json`](file:///c:/HARES/audit/audit_6.json) certifying zero open critical/high vulnerabilities and production readiness.
 - **Hermetic Test Suite:** 89 of 89 tests passing (100% pass rate) across security hardening, Prometheus metrics, concurrent load benchmarks, core security, webhook ingress, deterministic verification engine, persistence tier, rate limiting, sovereign AI schemas, conformal calibration, audio preprocessing, deepfake classification, speech ASR, guided SLM, threat feed API, unified audio pipeline, and Celery task workers.
 
 
