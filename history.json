@@ -262,6 +262,12 @@
       "scope": "feat(core)",
       "message": "feat(core): complete Phases 2-5, Next.js dashboard, security audits, and open-source registry",
       "files_count": 2854
+    },
+    {
+      "hash": "52126f6",
+      "scope": "feat(phase6)",
+      "message": "feat(phase6): production hardening, GPU topology, Prometheus metrics, and 200 QPS load benchmark",
+      "files_count": 28
     }
   ],
   "dual_ledger_state": {
