@@ -61,7 +61,17 @@ def create_app() -> FastAPI:
     application.include_router(webhook_router, tags=["WhatsApp Webhook"])
     application.include_router(threat_feed_router, prefix="/api/v1", tags=["Municipal Threat Intelligence"])
 
+    # Prometheus Metrics Endpoint (Phase 6 Observability)
+    @application.get("/metrics", tags=["Observability"])
+    async def prometheus_metrics() -> Response:
+        """Exposes Prometheus/OpenMetrics formatted telemetry for scraper daemons."""
+        from hares.core.metrics import export_prometheus_metrics
+
+        content, content_type = export_prometheus_metrics()
+        return Response(content=content, media_type=content_type)
+
     return application
+
 
 
 app = create_app()

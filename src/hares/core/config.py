@@ -58,6 +58,8 @@ class Settings(BaseSettings):
 
     # Municipal Threat Intelligence Portal Settings (FR-4.3)
     ANALYST_API_KEY: str = Field(default="hares_analyst_secret_key_2026", min_length=16)
+    ANALYST_RATE_LIMIT_PER_MINUTE: int = 120
+    STIX_SIGNING_KEY_HEX: str = ""
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
 
     @field_validator("CITIZEN_HASH_SALT")
@@ -79,6 +81,20 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "In production, ANALYST_API_KEY must be overridden via .env with a secure key >= 32 characters."
                 )
+        return value
+
+    @field_validator("CORS_ORIGINS")
+    @classmethod
+    def validate_cors_origins(cls, value: list[str], info) -> list[str]:
+        # AUDIT-OBS-15: Prevent insecure localhost CORS in production
+        env = info.data.get("ENVIRONMENT", "development")
+        if env == "production":
+            for origin in value:
+                lower_origin = origin.lower()
+                if "localhost" in lower_origin or "127.0.0.1" in lower_origin:
+                    raise ValueError(
+                        f"In production, CORS_ORIGINS cannot contain localhost or loopback addresses: {origin}"
+                    )
         return value
 
 

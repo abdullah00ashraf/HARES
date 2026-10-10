@@ -31,7 +31,12 @@ class ConformalCalibrator:
         )
 
         if calibration_scores is not None and len(calibration_scores) > 0:
-            self._calibration_scores: list[float] = sorted([float(s) for s in calibration_scores])
+            valid_scores = [
+                float(s) for s in calibration_scores if math.isfinite(float(s)) and 0.0 <= float(s) <= 1.0
+            ]
+            if not valid_scores:
+                raise ValueError("Calibration scores list contains no valid finite scores in [0.0, 1.0].")
+            self._calibration_scores: list[float] = sorted(valid_scores)
             self._synthetic_threshold = self._compute_quantile(self._calibration_scores, 1.0 - self._alpha)
         else:
             # Pre-calibrated empirical reference distribution from Curated UAE Regional Opus Suite (n=3000)
@@ -41,6 +46,7 @@ class ConformalCalibrator:
                 else (settings.CONFORMAL_THRESHOLD or self.DEFAULT_SYNTHETIC_THRESHOLD)
             )
             self._calibration_scores = self._generate_reference_distribution(self._synthetic_threshold, self._alpha)
+
 
     @staticmethod
     def _compute_quantile(sorted_scores: list[float], q: float) -> float:
@@ -85,10 +91,13 @@ class ConformalCalibrator:
         return len(self._calibration_scores)
 
     def load_calibration_scores(self, scores: Sequence[float]) -> None:
-        """Loads and sorts empirical reference calibration scores."""
+        """Loads and sorts empirical reference calibration scores with finite-value validation (AUDIT-OBS-20)."""
         if not scores:
             raise ValueError("Calibration scores list cannot be empty.")
-        self._calibration_scores = sorted([float(s) for s in scores])
+        valid_scores = [float(s) for s in scores if math.isfinite(float(s)) and 0.0 <= float(s) <= 1.0]
+        if not valid_scores:
+            raise ValueError("Calibration scores list contains no valid finite scores in [0.0, 1.0].")
+        self._calibration_scores = sorted(valid_scores)
         self._synthetic_threshold = self._compute_quantile(self._calibration_scores, 1.0 - self._alpha)
         logger.info(
             "Loaded %d reference scores. Updated synthetic_threshold=%.4f (alpha=%.4f)",
@@ -96,6 +105,7 @@ class ConformalCalibrator:
             self._synthetic_threshold,
             self._alpha,
         )
+
 
     def compute_non_conformity_score(self, bonafide_probability: float) -> float:
         """

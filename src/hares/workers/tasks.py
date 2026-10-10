@@ -121,8 +121,12 @@ def process_incoming_webhook(self, raw_payload: dict[str, Any]) -> dict[str, Any
                                 "verdict": rate_limit_verdict.verdict.value,
                                 "rule_triggered": "rate_limit_exceeded",
                             })
+                            from hares.core.metrics import record_rate_limit_rejection
+
+                            record_rate_limit_rejection("citizen")
                             processed_count += 1
                             continue
+
 
                         assigned_verdict: VerdictResult | None = None
                         triggered_indicator: str | None = None
@@ -264,6 +268,13 @@ def process_incoming_webhook(self, raw_payload: dict[str, Any]) -> dict[str, Any
                         except Exception as db_exc:
                             logger.debug("Database write skipped in offline/test context: %s", str(db_exc))
 
+                        # Prometheus Telemetry (Phase 6 Observability)
+                        from hares.core.metrics import record_e2e_latency, record_verdict
+
+                        total_duration_sec = time.perf_counter() - start_time
+                        record_e2e_latency(msg_type, assigned_verdict.verdict.value, total_duration_sec)
+                        record_verdict(assigned_verdict.verdict.value, assigned_verdict.rule_triggered)
+
                         verdict_summaries.append({
                             "message_id": msg_id,
                             "verdict": assigned_verdict.verdict.value,
@@ -272,6 +283,7 @@ def process_incoming_webhook(self, raw_payload: dict[str, Any]) -> dict[str, Any
                         })
 
                         processed_count += 1
+
                     finally:
                         # 8. Guaranteed Ephemeral in-memory memory purge (AUDIT-OBS-08, FR-4.1)
                         if "recipient_phone" in locals():

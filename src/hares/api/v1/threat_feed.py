@@ -285,12 +285,20 @@ async def export_stix_bundle() -> Response:
     }
 
     import json
+    from hares.core.security import sign_stix_bundle
+
     content = json.dumps(bundle, indent=2)
+    ecdsa_sig = sign_stix_bundle(content)
+
     return Response(
         content=content,
         media_type="application/json",
-        headers={"Content-Disposition": 'attachment; filename="hares_stix21_feed.json"'},
+        headers={
+            "Content-Disposition": 'attachment; filename="hares_stix21_feed.json"',
+            "X-Hares-Bundle-Signature": ecdsa_sig,
+        },
     )
+
 
 
 @router.get("/export/csv", status_code=status.HTTP_200_OK)

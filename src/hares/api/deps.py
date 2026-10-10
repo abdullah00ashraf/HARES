@@ -40,4 +40,19 @@ async def verify_analyst_key(
             detail="Invalid Municipal Analyst API Key. Access denied.",
         )
 
+    # AUDIT-OBS-14: Enforce token-bucket rate limiting per analyst key
+    import hashlib
+    from hares.services.rate_limiter import RedisTokenBucketRateLimiter
+
+    limiter = RedisTokenBucketRateLimiter()
+    key_hash = hashlib.sha256(candidate_key.encode("utf-8")).hexdigest()[:16]
+    rl_result = limiter.check_analyst_rate_limit(key_hash, max_requests=settings.ANALYST_RATE_LIMIT_PER_MINUTE)
+    if not rl_result.is_allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Municipal Analyst API rate limit exceeded ({rl_result.max_allowed} requests/minute). Please throttle requests.",
+            headers={"Retry-After": str(rl_result.reset_seconds)},
+        )
+
     return candidate_key
+

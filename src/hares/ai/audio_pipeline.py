@@ -103,13 +103,14 @@ class UnifiedAudioTriage:
         self._whisper_model: Any = None
 
     def _load_head_weights(self, weights_path: str) -> None:
-        """Loads pretrained state dict into WhisperDeepfakeMLPHead."""
+        """Loads pretrained state dict into WhisperDeepfakeMLPHead (AUDIT-OBS-18)."""
         try:
-            state_dict = torch.load(weights_path, map_location="cpu")
+            state_dict = torch.load(weights_path, map_location="cpu", weights_only=True)
             self.deepfake_head.load_state_dict(state_dict)
             logger.info("Loaded Whisper deepfake head weights from %s", weights_path)
         except Exception as exc:
             logger.warning("Could not load deepfake head weights from %s: %s", weights_path, str(exc))
+
 
     def process(self, audio_bytes: bytes, filename_hint: str = "voice.ogg") -> UnifiedAudioTriageResult:
         """

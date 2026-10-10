@@ -59,8 +59,8 @@ class LocalSLMClient:
                 reasoning_summary="Empty message text.",
             )
 
-        # 1. Defend against prompt injection via XML delimitation & tag escaping (NFR-1.3)
-        escaped_text = sanitized_text.replace("</citizen_forwarded_text>", "")
+        # 1. Defend against prompt injection via XML delimitation & tag escaping (NFR-1.3, AUDIT-OBS-17)
+        escaped_text = re.sub(r"</citizen_forwarded_text>", "", sanitized_text, flags=re.IGNORECASE)
         bounded_prompt = f"<citizen_forwarded_text>\n{escaped_text}\n</citizen_forwarded_text>"
 
         # If mock mode is explicitly requested, jump directly to deterministic heuristics

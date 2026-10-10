@@ -1,0 +1,79 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "title": "Webhook Ingress Latency (p99 vs 50ms SLA)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(hares_webhook_ingress_latency_seconds_bucket[1m])) by (le)) * 1000",
+          "legendFormat": "p99 Ingress (ms)"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(hares_webhook_ingress_latency_seconds_bucket[1m])) by (le)) * 1000",
+          "legendFormat": "p95 Ingress (ms)"
+        },
+        {
+          "expr": "50",
+          "legendFormat": "SLA Ceiling (50ms)"
+        }
+      ]
+    },
+    {
+      "title": "End-to-End Triage Latency by Modality (p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(hares_triage_e2e_latency_seconds_bucket{payload_type=\"text\"}[1m])) by (le))",
+          "legendFormat": "Text p95 (s)"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(hares_triage_e2e_latency_seconds_bucket{payload_type=~\"audio|voice\"}[1m])) by (le))",
+          "legendFormat": "Audio p95 (s)"
+        }
+      ]
+    },
+    {
+      "title": "Triage Verdict Distribution Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(hares_triage_verdicts_total[1m])) by (verdict)",
+          "legendFormat": "{{verdict}}"
+        }
+      ]
+    },
+    {
+      "title": "Redis Queue Depths (Equilibrium Monitoring)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "hares_queue_depth",
+          "legendFormat": "{{queue_name}}"
+        }
+      ]
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 38,
+  "tags": ["hares", "dubai-security", "telemetry"],
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "title": "Project Hares Sovereign Operational Dashboard",
+  "uid": "hares-ops-prod",
+  "version": 1
+}

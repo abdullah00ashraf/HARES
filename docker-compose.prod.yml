@@ -1,0 +1,262 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hares-api
+    restart: always
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+    ports:
+      - "8000:8000"
+    networks:
+      - hares_ingress
+      - hares_internal
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+        reservations:
+          cpus: "1.0"
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  worker-text:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hares-worker-text
+    restart: always
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+    command: [
+      "celery",
+      "-A", "hares.workers.celery_app.celery_app",
+      "worker",
+      "--loglevel=info",
+      "-Q", "high_priority_triage",
+      "-c", "4",
+      "--max-tasks-per-child=1000"
+    ]
+    networks:
+      - hares_internal
+      - hares_egress
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  worker-media:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hares-worker-media
+    restart: always
+    env_file: .env
+    environment:
+      ENVIRONMENT: production
+      ASR_DEVICE: cuda
+    command: [
+      "celery",
+      "-A", "hares.workers.celery_app.celery_app",
+      "worker",
+      "--loglevel=info",
+      "-Q", "media_triage",
+      "-c", "2",
+      "--max-tasks-per-child=500"
+    ]
+    networks:
+      - hares_internal
+      - hares_egress
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "8.0"
+          memory: 16G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  slm:
+    image: vllm/vllm-openai:v0.6.2
+    container_name: hares-slm
+    restart: always
+    ports:
+      - "8001:8000"
+    command: [
+      "--model", "Qwen/Qwen2.5-3B-Instruct",
+      "--dtype", "bfloat16",
+      "--max-model-len", "2048",
+      "--gpu-memory-utilization", "0.85",
+      "--enforce-eager"
+    ]
+    networks:
+      - hares_internal
+    deploy:
+      resources:
+        limits:
+          memory: 16G
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  dashboard:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hares-dashboard
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - hares_ingress
+      - hares_internal
+    depends_on:
+      api:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  db:
+    image: postgres:16-alpine
+    container_name: hares-db
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hares_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_postgres_password_here}
+      POSTGRES_DB: ${POSTGRES_DB:-hares_threat_db}
+    volumes:
+      - hares_postgres_data:/var/lib/postgresql/data
+    networks:
+      - hares_internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hares_admin} -d ${POSTGRES_DB:-hares_threat_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 8G
+
+  redis:
+    image: redis:7-alpine
+    container_name: hares-redis
+    restart: always
+    command: [
+      "redis-server",
+      "--requirepass", "${REDIS_PASSWORD:-secure_redis_password_here}",
+      "--maxmemory", "2gb",
+      "--maxmemory-policy", "noeviction"
+    ]
+    volumes:
+      - hares_redis_data:/data
+    networks:
+      - hares_internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-secure_redis_password_here}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: hares-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - hares_ingress
+      - hares_internal
+    depends_on:
+      api:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 2G
+
+networks:
+  hares_ingress:
+    name: hares_ingress
+    driver: bridge
+  hares_internal:
+    name: hares_internal
+    driver: bridge
+    internal: true
+  hares_egress:
+    name: hares_egress
+    driver: bridge
+
+volumes:
+  hares_postgres_data:
+    name: hares_postgres_data
+  hares_redis_data:
+    name: hares_redis_data

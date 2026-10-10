@@ -81,6 +81,52 @@ class RedisTokenBucketRateLimiter:
                 reset_seconds=self._window_seconds,
             )
 
+    def check_analyst_rate_limit(
+        self,
+        analyst_identifier: str,
+        max_requests: int | None = None,
+        window_seconds: int = 60,
+    ) -> RateLimitResult:
+        """
+        Atomically limits requests per analyst API key (AUDIT-OBS-14) (default: 120 req/min).
+        Protects municipal threat feeds against runaway automated scrapers and denial-of-service.
+        """
+        settings = get_settings()
+        limit = max_requests if max_requests is not None else settings.ANALYST_RATE_LIMIT_PER_MINUTE
+        key = f"rl:analyst:{analyst_identifier.strip().lower()}"
+        try:
+            try:
+                res = self._redis.eval(self._LUA_RATE_LIMIT_SCRIPT, 1, key, window_seconds)
+                if isinstance(res, (list, tuple)) and len(res) >= 2:
+                    count = int(res[0])
+                    ttl = int(res[1])
+                else:
+                    count = int(res)
+                    ttl = window_seconds
+            except (redis.ResponseError, AttributeError):
+                count = self._redis.incr(key)
+                if count == 1:
+                    self._redis.expire(key, window_seconds)
+                ttl = self._redis.ttl(key)
+
+            reset_seconds = ttl if ttl > 0 else window_seconds
+            is_allowed = count <= limit
+
+            return RateLimitResult(
+                is_allowed=is_allowed,
+                current_count=count,
+                max_allowed=limit,
+                reset_seconds=reset_seconds,
+            )
+        except redis.RedisError as exc:
+            logger.error("Redis connection error during analyst rate limiting check: %s", str(exc))
+            return RateLimitResult(
+                is_allowed=True,
+                current_count=1,
+                max_allowed=limit,
+                reset_seconds=window_seconds,
+            )
+
     def reset_limit(self, citizen_user_hash: str) -> None:
         """Clears rate limit key for testing or administrative resets."""
         key = f"rl:citizen:{citizen_user_hash.strip().lower()}"

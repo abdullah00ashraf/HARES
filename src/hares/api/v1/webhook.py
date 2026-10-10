@@ -1,3 +1,4 @@
+import time
 from fastapi import APIRouter, Header, HTTPException, Query, Request, Response, status
 from hares.core.config import get_settings
 from hares.core.security import verify_meta_signature
@@ -37,6 +38,7 @@ async def receive_webhook_payload(
     payload_bytes = await request.body()
 
     # 1. Cryptographic Signature Validation
+    start_time = time.perf_counter()
     if not verify_meta_signature(payload_bytes, x_hub_signature_256, settings.WHATSAPP_APP_SECRET):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid payload signature")
 
@@ -55,5 +57,9 @@ async def receive_webhook_payload(
         expires=settings.REDIS_EPHEMERAL_PAYLOAD_TTL_SECONDS,
     )
 
-    # 3. Sub-50ms Response Acknowledgment
+    # 3. Sub-50ms Response Acknowledgment & Metrics Telemetry
+    from hares.core.metrics import record_ingress_latency
+
+    record_ingress_latency(time.perf_counter() - start_time)
     return {"status": "queued"}
+

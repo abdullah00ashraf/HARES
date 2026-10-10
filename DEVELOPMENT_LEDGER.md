@@ -205,7 +205,38 @@
 * **Decision Taken & Rationale:**
   - Adhered strictly to Cloudflare Defensive Source-First Audit standards. Classified all 4 observations honestly (two Low, two Informational) without fabricating false criticals, noting that deterministic allowlist and prompt boundaries already prevent execution bypasses.
 * **Errors/Issues Encountered:** None. Full hermetic test suite executed with zero failures.
-* **Rectification/Resolution:** N/A. All deliverables verified.
+### 2026-10-10 07:50:00 UTC - Milestone 20: Phase 6 Production Hardening, Multi-Container GPU Orchestration, Observability & 200 QPS E2E Stress Testing
+* **Development Made:**
+  1. **Security Hardening Remediations (Deliverable 6.1):**
+     - Remediated `AUDIT-OBS-14`: Implemented Redis token-bucket analyst rate limiter (120 req/min per analyst API key emitting HTTP 429).
+     - Remediated `AUDIT-OBS-15`: Added production CORS origin validation rejecting `localhost` and `127.0.0.1` when `ENVIRONMENT="production"`.
+     - Remediated `AUDIT-OBS-16`: Implemented ECDSA SECP256R1 cryptographic signatures on STIX 2.1 JSON threat intelligence bundles emitted via detached `X-Hares-Bundle-Signature` header.
+     - Remediated `AUDIT-OBS-17`: Applied case-insensitive regex XML tag stripping (`re.sub(r"</citizen_forwarded_text>", "", text, flags=re.IGNORECASE)`) in `SLMClient`.
+     - Remediated `AUDIT-OBS-18`: Added `weights_only=True` to `torch.load` state dictionary ingestion in `src/hares/ai/audio_pipeline.py`.
+     - Remediated `AUDIT-OBS-19`: Implemented sanitized subprocess environment (`PATH`, `SYSTEMROOT`) in `AudioPreprocessor` stripping sensitive database and secret keys from child FFmpeg media processes.
+     - Remediated `AUDIT-OBS-20`: Added finite-value and unit interval $[0.0, 1.0]$ validation to `ConformalCalibrator` calibration score ingestion.
+  2. **Prometheus Observability & Real-Time Telemetry (Deliverable 6.2):**
+     - Implemented `src/hares/core/metrics.py` defining custom Prometheus collectors for webhook ingress latency, E2E triage latency, Celery queue depth, verdict distributions, rate limit rejections, and conformal p-values.
+     - Mounted `GET /metrics` on FastAPI gateway in `src/hares/main.py`.
+     - Created `monitoring/prometheus.yml` (5s scrape interval) and `monitoring/grafana_dashboard.json` (operational dashboard).
+  3. **Multi-Container Production Docker Topology (Deliverable 6.3):**
+     - Authored `docker-compose.prod.yml` featuring NVIDIA GPU device reservations for `hares-worker-media` and `hares-slm`, partitioned worker pools (text concurrency 4, media concurrency 2), JSON log rotation, and complete internal network isolation.
+  4. **Distributed Locust E2E 200 QPS Benchmark Suite (Deliverable 6.4):**
+     - Created `benchmarks/mock_meta_sink.py`: Standalone FastAPI server capturing worker dispatches, streaming synthetic Opus voice notes, and calculating round-trip triage latency $\Delta t = t_{outbound} - t_{inbound}$.
+     - Created `benchmarks/traffic_payloads.py`: Modular payload generation and dynamic HMAC-SHA256 signature calculations.
+     - Created `benchmarks/locustfile.py`: Pure-Python Locust load generator with weighted 85 text / 15 audio tasks and nanosecond timestamps.
+     - Created `benchmarks/run_stress_test.py`: Stepped load orchestrator (50 -> 100 -> 200 QPS) with automated SLA markdown report generator.
+  5. **Automated Verification & Test Expansion (Deliverable 6.5):**
+     - Added `tests/test_audit_hardening.py` (13 tests verifying all audit observations), `tests/test_metrics.py` (2 tests), and `tests/test_load_benchmark.py` (3 tests verifying sub-50ms ingress and mock Meta sink).
+     - Executed full test suite: **89 of 89 tests PASSED in 128s (100% pass rate)**.
+* **Decision Taken & Rationale:**
+  - Separated traffic payload logic into `benchmarks/traffic_payloads.py` to prevent `gevent` monkey-patching collision with `anyio`/`asyncio` inside `pytest`, allowing hermetic automated benchmark testing alongside standalone Locust execution.
+  - Maintained zero-mockup / zero-placeholder compliance across all benchmark and production orchestrator files.
+* **Errors/Issues Encountered:**
+  - Initial `locust` import in pytest process triggered `gevent` monkey-patching warning on previously imported `ssl` module.
+* **Rectification/Resolution:**
+  - Decoupled payload structures into `benchmarks/traffic_payloads.py` without top-level gevent dependency, enabling 100% test suite stability.
+
 
 
 

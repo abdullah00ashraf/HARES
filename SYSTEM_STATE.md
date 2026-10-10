@@ -1,8 +1,8 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Phase 5 Completed & Verified (Unified Whisper Dual-Head Pipeline, Audio Opus Normalizer, Conformal Calibration Engine, Sovereign SLM Guided Decoding, and Open-Source Asset Registry)  
+**Current Status:** Phase 6 Completed & Verified (Production Hardening, Prometheus Telemetry, Multi-Container GPU Topology, 200 QPS Distributed Locust Stress Testing, and Zero-Guess SLA Verification)  
 **Last Updated:** 2026-10-10  
-**Version:** 1.5.0-phase5-complete  
+**Version:** 1.6.0-phase6-complete  
 
 ---
 
@@ -10,12 +10,14 @@
 
 | Service Name | Container / Process | Port | Binding | Protocol | Purpose |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **FastAPI Gateway** | `hares-api` | `8000` | `0.0.0.0:8000` | HTTP/REST | WhatsApp Webhook Ingress (`/webhook`), Health Probes, Municipal Threat Feed API (`/api/v1/threats/*`) |
+| **FastAPI Gateway** | `hares-api` | `8000` | `0.0.0.0:8000` | HTTP/REST | WhatsApp Webhook Ingress (`/webhook`), Health Probes, Metrics (`/metrics`), Municipal Threat Feed API (`/api/v1/threats/*`) |
 | **Celery Text Worker**| `hares-worker-text`| N/A | Internal | AMQP/Redis | Rapid text & URL triage tasks (<1.5s SLA) (`high_priority_triage`) |
-| **Celery Media Worker**| `hares-worker-media`| N/A| Internal | AMQP/Redis | Audio deepfake transcoding & ASR inference (<4.5s SLA) (`media_triage`) |
+| **Celery Media Worker**| `hares-worker-media`| N/A| Internal | AMQP/Redis | Audio deepfake transcoding & ASR inference (<4.5s SLA) (`media_triage`) (NVIDIA GPU Passthrough) |
 | **Redis Broker/Cache**| `hares-redis` | `6379` | `127.0.0.1:6379` | RESP | Celery task message broker and citizen token-bucket rate limiter (NFR-1.3)|
 | **PostgreSQL DB** | `hares-db` | `5432` | `127.0.0.1:5432` | TCP/PostgreSQL| Class A threat intelligence repository and audit logging |
-| **Local SLM Service** | `hares-slm` | `11434` / `8001` | Internal | HTTP (vLLM/Ollama)| Local sovereign language model text triage (NFR-1.1) |
+| **Local SLM Service** | `hares-slm` | `11434` / `8001` | Internal | HTTP (vLLM/Ollama)| Local sovereign language model text triage (NFR-1.1) (NVIDIA GPU Passthrough) |
+| **Prometheus Telemetry**| `hares-prometheus`| `9090` | `0.0.0.0:9090` | HTTP/Prometheus| High-frequency metrics scraping (5s interval) and SLA alerting |
+| **Mock Meta Sink** | `mock-meta-sink` | `8001` | `0.0.0.0:8001` | HTTP/FastAPI | E2E turnaround tracking (Delta t = t_outbound - t_inbound) and synthetic media streaming |
 | **Next.js Dashboard** | `hares-dashboard` | `3000` | `0.0.0.0:3000` | HTTP | Air-gapped Municipal Threat Intelligence Portal (Analysts & SOC) |
 
 ### Network Topologies & Egress Isolation
@@ -190,14 +192,19 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **Open-Source Asset Registry**| `opensource/` | 11 synchronized upstream git repos, 5 benchmark evaluation datasets, and 3 model profiles | Verified (100% synchronized) |
 | **Two-Stage Media Fetcher** | `src/hares/services/media_downloader.py` | Two-stage WhatsApp Cloud API media retriever (GET /media_id + GET binary stream) | Verified (100% tests passing) |
 | **WhatsApp Outbound Dispatch**| `src/hares/services/whatsapp_client.py` | Outbound WhatsApp client with official Dubai Police e-Crime escalation (FR-3.1, FR-3.2) | Verified (100% tests passing) |
-| **Threat Feed API** | `src/hares/api/v1/threat_feed.py` | Municipal Class A IoC feeds, campaigns, homographs, STIX 2.1 & CSV exports (FR-4.3) | Verified (100% tests passing) |
-| **Analyst Security Dep** | `src/hares/api/deps.py` | Municipal analyst API key validation with production entropy enforcement | Verified (100% tests passing) |
+| **Threat Feed API** | `src/hares/api/v1/threat_feed.py` | Municipal Class A IoC feeds, campaigns, homographs, STIX 2.1 & CSV exports with ECDSA SECP256R1 signatures (FR-4.3, AUDIT-OBS-16) | Verified (100% tests passing) |
+| **Analyst Security Dep** | `src/hares/api/deps.py` | Municipal analyst API key validation with 120 req/min rate limiter (AUDIT-OBS-14) | Verified (100% tests passing) |
 | **Active Health Readiness** | `src/hares/api/v1/health.py` | Active SELECT 1 on DB & PING on Redis (AUDIT-OBS-10) emitting 503 if down | Verified (100% tests passing) |
 | **Media CDN SSRF Shield** | `src/hares/services/media_downloader.py` | Meta CDN hostname verification against malicious SSRF injection (AUDIT-OBS-11) | Verified (100% tests passing) |
 | **Queue Worker Partitioning**| `src/hares/workers/celery_app.py` | Dedicated worker process pools for text vs media queues (AUDIT-OBS-12) | Verified (100% tests passing) |
 | **Phone Sanitizing Filter** | `src/hares/core/logging.py` | Global logging filter scrubbing telephone numbers from logs and tracebacks (AUDIT-OBS-13) | Verified (100% tests passing) |
 | **Next.js 15 Portal** | `frontend/` | 100% air-gapped zero-SaaS operations portal with decoupled 60 FPS HTML5 Canvas | Verified (Build succeeds) |
-| **Hermetic Test Suite (v5)** | `tests/` | 77 automated unit & integration tests across security, DB, engine, AI, media, threat feeds, unified audio pipeline, and workers | 77/77 tests PASSED (100%) |
+| **Prometheus Telemetry**| `src/hares/core/metrics.py` | OpenMetrics `/metrics` endpoint, custom histograms for ingress, E2E turnaround, and queue equilibrium | Verified (100% tests passing) |
+| **Production GPU Topology**| `docker-compose.prod.yml` | Multi-container compose with NVIDIA GPU passthrough for Whisper/AASIST & vLLM, dual Celery pools | Verified (`docker compose config` valid) |
+| **Mock Meta Egress Sink** | `benchmarks/mock_meta_sink.py` | Standalone FastAPI sink tracking E2E latency Delta t = t_outbound - t_inbound and serving synthetic Opus media | Verified (100% tests passing) |
+| **Locust 200 QPS Harness** | `benchmarks/locustfile.py` | Pure Python load generator with 85/15 text/audio split, nanosecond timestamps, and dynamic HMAC signatures | Verified (100% tests passing) |
+| **Benchmark Orchestrator**| `benchmarks/run_stress_test.py` | Stepped load runner (50 -> 100 -> 200 QPS) and automated SLA markdown report generator | Verified (CLI runs cleanly) |
+| **Hermetic Test Suite (v6)** | `tests/` | 89 automated unit & integration tests across security hardening, Prometheus metrics, concurrent load benchmarks, AI, media, and threat feeds | 89/89 tests PASSED (100%) |
 
 ---
 

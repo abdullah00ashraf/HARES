@@ -145,8 +145,15 @@ class AudioPreprocessor:
             err_msg = exc.stderr.decode("utf-8", errors="ignore") if exc.stderr else str(exc)
             raise ValueError(f"ffmpeg-python audio transcoding failed: {err_msg}")
 
+    @staticmethod
+    def _get_sanitized_subprocess_env() -> dict[str, str]:
+        """Returns a minimal, sanitized environment dictionary for child FFmpeg processes (AUDIT-OBS-19)."""
+        import os
+        safe_keys = ["PATH", "SYSTEMROOT", "WINDIR", "TMP", "TEMP", "LD_LIBRARY_PATH"]
+        return {k: os.environ[k] for k in safe_keys if k in os.environ}
+
     def _transcode_via_ffmpeg(self, audio_bytes: bytes) -> tuple[bytes, float]:
-        """Streams audio through system FFmpeg subprocess to produce 16kHz mono s16le PCM."""
+        """Streams audio through system FFmpeg subprocess with sanitized environment (AUDIT-OBS-19)."""
         cmd = [
             "ffmpeg",
             "-loglevel", "error",
@@ -163,10 +170,12 @@ class AudioPreprocessor:
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
+                env=self._get_sanitized_subprocess_env(),
             )
             out_pcm, err = process.communicate(input=audio_bytes, timeout=10)
             if process.returncode != 0 or not out_pcm:
                 raise ValueError(f"FFmpeg audio transcoding failed: {err.decode('utf-8', errors='ignore')}")
+
 
             num_samples = len(out_pcm) // self.BYTES_PER_SAMPLE
             duration = num_samples / float(self.TARGET_SAMPLE_RATE)
@@ -214,8 +223,15 @@ class AudioPreprocessor:
                 "pipe:1",
             ]
             try:
-                proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                proc = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    env=AudioPreprocessor._get_sanitized_subprocess_env(),
+                )
                 opus_data, _ = proc.communicate(input=pcm_bytes, timeout=10)
+
                 if proc.returncode == 0 and opus_data:
                     return opus_data
             except Exception:
