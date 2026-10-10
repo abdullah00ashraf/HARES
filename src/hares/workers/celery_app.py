@@ -22,5 +22,6 @@ celery_app.conf.update(
     task_default_queue="high_priority_triage",
     task_routes={
         "hares.process_incoming_webhook": {"queue": "high_priority_triage"},
+        "hares.process_audio_triage": {"queue": "media_triage"},
     },
 )

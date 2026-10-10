@@ -22,14 +22,14 @@ services:
       timeout: 5s
       retries: 3
 
-  worker:
+  worker-text:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: hares-worker
+    container_name: hares-worker-text
     restart: always
     env_file: .env
-    command: ["celery", "-A", "hares.workers.celery_app.celery_app", "worker", "--loglevel=info", "-Q", "high_priority_triage,media_triage", "-c", "4"]
+    command: ["celery", "-A", "hares.workers.celery_app.celery_app", "worker", "--loglevel=info", "-Q", "high_priority_triage", "-c", "4"]
     networks:
       - hares_internal
       - hares_egress
@@ -37,6 +37,38 @@ services:
       redis:
         condition: service_healthy
       db:
+        condition: service_healthy
+
+  worker-media:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hares-worker-media
+    restart: always
+    env_file: .env
+    command: ["celery", "-A", "hares.workers.celery_app.celery_app", "worker", "--loglevel=info", "-Q", "media_triage", "-c", "2"]
+    networks:
+      - hares_internal
+      - hares_egress
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
+  dashboard:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hares-dashboard
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - hares_ingress
+      - hares_internal
+    depends_on:
+      api:
         condition: service_healthy
 
   db:

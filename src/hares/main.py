@@ -1,26 +1,48 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 from hares.core.config import get_settings
+from hares.core.logging import configure_logging
 from hares.api.v1.webhook import router as webhook_router
 from hares.api.v1.health import router as health_router
+from hares.api.v1.threat_feed import router as threat_feed_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Lifespan context manager for resource initialization and teardown."""
-    # Startup sequence
+    settings = get_settings()
+    configure_logging(level=settings.LOG_LEVEL)
+
+    # Initialize in-memory SQLite schema in local/testing environment
+    if "sqlite" in settings.DATABASE_URL:
+        from hares.db.models import Base
+        from hares.db.session import async_engine
+        async with async_engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+
     yield
-    # Teardown sequence
 
 
 def create_app() -> FastAPI:
     """Application factory configuring routers, security headers, and middleware."""
     settings = get_settings()
+    configure_logging(level=settings.LOG_LEVEL)
+
     application = FastAPI(
         title=settings.PROJECT_NAME,
         version="0.1.0",
         lifespan=lifespan,
+    )
+
+    # CORS Middleware for Internal Municipal Analyst Dashboard
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["GET", "POST", "OPTIONS"],
+        allow_headers=["*"],
     )
 
     # Enterprise Security Headers Middleware (NFR-1.3)
@@ -37,6 +59,7 @@ def create_app() -> FastAPI:
     # Master Routers
     application.include_router(health_router, tags=["Health"])
     application.include_router(webhook_router, tags=["WhatsApp Webhook"])
+    application.include_router(threat_feed_router, prefix="/api/v1", tags=["Municipal Threat Intelligence"])
 
     return application
 

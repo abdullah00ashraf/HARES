@@ -41,7 +41,14 @@ async def receive_webhook_payload(
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid payload signature")
 
     # 2. Broker-Level Ephemeral Queue Dispatch (FR-3.3 & FR-4.1)
-    raw_payload = await request.json()
+    try:
+        raw_payload = await request.json()
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Malformed JSON payload",
+        ) from exc
+
     process_incoming_webhook.apply_async(
         args=[raw_payload],
         queue="high_priority_triage",

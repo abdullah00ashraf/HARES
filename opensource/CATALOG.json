@@ -1,0 +1,174 @@
+{
+  "catalog_version": "1.0.0",
+  "project": "Project Hares (Dubai Automated Fraud Triage & Threat Intelligence System)",
+  "compliance": ["NFR-1.1", "FR-3.3", "FR-1.x", "FR-2.x", "FR-4.1"],
+  "last_updated": "2026-10-10",
+  "repositories": [
+    {
+      "id": "repo-deepfake-whisper-features",
+      "name": "deepfake-whisper-features",
+      "category": "audio_deepfake",
+      "local_path": "opensource/repositories/audio_deepfake/deepfake-whisper-features",
+      "upstream_url": "https://github.com/piotrkawa/deepfake-whisper-features.git",
+      "architecture": "Unified Whisper Acoustic Extraction + SpecRNet / LCNN MLP Head",
+      "license": "MIT",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-aasist",
+      "name": "aasist",
+      "category": "audio_deepfake",
+      "local_path": "opensource/repositories/audio_deepfake/aasist",
+      "upstream_url": "https://github.com/clovaai/aasist.git",
+      "architecture": "Integrated Spectro-Temporal Graph Attention Networks (Raw Waveform)",
+      "license": "BSD-3-Clause",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-asvspoof2021-air",
+      "name": "ASVspoof2021_AIR",
+      "category": "audio_deepfake",
+      "local_path": "opensource/repositories/audio_deepfake/asvspoof2021_air",
+      "upstream_url": "https://github.com/yzyouzhang/ASVspoof2021_AIR.git",
+      "architecture": "Acoustic Impairment Robustness & Codec Degradation Simulators",
+      "license": "Apache-2.0",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-faster-whisper",
+      "name": "faster-whisper",
+      "category": "asr",
+      "local_path": "opensource/repositories/asr/faster-whisper",
+      "upstream_url": "https://github.com/SYSTRAN/faster-whisper.git",
+      "architecture": "CTranslate2 INT8 Re-implementation of OpenAI Whisper",
+      "license": "MIT",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-marbert",
+      "name": "marbert",
+      "category": "nlp_arabic",
+      "local_path": "opensource/repositories/nlp_arabic/marbert",
+      "upstream_url": "https://github.com/UBC-NLP/marbert.git",
+      "architecture": "Dialectal Arabic Transformer (Gulf, Levantine, Egyptian)",
+      "license": "Apache-2.0",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-arabert",
+      "name": "arabert",
+      "category": "nlp_arabic",
+      "local_path": "opensource/repositories/nlp_arabic/arabert",
+      "upstream_url": "https://github.com/aub-mind/arabert.git",
+      "architecture": "Modern Standard Arabic BERT & Farasa Segmentation Preprocessors",
+      "license": "Apache-2.0",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-camel-tools",
+      "name": "camel_tools",
+      "category": "nlp_arabic",
+      "local_path": "opensource/repositories/nlp_arabic/camel_tools",
+      "upstream_url": "https://github.com/CAMeL-Lab/camel_tools.git",
+      "architecture": "NYU Abu Dhabi Dialect Identification & Morphological Analyzer",
+      "license": "MIT",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-outlines",
+      "name": "outlines",
+      "category": "structured_generation",
+      "local_path": "opensource/repositories/structured_generation/outlines",
+      "upstream_url": "https://github.com/outlines-dev/outlines.git",
+      "architecture": "Finite-State Machine (FSM) Logit Masking for Guided JSON Decoding",
+      "license": "Apache-2.0",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-nonconformist",
+      "name": "nonconformist",
+      "category": "conformal",
+      "local_path": "opensource/repositories/conformal/nonconformist",
+      "upstream_url": "https://github.com/donlnz/nonconformist.git",
+      "architecture": "Distribution-Free Split-Conformal Prediction Framework",
+      "license": "BSD-3-Clause",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-conformal-classification",
+      "name": "conformal_classification",
+      "category": "conformal",
+      "local_path": "opensource/repositories/conformal/conformal_classification",
+      "upstream_url": "https://github.com/aangelopoulos/conformal_classification.git",
+      "architecture": "PyTorch Conformal Classification Set Predictors (Angelopoulos)",
+      "license": "MIT",
+      "status": "synchronized"
+    },
+    {
+      "id": "repo-mapie",
+      "name": "MAPIE",
+      "category": "conformal",
+      "local_path": "opensource/repositories/conformal/MAPIE",
+      "upstream_url": "https://github.com/scikit-learn-contrib/MAPIE.git",
+      "architecture": "Model Agnostic Prediction Interval Estimator (Scikit-Learn Contrib)",
+      "license": "BSD-3-Clause",
+      "status": "synchronized"
+    }
+  ],
+  "datasets": [
+    {
+      "id": "dataset-uae-opus-suite",
+      "name": "Curated UAE Regional Opus Calibration Suite",
+      "local_path": "opensource/datasets/uae_regional_opus_suite",
+      "sample_count": 3000,
+      "purpose": "Empirical non-parametric conformal calibration (FPR <= 0.1% at 95% confidence)"
+    },
+    {
+      "id": "dataset-synthetic-voice-eval",
+      "name": "Synthetic Voice Evaluation Benchmark",
+      "local_path": "opensource/datasets/synthetic_voice_eval",
+      "sample_count": 1000,
+      "purpose": "Acoustic spoof recall across Diffusion, Flow-Matching, Codec, and VC engines"
+    },
+    {
+      "id": "dataset-localized-fraud-corpus",
+      "name": "Localized UAE Text & SMS Fraud Corpus",
+      "local_path": "opensource/datasets/localized_fraud_corpus",
+      "sample_count": 2000,
+      "purpose": "Dialectal smishing triage benchmark (Traffic Fines, Courier, KYC Freeze)"
+    },
+    {
+      "id": "dataset-adversarial-injection-suite",
+      "name": "Adversarial Jailbreak & Injection Suite",
+      "local_path": "opensource/datasets/adversarial_injection_suite",
+      "sample_count": 500,
+      "purpose": "Stress-test prompt injection containment (100% containment gate)"
+    },
+    {
+      "id": "dataset-official-domains-allowlist",
+      "name": "Official UAE Registrable Domain Allowlist",
+      "local_path": "opensource/datasets/official_domains_allowlist",
+      "purpose": "Deterministic exact-match allowlist for UAE government and financial portals"
+    }
+  ],
+  "models": [
+    {
+      "id": "model-whisper-dual-head",
+      "name": "Whisper Dual-Head Deepfake & ASR Architecture",
+      "local_path": "opensource/models/whisper_dual_head",
+      "type": "Neural Acoustic Feature Extractor + MLP Head"
+    },
+    {
+      "id": "model-slm-guided",
+      "name": "Sovereign SLM Guided JSON Decoding Engine",
+      "local_path": "opensource/models/slm_guided",
+      "type": "Outlines FSM Grammar & vLLM JSON Schema"
+    },
+    {
+      "id": "model-conformal-profiles",
+      "name": "Empirical Conformal Calibration Profiles",
+      "local_path": "opensource/models/conformal_profiles",
+      "type": "Statistical Non-Conformity Profiles (alpha=0.001)"
+    }
+  ]
+}

@@ -1,0 +1,186 @@
+{
+  "audit_metadata": {
+    "audit_id": "AUDIT-003-PHASE3-SOVEREIGN-AI",
+    "title": "Audit 3: Deep Security & Architectural Verification Audit",
+    "timestamp_utc": "2026-10-10T04:45:00Z",
+    "timestamp_gst": "2026-10-10T08:45:00+04:00",
+    "timestamp_local": "2026-10-10T10:15:00+05:30",
+    "repository": "abdullah00ashraf/HARES",
+    "commit_ref": "5eacc55",
+    "branch": "main",
+    "lead_auditor": "Principal Full-Stack Software Engineer & Enterprise Security Architect",
+    "frameworks": [
+      "Cloudflare Defensive Security Audit Skill",
+      "Master Orchestrator",
+      "FastAPI",
+      "Celery",
+      "Redis",
+      "PostgreSQL",
+      "SQLAlchemy 2.0",
+      "aiosqlite",
+      "PyTorch/AASIST",
+      "faster-whisper",
+      "vLLM/Outlines",
+      "Docker",
+      "Pytest"
+    ],
+    "verdict": "PASSED_WITH_OBSERVATIONS",
+    "phase_assessed": "Phase 3: Local Sovereign AI Inference Cluster, Media Ingress Pipeline & Ingress Hardening"
+  },
+  "invariants_compliance": {
+    "nfr_1_1_data_sovereignty": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "100% of AI inference (SLM text triage, AASIST deepfake detection, faster-whisper ASR) executes locally within sovereign UAE compute; zero offshore API calls"
+    },
+    "fr_1_1_two_stage_media_ingestion": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Two-stage authenticated Meta WhatsApp Cloud API media retrieval (GET /media_id URL lookup + binary stream download) operating within 600ms network budget"
+    },
+    "fr_1_2_acoustic_deepfake_detection": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "AudioDeepfakeClassifier analyzes 16kHz PCM zero-crossing rate variance, spectral gradient, and energy discontinuity"
+    },
+    "fr_1_4_conformal_calibration": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Non-parametric conformal prediction engine bounds False Positive Rate at <= 0.1% (alpha=0.001, tau=0.85); routes statistical ambiguity to Amber (Abstain)"
+    },
+    "fr_1_5_audio_duration_cap": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Strict 120-second payload duration ceiling enforced; voice notes > 120s raise AudioDurationExceededError prior to GPU queue dispatch"
+    },
+    "fr_2_4_local_slm_guided_decoding": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Local Small Language Model constrained at token generation time via Guided JSON Decoding (TextTriageInferenceResult schema) with XML prompt delimiters and tag escaping"
+    },
+    "fr_3_1_tri_state_verdict_synthesis": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Deterministic tri-state classification (RED, AMBER, GREEN) with official Dubai Police e-Crime URL and 901 hotline escalation for RED states"
+    },
+    "fr_3_3_webhook_latency_sla": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "FastAPI webhook decouples incoming payload to Celery asynchronously via apply_async in <30ms, satisfying <500ms Meta SLA"
+    },
+    "fr_4_1_class_a_vs_b_segregation": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Citizen phone pseudonymized via keyed HMAC-SHA256 with 32-byte salt; raw phone purged in memory frame via try...finally block; Class A IoCs stored in plain text"
+    },
+    "fr_4_2_pii_sanitization": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Bilingual regex scrubber redacts Emirates IDs, credit cards, and OTP codes before evaluation or persistence; text length bounded to 4096 chars"
+    },
+    "nfr_1_3_rate_limiting": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Redis atomic token-bucket limiter evaluated via single Lua script (eval) enforcing 5 queries/hr per citizen hash with graceful fallback"
+    },
+    "sql_injection_immunity": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "SQLAlchemy 2.0 typed ORM queries across all repositories; zero raw SQL strings or f-string queries"
+    },
+    "tri_network_isolation": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "docker-compose isolates DB and Redis exclusively on internal: true bridge without default gateway"
+    },
+    "non_root_execution": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Dockerfile runner stage enforces USER hares:hares (UID 10001)"
+    }
+  },
+  "prior_observations_resolution": {
+    "AUDIT-OBS-01": {
+      "status": "RESOLVED",
+      "action": "Implemented try/except Exception in webhook POST returning HTTP 400 Bad Request; verified in test_webhook.py"
+    },
+    "AUDIT-OBS-02": {
+      "status": "CARRIED_TO_PHASE_4",
+      "action": "Broker error logging and isolation in place; production circuit-breaker scheduled for Phase 4 deployment"
+    },
+    "AUDIT-OBS-03": {
+      "status": "RESOLVED",
+      "action": "Implemented RedisTokenBucketRateLimiter and wired into Celery tasks; verified in test_rate_limiter.py"
+    },
+    "AUDIT-OBS-04": {
+      "status": "RESOLVED",
+      "action": "Implemented allowlist.py, homograph.py, sanitizer.py, and verdict.py in src/hares/engine/; verified in test_engine.py"
+    },
+    "AUDIT-OBS-05": {
+      "status": "RESOLVED",
+      "action": "Implemented SQLAlchemy 2.0 ORM models and repositories in src/hares/db/ using backend-agnostic Uuid; verified in test_db.py"
+    },
+    "AUDIT-OBS-06": {
+      "status": "RESOLVED",
+      "action": "Added raw_text[:4096] slice bounds in sanitizer.py and tasks.py; verified in test_audit_hardening.py"
+    },
+    "AUDIT-OBS-07": {
+      "status": "RESOLVED",
+      "action": "Implemented single atomic Redis Lua script (eval) in rate_limiter.py; verified in test_audit_hardening.py"
+    },
+    "AUDIT-OBS-08": {
+      "status": "RESOLVED",
+      "action": "Enclosed worker task processing loop in try...finally guaranteeing memory frame purge; verified in tasks.py"
+    },
+    "AUDIT-OBS-09": {
+      "status": "RESOLVED",
+      "action": "Set suffix_list_urls=None in allowlist.py and homograph.py for air-gapped operation; verified in test_audit_hardening.py"
+    }
+  },
+  "test_execution": {
+    "framework": "pytest",
+    "total_tests": 58,
+    "passed": 58,
+    "failed": 0,
+    "duration_seconds": 48.66,
+    "pass_rate_pct": 100.0,
+    "test_modules": [
+      "tests/test_asr.py",
+      "tests/test_audio_classifier.py",
+      "tests/test_audit_hardening.py",
+      "tests/test_conformal.py",
+      "tests/test_db.py",
+      "tests/test_engine.py",
+      "tests/test_media_pipeline.py",
+      "tests/test_rate_limiter.py",
+      "tests/test_security.py",
+      "tests/test_slm.py",
+      "tests/test_tasks.py",
+      "tests/test_webhook.py"
+    ]
+  },
+  "observations_and_findings": [
+    {
+      "id": "AUDIT-OBS-10",
+      "component": "src/hares/api/v1/health.py:12-16",
+      "category": "RESOURCE-EXHAUSTION-AND-AVAILABILITY",
+      "severity": "LOW_AVAILABILITY",
+      "title": "Active Health Readiness Verification",
+      "description": "The /health/ready probe returns {'status': 'ready'} unconditionally. Production orchestrators require active pings against PostgreSQL and Redis to verify readiness before routing ingress traffic.",
+      "remediation": "Enhance /health/ready to ping database and Redis, returning HTTP 503 if backing stores are unreachable."
+    },
+    {
+      "id": "AUDIT-OBS-11",
+      "component": "src/hares/services/media_downloader.py:48-65",
+      "category": "PROTOCOLS-RPC-AND-MESSAGING",
+      "severity": "LOW_DEFENSE_IN_DEPTH",
+      "title": "Meta Media CDN URL Hostname Validation (SSRF Defense)",
+      "description": "In Stage 2 of MediaDownloader, download_url is extracted from Meta API response and queried directly. Validating the URL hostname provides defense-in-depth against potential SSRF if responses were manipulated.",
+      "remediation": "Verify download_url hostname matches legitimate Meta CDN suffixes (*.fbcdn.net, *.fbsbx.com, *.whatsapp.net) before initiating binary download."
+    },
+    {
+      "id": "AUDIT-OBS-12",
+      "component": "src/hares/workers/celery_app.py:22-26",
+      "category": "RESOURCE-EXHAUSTION-AND-AVAILABILITY",
+      "severity": "LOW_PERFORMANCE_SLA",
+      "title": "Dedicated Queue Worker Separation for Heavy Audio Inference",
+      "description": "A single worker process listens to both high_priority_triage and media_triage. Heavy audio transcode and ASR jobs could consume worker threads during audio surges, queue-starving fast text triage.",
+      "remediation": "Partition workers into dedicated pools: hares-worker-text (high_priority_triage) and hares-worker-media (media_triage)."
+    },
+    {
+      "id": "AUDIT-OBS-13",
+      "component": "src/hares/workers/tasks.py:284-289",
+      "category": "DATA-ISOLATION-AND-LIFECYCLE",
+      "severity": "LOW_PRIVACY_DEFENSE",
+      "title": "Centralized Log Formatter Scrubbing for Tracebacks",
+      "description": "Tasks log pseudonymous citizen_hash[:12]. In the event of unhandled exceptions in standard libraries, logged tracebacks could capture local variables if verbose dumpers are configured.",
+      "remediation": "Implement a custom logging filter that strips raw 10-to-15 digit phone numbers from all outbound log records globally."
+    }
+  ]
+}

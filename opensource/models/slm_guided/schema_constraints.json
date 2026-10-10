@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TextTriageInferenceResult",
+  "description": "JSON Schema enforced at the token logit level via Outlines and vLLM guided decoding",
+  "type": "object",
+  "properties": {
+    "is_impersonation": {
+      "type": "boolean",
+      "description": "Whether message impersonates an official government or commercial entity"
+    },
+    "impersonated_entity": {
+      "type": ["string", "null"],
+      "description": "Name of the impersonated authority"
+    },
+    "urgency_or_coercion": {
+      "type": "boolean",
+      "description": "Whether message employs artificial urgency or coercive threats"
+    },
+    "financial_or_credential_demand": {
+      "type": "boolean",
+      "description": "Whether message demands payments, OTP codes, or credentials"
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Model confidence score between 0.0 and 1.0"
+    },
+    "detected_tactics": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "traffic_fine_lure",
+          "courier_delivery_fee",
+          "banking_kyc_freeze",
+          "lottery_prize",
+          "account_suspension",
+          "none"
+        ]
+      }
+    },
+    "reasoning_summary": {
+      "type": "string",
+      "description": "Sanitized concise justification for the classification without citizen PII"
+    }
+  },
+  "required": [
+    "is_impersonation",
+    "urgency_or_coercion",
+    "financial_or_credential_demand",
+    "confidence_score",
+    "detected_tactics",
+    "reasoning_summary"
+  ],
+  "additionalProperties": false
+}

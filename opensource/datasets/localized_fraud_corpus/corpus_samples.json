@@ -1,0 +1,41 @@
+{
+  "corpus_name": "Localized UAE Text & SMS Fraud Corpus",
+  "version": "1.0.0",
+  "total_records": 2000,
+  "negative_class_scams_count": 1000,
+  "positive_class_legitimate_count": 1000,
+  "categories": [
+    {
+      "category": "Traffic Fines & Vehicle Impound",
+      "impersonated_entities": ["Dubai Police", "Salik", "RTA"],
+      "sample_phrasings": [
+        "شرطة دبي: إشعار بمخالفة مرورية غير مسددة. يرجى سداد المبلغ فوراً لتجنب حجز المركبة: https://ecr1me-pay.top",
+        "Salik Toll Alert: Outstanding violation detected on vehicle. Pay immediately within 24h to avoid judicial referral."
+      ]
+    },
+    {
+      "category": "Courier & Package Delivery Fees",
+      "impersonated_entities": ["Emirates Post", "Aramex", "DHL"],
+      "sample_phrasings": [
+        "بريد الإمارات: شحنتك رقم EP98234 معلقة في المستودع. يرجى دفع رسوم تأكيد العنوان (15 درهم) لاستلام الطرد: https://emiratespost-tracking.online",
+        "Aramex UAE: Delivery attempt failed due to unpaid customs fee. Reschedule and pay here: https://aramex-portal-pay.com"
+      ]
+    },
+    {
+      "category": "Banking KYC Freeze & Identity Demands",
+      "impersonated_entities": ["UAE Central Bank", "Emirates NBD", "Dubai Islamic Bank", "UAE Pass"],
+      "sample_phrasings": [
+        "المصرف المركزي: تم تجميد حسابك المصرفي مؤقتاً لعدم تحديث الهوية. يرجى إدخال رمز التحقق OTP وكلمة المرور فوراً لتفادي الإغلاق الدائم.",
+        "Emirates NBD Security: Suspicious login detected. Verify your debit card credentials immediately: https://enbd-security-check.net"
+      ]
+    },
+    {
+      "category": "Utility & Telecommunications Threats",
+      "impersonated_entities": ["DEWA", "du", "e&"],
+      "sample_phrasings": [
+        "DEWA Notice: Disconnection order scheduled today due to overdue utility bill. Pay via link: https://dewa-bill-settle.cc",
+        "e& Customer Care: Your mobile SIM card will be deactivated within 2 hours. Click to verify Emirates ID."
+      ]
+    }
+  ]
+}

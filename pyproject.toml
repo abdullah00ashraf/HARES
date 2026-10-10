@@ -21,6 +21,12 @@ dependencies = [
     "Levenshtein>=0.26.0",
     "starlette>=0.40.0,<0.48.0",
     "python-dotenv>=1.0.1",
+    "torch>=2.4.0",
+    "torchaudio>=2.4.0",
+    "faster-whisper>=1.0.0",
+    "ctranslate2>=4.4.0",
+    "outlines>=0.0.44",
+    "ffmpeg-python>=0.2.0",
 ]
 
 [project.optional-dependencies]
@@ -30,6 +36,7 @@ dev = [
     "pytest-cov>=5.0.0",
     "ruff>=0.6.0",
     "mypy>=1.11.0",
+    "aiosqlite>=0.20.0",
 ]
 
 [build-system]

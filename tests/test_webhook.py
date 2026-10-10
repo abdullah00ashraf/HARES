@@ -71,8 +71,41 @@ async def test_webhook_post_success_mocked():
 
 
 @pytest.mark.asyncio
-async def test_health_probes():
-    """Tests liveness and readiness endpoints."""
+async def test_webhook_post_malformed_json_returns_400():
+    """Tests POST payload with valid signature but malformed JSON bytes returns 400 (AUDIT-OBS-01)."""
+    settings = get_settings()
+    malformed_payload = b"this is not a valid json string {["
+    signature = hmac.new(
+        settings.WHATSAPP_APP_SECRET.encode(), malformed_payload, hashlib.sha256
+    ).hexdigest()
+
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
+        resp = await client.post(
+            "/webhook",
+            content=malformed_payload,
+            headers={
+                "X-Hub-Signature-256": f"sha256={signature}",
+                "Content-Type": "application/json",
+            },
+        )
+        assert resp.status_code == 400
+        assert "Malformed JSON payload" in resp.json()["detail"]
+
+
+@pytest.mark.asyncio
+async def test_health_probes(monkeypatch):
+    """Tests liveness and readiness endpoints with active backing store mock."""
+    import redis.asyncio as aioredis
+
+    class MockRedisClient:
+        async def ping(self):
+            return True
+        async def aclose(self):
+            pass
+
+    monkeypatch.setattr(aioredis, "from_url", lambda *args, **kwargs: MockRedisClient())
+
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as client:
         live_resp = await client.get("/health/live")
@@ -81,4 +114,4 @@ async def test_health_probes():
 
         ready_resp = await client.get("/health/ready")
         assert ready_resp.status_code == 200
-        assert ready_resp.json() == {"status": "ready"}
+        assert ready_resp.json()["status"] == "ready"

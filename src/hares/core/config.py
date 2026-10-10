@@ -46,6 +46,20 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str = Field(..., min_length=10)
     CELERY_RESULT_BACKEND: str = Field(..., min_length=10)
 
+    # Sovereign Local AI Cluster & Inference Settings (NFR-1.1, FR-1.x, FR-2.4)
+    SLM_API_BASE_URL: str = "http://localhost:8000/v1"
+    SLM_MODEL_NAME: str = "llama-3.2-3b-instruct-awq"
+    SLM_TIMEOUT_SECONDS: float = 3.0
+    ASR_MODEL_SIZE: str = "small"
+    ASR_DEVICE: str = "cpu"
+    AUDIO_MAX_DURATION_SECONDS: float = 120.0
+    CONFORMAL_ALPHA: float = 0.001
+    CONFORMAL_THRESHOLD: float = 0.85
+
+    # Municipal Threat Intelligence Portal Settings (FR-4.3)
+    ANALYST_API_KEY: str = Field(default="hares_analyst_secret_key_2026", min_length=16)
+    CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
     @field_validator("CITIZEN_HASH_SALT")
     @classmethod
     def validate_salt_entropy(cls, value: str) -> str:
@@ -53,6 +67,18 @@ class Settings(BaseSettings):
             raise ValueError(
                 "CITIZEN_HASH_SALT must be at least 32 characters in length for cryptographic entropy."
             )
+        return value
+
+    @field_validator("ANALYST_API_KEY")
+    @classmethod
+    def validate_analyst_api_key(cls, value: str, info) -> str:
+        # If in production, prevent default key and enforce high entropy
+        env = info.data.get("ENVIRONMENT", "development")
+        if env == "production":
+            if value == "hares_analyst_secret_key_2026" or len(value) < 32:
+                raise ValueError(
+                    "In production, ANALYST_API_KEY must be overridden via .env with a secure key >= 32 characters."
+                )
         return value
 
 

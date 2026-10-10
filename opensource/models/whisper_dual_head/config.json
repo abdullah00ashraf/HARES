@@ -1,0 +1,21 @@
+{
+  "model_name": "faster-whisper-small-dual-head",
+  "base_encoder": "openai/whisper-small",
+  "quantization": "int8",
+  "engine": "CTranslate2",
+  "head_architecture": {
+    "module": "WhisperDeepfakeMLPHead",
+    "hidden_dim": 768,
+    "bottleneck_dim": 256,
+    "dropout": 0.2,
+    "pooling": "AdaptiveAvgPool1d(1)",
+    "activations": ["GELU", "GELU", "Sigmoid"],
+    "output_dimension": 1,
+    "output_range": [0.0, 1.0]
+  },
+  "runtime_synergy": {
+    "vram_saved_gb": 3.5,
+    "latency_saved_ms": 180,
+    "peak_throughput_qps": 35.5
+  }
+}

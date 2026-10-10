@@ -1,0 +1,149 @@
+{
+  "audit_metadata": {
+    "audit_id": "AUDIT-002-PHASE2-DETERMINISTIC",
+    "title": "Audit 2: Comprehensive Security & Architectural Verification Audit",
+    "timestamp_utc": "2026-10-10T04:10:00Z",
+    "timestamp_gst": "2026-10-10T08:10:00+04:00",
+    "timestamp_local": "2026-10-10T09:40:00+05:30",
+    "repository": "abdullah00ashraf/HARES",
+    "commit_ref": "5eacc55",
+    "branch": "main",
+    "lead_auditor": "Principal Full-Stack Software Engineer & Enterprise Security Architect",
+    "frameworks": [
+      "Cloudflare Defensive Security Audit Skill",
+      "Master Orchestrator",
+      "FastAPI",
+      "Celery",
+      "Redis",
+      "PostgreSQL",
+      "SQLAlchemy 2.0",
+      "aiosqlite",
+      "Docker",
+      "Pytest"
+    ],
+    "verdict": "PASSED_WITH_OBSERVATIONS",
+    "phase_assessed": "Phase 2: Deterministic Verification Engine, PostgreSQL Persistence Tier & Rate Limiting"
+  },
+  "invariants_compliance": {
+    "nfr_1_1_data_sovereignty": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Zero offshore AI dispatches; deterministic verification executes 100% locally; UAE sovereign compute and local storage preserved"
+    },
+    "fr_2_2_exact_domain_allowlist": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Exact registrable domain matching using tldextract; prevents sub-domain spoofing and wildcards"
+    },
+    "fr_2_3_idn_homograph_arabic_protection": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "IDN Punycode decoding; strict Arabic Unicode regex on .امارات ccTLD; length-normalized Levenshtein lookalike detection"
+    },
+    "fr_3_1_tri_state_verdict_synthesis": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Deterministic tri-state verdict synthesis (RED/AMBER/GREEN) with official Dubai Police e-Crime and 901 hotline escalation"
+    },
+    "fr_3_3_webhook_latency_sla": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "FastAPI webhook decouples incoming payload to Celery asynchronously via apply_async in <30ms, satisfying <500ms Meta SLA"
+    },
+    "fr_4_1_class_a_vs_b_segregation": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Citizen phone pseudonymized via keyed HMAC-SHA256 with 32-byte salt; raw phone purged from worker memory frame; Class A IoCs stored in plain text"
+    },
+    "fr_4_2_pii_sanitization": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Bilingual regex scrubber redacts Emirates IDs, credit cards, and OTP codes before evaluation or persistence"
+    },
+    "nfr_1_3_rate_limiting": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Redis atomic token-bucket limiter enforcing 5 queries/hr per citizen user hash with graceful fallback"
+    },
+    "sql_injection_immunity": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "SQLAlchemy 2.0 typed ORM queries across all repositories; zero raw SQL strings or f-string queries"
+    },
+    "tri_network_isolation": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "docker-compose isolates DB and Redis exclusively on internal: true bridge without default gateway"
+    },
+    "non_root_execution": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Dockerfile runner stage enforces USER hares:hares (UID 10001)"
+    }
+  },
+  "prior_observations_resolution": {
+    "AUDIT-OBS-01": {
+      "status": "RESOLVED",
+      "action": "Implemented try/except Exception in webhook POST returning HTTP 400 Bad Request; verified by test_webhook_post_malformed_json_returns_400"
+    },
+    "AUDIT-OBS-02": {
+      "status": "CARRIED_TO_PHASE_4",
+      "action": "Broker error logging and isolation in place; production circuit-breaker scheduled for Phase 4 deployment"
+    },
+    "AUDIT-OBS-03": {
+      "status": "RESOLVED",
+      "action": "Implemented RedisTokenBucketRateLimiter and wired into Celery tasks; verified by test_rate_limiter suite"
+    },
+    "AUDIT-OBS-04": {
+      "status": "RESOLVED",
+      "action": "Implemented allowlist.py, homograph.py, sanitizer.py, and verdict.py in src/hares/engine/; verified by test_engine suite"
+    },
+    "AUDIT-OBS-05": {
+      "status": "RESOLVED",
+      "action": "Implemented SQLAlchemy 2.0 ORM models and repositories in src/hares/db/ using backend-agnostic Uuid; verified by test_db suite"
+    }
+  },
+  "test_execution": {
+    "framework": "pytest",
+    "total_tests": 32,
+    "passed": 32,
+    "failed": 0,
+    "duration_seconds": 19.42,
+    "pass_rate_pct": 100.0,
+    "test_modules": [
+      "tests/test_db.py",
+      "tests/test_engine.py",
+      "tests/test_rate_limiter.py",
+      "tests/test_security.py",
+      "tests/test_tasks.py",
+      "tests/test_webhook.py"
+    ]
+  },
+  "observations_and_findings": [
+    {
+      "id": "AUDIT-OBS-06",
+      "component": "src/hares/engine/sanitizer.py:53",
+      "category": "RESOURCE-EXHAUSTION-AND-AVAILABILITY",
+      "severity": "LOW_AVAILABILITY",
+      "title": "Input Text Length Bounding Prior to Regex Scanning",
+      "description": "Entity extraction and PII scrubbing execute regexes across incoming text bodies. While WhatsApp messages are bounded to 4096 characters by Meta, internal invocations with oversized text (>50k chars) can consume CPU cycles.",
+      "remediation": "Enforce a strict text slice limit (raw_text[:4096]) upon entering EntityExtractor.extract and PIIScrubber.scrub."
+    },
+    {
+      "id": "AUDIT-OBS-07",
+      "component": "src/hares/services/rate_limiter.py:38-44",
+      "category": "RESOURCE-EXHAUSTION-AND-AVAILABILITY",
+      "severity": "LOW_RESOURCE_HYGIENE",
+      "title": "Redis Rate Limiter Multi-Command Atomicity via Lua Script",
+      "description": "check_and_increment executes self._redis.incr(key) followed by self._redis.expire(key, ...) on the first request. A crash between incr and expire could leave an orphan key without TTL.",
+      "remediation": "Bundle the increment and expiration into an atomic Redis Lua script (eval) to ensure zero orphan keys on abrupt process termination."
+    },
+    {
+      "id": "AUDIT-OBS-08",
+      "component": "src/hares/workers/tasks.py:161-163",
+      "category": "DATA-ISOLATION-AND-LIFECYCLE",
+      "severity": "LOW_PRIVACY_DEFENSE",
+      "title": "Guaranteed In-Memory Purge via try...finally Scope",
+      "description": "del recipient_phone and del raw_sender_phone are executed at loop completion. An unhandled exception during processing could leave the variable reference in the traceback frame.",
+      "remediation": "Enclose processing loop in try...finally where finally guarantees execution of del recipient_phone."
+    },
+    {
+      "id": "AUDIT-OBS-09",
+      "component": "src/hares/engine/allowlist.py:14",
+      "category": "CLOUD-AND-DEPLOYMENT",
+      "severity": "LOW_NETWORK_HYGIENE",
+      "title": "Explicit Air-Gapped Flag for tldextract",
+      "description": "tldextract.TLDExtract defaults to bundled offline public suffixes when network fails. On hares_internal bridge, passing suffix_list_urls=None explicitly prevents socket probe attempts.",
+      "remediation": "Initialize TLDExtract with suffix_list_urls=None to declare air-gapped operation deterministically."
+    }
+  ]
+}

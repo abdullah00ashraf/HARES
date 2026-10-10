@@ -1,0 +1,37 @@
+{
+  "dataset_name": "Synthetic Voice Evaluation Benchmark",
+  "version": "1.0.0",
+  "target_sample_count": 1000,
+  "codec_preprocessing": "WhatsApp Opus 16 kbps transcoding via FFmpeg",
+  "evaluated_model_families": [
+    {
+      "architecture_family": "Diffusion & Flow-Matching",
+      "models": ["CosyVoice", "F5-TTS", "VoiceCraft"],
+      "proportion": 0.30,
+      "acoustic_characteristics": "Phase continuity artifacts, high-frequency spectral over-smoothing"
+    },
+    {
+      "architecture_family": "Autoregressive & Neural Codec",
+      "models": ["Bark", "XTTS-v2", "ChatTTS"],
+      "proportion": 0.30,
+      "acoustic_characteristics": "Temporal codebook jitter, frame boundary discontinuities"
+    },
+    {
+      "architecture_family": "Commercial Voice Cloning",
+      "models": ["ElevenLabs Clones", "PlayHT"],
+      "proportion": 0.25,
+      "acoustic_characteristics": "Unnatural pitch micro-variance, artificial prosodic rhythm"
+    },
+    {
+      "architecture_family": "Voice Conversion (VC)",
+      "models": ["RVC v2", "FreeVC"],
+      "proportion": 0.15,
+      "acoustic_characteristics": "Formant mismatch, residual source speaker leakage"
+    }
+  ],
+  "acceptance_gates": {
+    "target_recall_at_fpr_01": 0.90,
+    "conformal_confidence": 0.95,
+    "max_acceptable_fpr": 0.001
+  }
+}

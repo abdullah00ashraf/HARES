@@ -1,0 +1,15 @@
+**Method**,**Theoretical coverage**,**Typical coverage**,**Training cost**,**Evaluation cost**
+**Naïve**,No guarantee,$< 1-\alpha$,1,$n_{test}$
+**Split**,$\geq 1-\alpha$,$\simeq 1-\alpha$,1,$n_{test}$
+**Jackknife**,No guarantee,$\simeq 1-\alpha$,$n$,$n_{test}$
+,, or $< 1-\alpha$ if $\hat{\mu}$ unstable,,
+**Jackknife+**,$\geq 1-2\alpha$,$\simeq 1-\alpha$,$n$,$n \times n_{test}$
+**Jackknife-minmax**,$\geq 1-\alpha$,$> 1-\alpha$,$n$,$n \times n_{test}$
+**CV**,No guarantee,$\simeq 1-\alpha$,$K$,$n_{test}$
+,, or $< 1-\alpha$ if $\hat{\mu}$ unstable,,
+**CV+**,$\geq 1-2\alpha$,$\gtrsim 1-\alpha$,$K$,$K \times n_{test}$
+**CV-minmax**,$\geq 1-\alpha$,$> 1-\alpha$,$K$,$K \times n_{test}$
+**Jackknife-aB+**,$\geq 1-2\alpha$,$\gtrsim 1-\alpha$,$K$,$K \times n_{test}$
+**Jackknife-aB-minmax**,$\geq 1-\alpha$,$> 1-\alpha$,$K$,$K \times n_{test}$
+**Conformalized quantile regressor**,$\geq 1-\alpha$,$\gtrsim 1-\alpha$,$3$,$3 \times n_{test}$
+**EnbPI**,$\geq 1-\alpha$ (asymptotic),$\gtrsim 1-\alpha$,$K$,$K \times n_{test}$

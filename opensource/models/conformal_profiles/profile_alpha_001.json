@@ -1,0 +1,15 @@
+{
+  "profile_name": "conformal_uae_opus_alpha_001",
+  "version": "1.0.0",
+  "reference_dataset": "Curated UAE Regional Opus Calibration Suite (n=3000)",
+  "significance_level_alpha": 0.001,
+  "confidence_level": 0.95,
+  "empirical_decision_thresholds": {
+    "tau_synthetic_red": 0.85,
+    "tau_bonafide_green": 0.35,
+    "intermediate_band": "AMBER (Abstain / Inconclusive)"
+  },
+  "mathematical_formula": "p(x) = (1 + sum(I(s_i >= s(x)))) / (n + 1)",
+  "target_false_positive_rate": "<= 0.1%",
+  "operational_sla": "sub-10ms evaluation latency"
+}

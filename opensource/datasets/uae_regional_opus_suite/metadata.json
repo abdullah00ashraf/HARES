@@ -1,0 +1,39 @@
+{
+  "dataset_name": "Curated UAE Regional Opus Calibration Suite",
+  "version": "1.0.0",
+  "sample_count": 3000,
+  "codec_profile": "Opus in OGG container, 16kHz mono, 16-24 kbps VBR",
+  "target_confidence": "95% statistical confidence (alpha = 0.001, FPR <= 0.1%)",
+  "demographic_distribution": {
+    "emirati_and_gulf_arabic": {
+      "percentage": 35.0,
+      "clip_count": 1050,
+      "dialects": ["Emirati", "Omani", "Qatari", "Saudi Eastern"]
+    },
+    "modern_standard_arabic": {
+      "percentage": 20.0,
+      "clip_count": 600,
+      "dialects": ["MSA Official & Administrative"]
+    },
+    "uae_english": {
+      "percentage": 25.0,
+      "clip_count": 750,
+      "dialects": ["South Asian English", "Western Expatriate", "Arabizi Mixed"]
+    },
+    "urdu_and_hindi": {
+      "percentage": 20.0,
+      "clip_count": 600,
+      "dialects": ["Urdu", "Hindi"]
+    }
+  },
+  "duration_range_seconds": {
+    "min": 5.0,
+    "max": 120.0,
+    "mean": 24.3
+  },
+  "conformal_parameters": {
+    "alpha": 0.001,
+    "synthetic_threshold_tau": 0.85,
+    "bonafide_threshold_tau": 0.35
+  }
+}

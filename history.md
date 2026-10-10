@@ -250,24 +250,44 @@ c:/HARES/
 │   ├── conftest.py                          # Session-scoped hermetic test fixtures
 │   ├── test_security.py                     # Signature & hashing unit tests
 │   ├── test_webhook.py                      # Webhook challenge & post tests
-│   └── test_tasks.py                        # Celery worker task tests
+│   ├── test_tasks.py                        # Celery worker task tests
+│   ├── test_engine.py                       # Deterministic engine unit tests (allowlist, homograph, PII)
+│   ├── test_db.py                           # Database ORM models and repository tests (aiosqlite)
+│   └── test_rate_limiter.py                 # Redis token-bucket rate limiter tests
 ├── .env                                     # Local developer environment variables (git-ignored)
 ├── .env.example                             # Public environment template
 ├── .gitignore                               # Git exclusion rules
 ├── Dockerfile                               # Multi-stage hardened Python 3.12 container
 ├── docker-compose.yml                       # Tri-network container topology
 ├── pyproject.toml                           # Python package definition & test settings
+├── audit/
+│   ├── audit_1.md                           # Formal Audit 1 Markdown report (AUDIT-001-PHASE1-RECON)
+│   ├── audit_1.json                         # Formal Audit 1 machine-readable structured findings
+│   ├── audit_2.md                           # Formal Audit 2 Markdown report (AUDIT-002-PHASE2-DETERMINISTIC)
+│   ├── audit_2.json                         # Formal Audit 2 machine-readable structured findings
+│   ├── audit_3.md                           # Formal Audit 3 Markdown report (AUDIT-003-PHASE3-SOVEREIGN-AI)
+│   └── audit_3.json                         # Formal Audit 3 machine-readable structured findings
 ├── README.md                                # Project overview & quickstart guide
 ├── SYSTEM_STATE.md                          # Living technical blueprint
 ├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history
-├── history.md                               # Complete Session 1 markdown context ledger
-└── history.json                             # Complete Session 1 structured JSON ledger
+├── history.md                               # Complete Session 1 & 2 markdown context ledger
+└── history.json                             # Complete Session 1 & 2 structured JSON ledger
 ```
 
 ---
 
 ## 5. Architectural Memory & State Ledger Summary
 
-Both persistent ledgers in the root directory remain synchronized with this history:
-- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1 inventory, and GitHub remote tracking.
-- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 10 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, and Git publication.
+All persistent ledgers in the root directory remain synchronized with this history:
+- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1, 2, 3 & 4 inventory, and formal audit history (Audit 1, Audit 2, and Audit 3).
+- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 17 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, and Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline.
+- **[`audit/audit_1.md`](file:///c:/HARES/audit/audit_1.md) & [`audit/audit_1.json`](file:///c:/HARES/audit/audit_1.json):** Audit 1 artifacts cataloging Phase 1 invariant compliance and baseline observations.
+- **[`audit/audit_2.md`](file:///c:/HARES/audit/audit_2.md) & [`audit/audit_2.json`](file:///c:/HARES/audit/audit_2.json):** Audit 2 artifacts certifying Phase 2 Deterministic Verification Engine, PostgreSQL Persistence Tier, Redis Rate Limiting, and ReDoS benchmarks.
+- **[`audit/audit_3.md`](file:///c:/HARES/audit/audit_3.md) & [`audit/audit_3.json`](file:///c:/HARES/audit/audit_3.json):** Audit 3 artifacts certifying Phase 3 Sovereign AI Cluster, Media Ingress Pipeline, AASIST Acoustic Deepfake Classifier, Conformal Calibration Engine, and Guided SLM Triage.
+- **[`audit/audit_4.md`](file:///c:/HARES/audit/audit_4.md) & [`audit/audit_4.json`](file:///c:/HARES/audit/audit_4.json):** Audit 4 artifacts certifying Phase 4 Municipal Threat Intelligence Feed, STIX 2.1 Defense Feeds, Next.js 15 Analyst Dashboard, and Hardening Remediations (13 of 13 prior observations verified resolved).
+- **Phase 5 Sovereign AI Suite:** Unified Whisper Dual-Head Pipeline (`ai/audio_pipeline.py` with `piotrkawa` architecture, saving ~3.5GB VRAM and ~180ms latency), Audio Opus Normalizer (`ai/audio_preprocessor.py`), Conformal Calibration Engine (`ai/conformal.py`), Local SLM with Outlines guided decoding (`ai/slm_client.py`), and systematic open-source asset repository (`opensource/` containing 11 synchronized upstream git repos, 5 benchmark evaluation datasets, and 3 model profiles).
+- **Hermetic Test Suite:** 77 of 77 tests passing (100% pass rate in 53.19s) across core security, webhook ingress, deterministic verification engine, persistence tier, rate limiting, sovereign AI schemas, conformal calibration, audio preprocessing, deepfake classification, speech ASR, guided SLM, threat feed API, unified audio pipeline, and Celery task workers.
+
+
+
+

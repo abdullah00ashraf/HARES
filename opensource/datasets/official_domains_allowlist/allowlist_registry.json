@@ -1,0 +1,77 @@
+{
+  "registry_name": "Official UAE Registrable Domain Allowlist",
+  "version": "1.0.0",
+  "verification_authority": "TDRA / DESC / Digital Dubai Authority",
+  "domains": [
+    {
+      "registrable_domain": "ecrime.ae",
+      "entity_name": "Dubai Police e-Crime Portal",
+      "category": "Law Enforcement",
+      "verified_owner": "Dubai Police General HQ",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "dubaipolice.gov.ae",
+      "entity_name": "Dubai Police Official Portal",
+      "category": "Law Enforcement",
+      "verified_owner": "Dubai Police General HQ",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "salik.ae",
+      "entity_name": "Salik Toll System",
+      "category": "Transport / Municipal",
+      "verified_owner": "Salik Company PJSC",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "dewa.gov.ae",
+      "entity_name": "Dubai Electricity & Water Authority",
+      "category": "Critical Utilities",
+      "verified_owner": "DEWA Government of Dubai",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "dubai.ae",
+      "entity_name": "Digital Dubai Official Portal",
+      "category": "Government Portal",
+      "verified_owner": "Digital Dubai Authority",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "rta.ae",
+      "entity_name": "Roads & Transport Authority",
+      "category": "Municipal Transport",
+      "verified_owner": "Roads and Transport Authority",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "centralbank.ae",
+      "entity_name": "Central Bank of the UAE",
+      "category": "Financial Regulator",
+      "verified_owner": "CBUAE",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "uaepass.ae",
+      "entity_name": "UAE National Digital Identity",
+      "category": "Identity Infrastructure",
+      "verified_owner": "TDRA",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "moec.gov.ae",
+      "entity_name": "Ministry of Economy",
+      "category": "Federal Government",
+      "verified_owner": "UAE Federal Government",
+      "status": "active"
+    },
+    {
+      "registrable_domain": "emiratespost.ae",
+      "entity_name": "Emirates Post Official Services",
+      "category": "Logistics / Postal",
+      "verified_owner": "Emirates Post Group",
+      "status": "active"
+    }
+  ]
+}
