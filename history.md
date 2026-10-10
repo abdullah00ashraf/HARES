@@ -267,8 +267,10 @@ c:/HARES/
 │   ├── audit_1.json                         # Formal Audit 1 machine-readable structured findings
 │   ├── audit_2.md                           # Formal Audit 2 Markdown report (AUDIT-002-PHASE2-DETERMINISTIC)
 │   ├── audit_2.json                         # Formal Audit 2 machine-readable structured findings
-│   ├── audit_3.md                           # Formal Audit 3 Markdown report (AUDIT-003-PHASE3-SOVEREIGN-AI)
-│   └── audit_3.json                         # Formal Audit 3 machine-readable structured findings
+│   ├── audit_4.md                           # Formal Audit 4 Markdown report (AUDIT-004-PHASE4-MUNICIPAL-DASHBOARD)
+│   ├── audit_4.json                         # Formal Audit 4 machine-readable structured findings
+│   ├── audit_5.md                           # Formal Audit 5 Markdown report (AUDIT-005-PHASE5-SOVEREIGN-AI-AND-MEDIA)
+│   └── audit_5.json                         # Formal Audit 5 machine-readable structured findings
 ├── README.md                                # Project overview & quickstart guide
 ├── SYSTEM_STATE.md                          # Living technical blueprint
 ├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history
@@ -281,14 +283,15 @@ c:/HARES/
 ## 5. Architectural Memory & State Ledger Summary
 
 All persistent ledgers in the root directory remain synchronized with this history:
-- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1, 2, 3 & 4 inventory, and formal audit history (Audit 1, Audit 2, and Audit 3).
-- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 17 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, and Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline.
+- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1 through 5 inventory, and formal audit history (Audits 1 through 5).
+- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 19 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline, and Audit 5.
 - **[`audit/audit_1.md`](file:///c:/HARES/audit/audit_1.md) & [`audit/audit_1.json`](file:///c:/HARES/audit/audit_1.json):** Audit 1 artifacts cataloging Phase 1 invariant compliance and baseline observations.
 - **[`audit/audit_2.md`](file:///c:/HARES/audit/audit_2.md) & [`audit/audit_2.json`](file:///c:/HARES/audit/audit_2.json):** Audit 2 artifacts certifying Phase 2 Deterministic Verification Engine, PostgreSQL Persistence Tier, Redis Rate Limiting, and ReDoS benchmarks.
 - **[`audit/audit_3.md`](file:///c:/HARES/audit/audit_3.md) & [`audit/audit_3.json`](file:///c:/HARES/audit/audit_3.json):** Audit 3 artifacts certifying Phase 3 Sovereign AI Cluster, Media Ingress Pipeline, AASIST Acoustic Deepfake Classifier, Conformal Calibration Engine, and Guided SLM Triage.
 - **[`audit/audit_4.md`](file:///c:/HARES/audit/audit_4.md) & [`audit/audit_4.json`](file:///c:/HARES/audit/audit_4.json):** Audit 4 artifacts certifying Phase 4 Municipal Threat Intelligence Feed, STIX 2.1 Defense Feeds, Next.js 15 Analyst Dashboard, and Hardening Remediations (13 of 13 prior observations verified resolved).
+- **[`audit/audit_5.md`](file:///c:/HARES/audit/audit_5.md) & [`audit/audit_5.json`](file:///c:/HARES/audit/audit_5.json):** Audit 5 artifacts certifying Phase 5 Sovereign AI Integration, Unified Whisper Dual-Head Pipeline, Audio Opus Normalizer, Conformal Statistical Calibration, Local SLM Guided Decoding, and Open-Source Asset Registry (PASSED WITH OBSERVATIONS).
 - **Phase 5 Sovereign AI Suite:** Unified Whisper Dual-Head Pipeline (`ai/audio_pipeline.py` with `piotrkawa` architecture, saving ~3.5GB VRAM and ~180ms latency), Audio Opus Normalizer (`ai/audio_preprocessor.py`), Conformal Calibration Engine (`ai/conformal.py`), Local SLM with Outlines guided decoding (`ai/slm_client.py`), and systematic open-source asset repository (`opensource/` containing 11 synchronized upstream git repos, 5 benchmark evaluation datasets, and 3 model profiles).
-- **Hermetic Test Suite:** 77 of 77 tests passing (100% pass rate in 53.19s) across core security, webhook ingress, deterministic verification engine, persistence tier, rate limiting, sovereign AI schemas, conformal calibration, audio preprocessing, deepfake classification, speech ASR, guided SLM, threat feed API, unified audio pipeline, and Celery task workers.
+- **Hermetic Test Suite:** 77 of 77 tests passing (100% pass rate in 59.34s) across core security, webhook ingress, deterministic verification engine, persistence tier, rate limiting, sovereign AI schemas, conformal calibration, audio preprocessing, deepfake classification, speech ASR, guided SLM, threat feed API, unified audio pipeline, and Celery task workers.
 
 
 
