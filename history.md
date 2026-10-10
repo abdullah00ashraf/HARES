@@ -282,9 +282,22 @@ c:/HARES/
 │   ├── audit_5.json                         # Formal Audit 5 machine-readable structured findings
 │   ├── audit_6.md                           # Formal Audit 6 Markdown report (AUDIT-006-PHASE6-PRODUCTION-HARDENING)
 │   └── audit_6.json                         # Formal Audit 6 machine-readable structured findings
+├── opensource/
+│   ├── datasets/
+│   │   ├── localized_fraud_corpus/              # 100,000 paired ChatML records (87.72 MB)
+│   │   │   ├── uae_smishing_100k.jsonl          # 40% Emirati, 30% MSA, 20% Expat English, 10% Arabizi; 70% Malicious, 30% Benign
+│   │   │   └── uae_smishing_manifest.json       # Formal dataset manifest
+│   │   ├── synthetic_voice_eval/                # 20,000 WhatsApp-compliant 16 kHz Mono Opus .ogg files
+│   │   │   ├── audio/
+│   │   │   │   ├── genuine/shard_00-09/         # 10,000 Genuine samples (Common Voice Arabic Gulf/MSA, English, Urdu)
+│   │   │   │   └── synthetic/shard_00-09/       # 10,000 Synthetic samples (F5-TTS, CosyVoice, XTTS-v2, ElevenLabs)
+│   │   │   ├── audio_metadata.jsonl             # Streaming metadata catalog (file_id, duration, SNR, artifacts)
+│   │   │   └── audio_corpus_manifest.json       # Formal audio corpus manifest
+│   │   └── generate_smishing_100k.py            # Localized text fraud corpus generator
+│   │   └── generate_audio_20k.py                # Sovereign audio deepfake & acoustic artifact generator
 ├── README.md                                # Project overview & quickstart guide
-├── SYSTEM_STATE.md                          # Living technical blueprint (v1.6.0-phase6-complete)
-├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history (Milestones 1-21)
+├── SYSTEM_STATE.md                          # Living technical blueprint (v1.7.0-datasets-populated)
+├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history (Milestones 1-22)
 ├── history.md                               # Complete Session 1, 2 & 3 markdown context ledger
 └── history.json                             # Complete Session 1, 2 & 3 structured JSON ledger
 ```
@@ -294,8 +307,11 @@ c:/HARES/
 ## 5. Architectural Memory & State Ledger Summary
 
 All persistent ledgers in the root directory remain synchronized with this history:
-- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000, 9090, 8001), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1 through 6 inventory, and formal audit history (Audits 1 through 6).
-- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 21 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline, Audit 5, Phase 6 Production Hardening, Multi-Container GPU Orchestration, Observability & 200 QPS Stress Testing, and Audit 6.
+- **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000, 9090, 8001), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1 through 6 inventory, formal audit history (Audits 1 through 6), and Sovereign Dataset Registries (Section 7).
+- **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 22 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline, Audit 5, Phase 6 Production Hardening, Multi-Container GPU Orchestration, Observability & 200 QPS Stress Testing, Audit 6, and Milestone 22: Local Open-Source Datasets Population.
+- **Milestone 22 Dataset Repositories:**
+  - **100K Text Smishing & Social Engineering Corpus:** [`uae_smishing_100k.jsonl`](file:///c:/HARES/opensource/datasets/localized_fraud_corpus/uae_smishing_100k.jsonl) (87.72 MB, 100,000 paired ChatML records, 40% Emirati Gulf Arabic, 30% Modern Standard Arabic, 20% UAE Expat English, 10% Arabizi; 70% Malicious, 30% Benign) strictly adhering to `TextTriageInferenceResult`.
+  - **20K Audio Deepfake & Acoustic Artifact Corpus:** [`synthetic_voice_eval/audio/`](file:///c:/HARES/opensource/datasets/synthetic_voice_eval/audio/) (20,000 WhatsApp-compatible 16 kHz mono Opus `.ogg` files, 50% Genuine across Common Voice Arabic Gulf/MSA, English, Urdu, and 50% Synthetic across F5-TTS, CosyVoice, XTTS-v2, and ElevenLabs) sharded across 20 subdirectories with streaming metadata [`audio_metadata.jsonl`](file:///c:/HARES/opensource/datasets/synthetic_voice_eval/audio_metadata.jsonl) and [`audio_corpus_manifest.json`](file:///c:/HARES/opensource/datasets/synthetic_voice_eval/audio_corpus_manifest.json).
 - **Phase 6 Production Suite:** Production multi-container Docker topology with NVIDIA GPU passthrough (`docker-compose.prod.yml`), Prometheus telemetry (`/metrics`, `monitoring/prometheus.yml`, `monitoring/grafana_dashboard.json`), Mock Meta Egress Sink (`benchmarks/mock_meta_sink.py`), Locust 200 QPS load test (`benchmarks/locustfile.py`), stepped load runner (`benchmarks/run_stress_test.py`), and 100% resolution of all 20 audit observations (`AUDIT-OBS-01` through `AUDIT-OBS-20`).
 - **Audit 6 Certification:** [`audit/audit_6.md`](file:///c:/HARES/audit/audit_6.md) & [`audit/audit_6.json`](file:///c:/HARES/audit/audit_6.json) certifying zero open critical/high vulnerabilities and production readiness.
 - **Hermetic Test Suite:** 89 of 89 tests passing (100% pass rate) across security hardening, Prometheus metrics, concurrent load benchmarks, core security, webhook ingress, deterministic verification engine, persistence tier, rate limiting, sovereign AI schemas, conformal calibration, audio preprocessing, deepfake classification, speech ASR, guided SLM, threat feed API, unified audio pipeline, and Celery task workers.

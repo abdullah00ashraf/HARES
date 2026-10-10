@@ -1,8 +1,8 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Phase 6 Completed & Verified (Production Hardening, Prometheus Telemetry, Multi-Container GPU Topology, 200 QPS Distributed Locust Stress Testing, and Zero-Guess SLA Verification)  
+**Current Status:** Datasets Populated & Verified (100K Text Smishing Instruction-Response Corpus & 20K WhatsApp 16kHz Opus Audio Deepfake Evaluation Suite)  
 **Last Updated:** 2026-10-10  
-**Version:** 1.6.0-phase6-complete  
+**Version:** 1.7.0-datasets-populated  
 
 ---
 
@@ -229,6 +229,17 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **AUDIT-004-PHASE4-MUNICIPAL-DASHBOARD** | 2026-10-10 05:30:00 UTC | Phase 4 Municipal Threat Intelligence Feed, STIX 2.1 Export, Next.js 15 Analyst Dashboard, and Hardening Remediations | Cloudflare Security Audit Skill & Master Orchestrator | **PASSED WITH OBSERVATIONS** (69/69 tests pass) | [`audit/audit_4.md`](audit/audit_4.md), [`audit/audit_4.json`](audit/audit_4.json) |
 | **AUDIT-005-PHASE5-SOVEREIGN-AI-AND-MEDIA** | 2026-10-10 07:15:00 UTC | Phase 5 Sovereign AI Integration, Unified Whisper Dual-Head Pipeline, Audio Opus Normalizer, Conformal Statistical Calibration, Local SLM Guided Decoding, and Open-Source Asset Registry | Cloudflare Security Audit Skill & Master Orchestrator | **PASSED WITH OBSERVATIONS** (77/77 tests pass) | [`audit/audit_5.md`](audit/audit_5.md), [`audit/audit_5.json`](audit/audit_5.json) |
 | **AUDIT-006-PHASE6-PRODUCTION-HARDENING** | 2026-10-10 07:55:00 UTC | Phase 6 Production Hardening, Multi-Container GPU Orchestration, Observability, STIX Signing, and 200 QPS Load Benchmark | Cloudflare Security Audit Skill & Master Orchestrator | **PASSED WITH OBSERVATIONS** (89/89 tests pass) | [`audit/audit_6.md`](audit/audit_6.md), [`audit/audit_6.json`](audit/audit_6.json) |
+
+---
+
+## 7. Sovereign Dataset Registries & Evaluation Benchmarks
+
+| Corpus / Benchmark Name | Local Filesystem Location | Volume | Format / Profile | Split & Class Distribution | Purpose / Invariants |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **UAE Smishing & Social Engineering Corpus** | `opensource/datasets/localized_fraud_corpus/` | 100,000 records (87.72 MB) | ChatML JSONL (`uae_smishing_100k.jsonl`) conforming to `TextTriageInferenceResult` | 40% Emirati Gulf, 30% MSA, 20% Expat English, 10% Arabizi; 70% Malicious, 30% Benign | Instruction-tuning and evaluating sovereign local SLMs for UAE fraud triage with zero offshore API dependencies |
+| **Audio Deepfake & Acoustic Artifact Suite** | `opensource/datasets/synthetic_voice_eval/` | 20,000 files (100% 16 kHz Mono Opus .ogg) | WhatsApp Opus profile (16-24 kbps VBR), 10 shards/class (`audio/genuine/`, `audio/synthetic/`) | 50% Genuine (Common Voice Arabic Gulf/MSA, English, Urdu) / 50% Synthetic (F5-TTS, CosyVoice, XTTS-v2, ElevenLabs) | Rigorous training and conformal calibration of AASIST and Whisper dual-head spoof detection under real WhatsApp compression |
+| **Audio Corpus Manifest & Streaming Index** | `opensource/datasets/synthetic_voice_eval/` | 20,000 entries | `audio_metadata.jsonl`, `audio_corpus_manifest.json` | Cataloged by file ID, duration, SNR, dialect, vocoder family, and specific acoustic artifacts | Continuous auditability, benchmark reproducibility, and automated evaluation pipeline ingestion |
+
 
 
 

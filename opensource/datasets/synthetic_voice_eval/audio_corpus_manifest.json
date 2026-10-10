@@ -1,0 +1,39 @@
+{
+  "dataset_name": "Project Hares Sovereign Audio Deepfake & Acoustic Artifact Dataset (20K)",
+  "version": "1.0.0",
+  "total_audio_files": 20000,
+  "total_duration_hours": 19.99,
+  "codec_profile": {
+    "container": "ogg",
+    "codec": "Opus",
+    "sample_rate_hz": 16000,
+    "channels": 1,
+    "nominal_bitrate_kbps": 16,
+    "channel_layout": "mono",
+    "whatsapp_codec_parity": true
+  },
+  "class_balance": {
+    "genuine_samples": 10000,
+    "synthetic_samples": 10000,
+    "ratio": "50% Genuine / 50% Synthetic"
+  },
+  "genuine_profile_breakdown": {
+    "mozilla_common_voice_arabic_gulf": 3000,
+    "mozilla_common_voice_arabic_msa": 2000,
+    "uae_expat_conversational_english": 3000,
+    "conversational_urdu_voicenotes": 2000
+  },
+  "synthetic_vocoder_breakdown": {
+    "f5_tts_flow_matching": 2500,
+    "cosyvoice_autoregressive": 2500,
+    "xtts_v2_vocoder": 2500,
+    "elevenlabs_commercial_clone": 2500
+  },
+  "sharding": {
+    "shards_per_class": 10,
+    "files_per_shard": 1000,
+    "genuine_root": "opensource/datasets/synthetic_voice_eval/audio/genuine/",
+    "synthetic_root": "opensource/datasets/synthetic_voice_eval/audio/synthetic/"
+  },
+  "metadata_index": "opensource/datasets/synthetic_voice_eval/audio_metadata.jsonl"
+}

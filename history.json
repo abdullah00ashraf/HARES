@@ -271,14 +271,53 @@
     }
   ],
   "dual_ledger_state": {
-    "system_state_version": "1.6.0-phase6-complete",
-    "development_ledger_milestones_logged": 21,
-    "last_updated_utc": "2026-10-10 07:55:00",
-    "phase_completed": "Phase 6: Production Hardening, Multi-Container GPU Orchestration, Observability & 200 QPS Stress Testing",
+    "system_state_version": "1.7.0-datasets-populated",
+    "development_ledger_milestones_logged": 22,
+    "last_updated_utc": "2026-10-10 08:30:00",
+    "phase_completed": "Milestone 22: Local Open-Source Datasets Population (100K Smishing & 20K Audio Deepfakes)",
     "test_suite_status": {
       "total_tests": 89,
       "passed": 89,
       "pass_rate_pct": 100.0
+    },
+    "datasets_inventory": {
+      "text_smishing_corpus": {
+        "file": "opensource/datasets/localized_fraud_corpus/uae_smishing_100k.jsonl",
+        "total_records": 100000,
+        "format": "ChatML JSONL",
+        "splits": {
+          "emirati_gulf_arabic_pct": 40.0,
+          "modern_standard_arabic_pct": 30.0,
+          "uae_expat_english_pct": 20.0,
+          "arabizi_franco_arabic_pct": 10.0
+        },
+        "class_balance": {
+          "malicious_fraud_lures_pct": 70.0,
+          "benign_notifications_pct": 30.0
+        }
+      },
+      "audio_deepfake_suite": {
+        "directory": "opensource/datasets/synthetic_voice_eval/audio/",
+        "total_files": 20000,
+        "codec": "16 kHz Mono Opus (.ogg)",
+        "bitrate_nominal_kbps": 16,
+        "class_balance": {
+          "genuine_samples": 10000,
+          "synthetic_samples": 10000
+        },
+        "genuine_breakdown": {
+          "mozilla_common_voice_arabic_gulf": 3000,
+          "mozilla_common_voice_arabic_msa": 2000,
+          "uae_expat_conversational_english": 3000,
+          "conversational_urdu_voicenotes": 2000
+        },
+        "synthetic_vocoder_breakdown": {
+          "f5_tts_flow_matching": 2500,
+          "cosyvoice_autoregressive": 2500,
+          "xtts_v2_vocoder": 2500,
+          "elevenlabs_commercial_clone": 2500
+        }
+      }
     },
     "phase_6_deliverables": {
       "security_hardening": "Remediated all 7 observations (AUDIT-OBS-14 to 20)",

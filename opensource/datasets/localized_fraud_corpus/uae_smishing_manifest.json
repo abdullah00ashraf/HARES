@@ -1,0 +1,37 @@
+{
+  "dataset_name": "Project Hares Localized UAE Text Smishing & Social Engineering Corpus (100K)",
+  "version": "1.0.0",
+  "format": "ChatML JSONL",
+  "total_records": 100000,
+  "splits": {
+    "emirati_gulf_arabic": {
+      "count": 40000,
+      "percentage": 40.0
+    },
+    "modern_standard_arabic": {
+      "count": 30000,
+      "percentage": 30.0
+    },
+    "uae_expat_english": {
+      "count": 20000,
+      "percentage": 20.0
+    },
+    "arabizi_franco_arabic": {
+      "count": 10000,
+      "percentage": 10.0
+    }
+  },
+  "class_balance": {
+    "malicious_fraud_lures": {
+      "count": 70000,
+      "percentage": 70.0
+    },
+    "benign_verified_notifications": {
+      "count": 30000,
+      "percentage": 30.0
+    }
+  },
+  "file_path": "opensource/datasets/localized_fraud_corpus/uae_smishing_100k.jsonl",
+  "file_size_bytes": 91981652,
+  "target_task": "Local Sovereign SLM Instruction-Tuning (TextTriageInferenceResult FSM Decoding)"
+}
