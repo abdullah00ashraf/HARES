@@ -1,0 +1,193 @@
+{
+  "audit_metadata": {
+    "audit_id": "AUDIT-007-PRETRAIN-MLOPS-SECURITY",
+    "title": "Pre-Train Defensive Security & MLOps Architectural Audit (pre-train_audit)",
+    "timestamp_utc": "2026-10-11T08:45:00Z",
+    "timestamp_gst": "2026-10-11T12:45:00+04:00",
+    "timestamp_local": "2026-10-11T14:15:00+05:30",
+    "repository": "abdullah00ashraf/HARES",
+    "commit_ref": "3fb87de",
+    "branch": "main",
+    "lead_auditor": "Principal Full-Stack Software Engineer, Enterprise Security Architect & Technical Project Manager",
+    "frameworks": [
+      "Cloudflare Defensive Security Audit Skill Suite",
+      "Master Orchestrator Protocol",
+      "PyTorch 2.4",
+      "Hugging Face Transformers",
+      "PEFT / QLoRA",
+      "TRL SFTTrainer",
+      "BitsAndBytes",
+      "AutoAWQ",
+      "llama.cpp GGUF",
+      "faster-whisper",
+      "libsndfile / soundfile",
+      "Pytest"
+    ],
+    "verdict": "PASSED_WITH_OBSERVATIONS",
+    "audit_mode": "READONLY_PRETRAIN_GATEKEEPER",
+    "phase_assessed": "Pre-Training Cloud MLOps & Sovereign Bridge (Track 1: QLoRA SLM & Track 2: 2-Phase Whisper Dual-Head Spoof Classifier)"
+  },
+  "audit_scope": {
+    "directories": [
+      "c:/HARES/notebooks",
+      "c:/HARES/scripts",
+      "c:/HARES/opensource"
+    ],
+    "artifacts": [
+      "c:/Users/abdul/.gemini/antigravity-ide/brain/e969603d-888a-429d-bec8-5ffd6a079d1e/colab_model_finetuning_plan.md"
+    ],
+    "evaluated_files": [
+      "notebooks/colab_slm_qlora_tuning.ipynb",
+      "notebooks/colab_whisper_dual_head_training.ipynb",
+      "scripts/package_colab_data.py",
+      "scripts/train_slm_qlora.py",
+      "scripts/train_whisper_dual_head.py",
+      "scripts/export_quantized_models.py",
+      "scripts/verify_colab_artifacts.py",
+      "opensource/CATALOG.json",
+      "opensource/README.md",
+      "opensource/models/whisper_dual_head/head_architecture.py",
+      "opensource/models/whisper_dual_head/config.json",
+      "opensource/models/conformal_profiles/profile_alpha_001.json",
+      "opensource/models/slm_guided/schema_constraints.json",
+      "opensource/datasets/localized_fraud_corpus/uae_smishing_manifest.json",
+      "opensource/datasets/synthetic_voice_eval/audio_corpus_manifest.json",
+      "tests/test_model_training_contracts.py"
+    ]
+  },
+  "invariants_compliance": {
+    "nfr_1_1_data_sovereignty": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "All training corpora (100k smishing corpus, 20k audio benchmark) are 100% synthetic/open-source with zero Class B citizen PII; cloud training on Google Colab utilizes report_to='none', preventing telemetry or loss exfiltration to third-party MLOps trackers (WandB/Comet); runtime model inference remains 100% sovereign within local containers (hares-slm and hares-worker-media)"
+    },
+    "fr_4_1_class_a_vs_class_b_segregation": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Inspection of uae_smishing_100k.jsonl and uae_smishing_25k_core.jsonl confirms zero phone numbers or real citizen identities; prompt envelopes encapsulate threat indicators inside <citizen_forwarded_text> XML tags with case-insensitive boundary scrubbing (AUDIT-OBS-17)"
+    },
+    "fr_1_1_unified_whisper_dual_head": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Unified Whisper feature extraction decoupled into 2-phase pipeline (Phase 1 pre-extracts 20,000 x 768 matrix once; Phase 2 trains WhisperDeepfakeMLPHead in <60s on T4 GPU); forward pass supports both 3D unpooled tensors and 2D pre-pooled batches without breaking 2D sequence pooling (1, 1)"
+    },
+    "fr_1_3_whatsapp_opus_resilience": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Training pipeline trains spoof classifier directly on genuine and synthetic WhatsApp 16 kHz mono Opus (.ogg) audio files, matching real-world WhatsApp compression profiles (16-24 kbps VBR)"
+    },
+    "fr_1_4_nfr_3_1_conformal_calibration": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Phase 3 computes non-parametric empirical conformal quantiles on n >= 3,000 genuine UAE voice notes with alpha = 0.001, mathematically bounding False Positive Rate <= 0.1% at 95% statistical confidence"
+    },
+    "fr_2_4_nfr_1_3_guided_json_decoding": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "SLM training targets enforce exact JSON compliance to TextTriageInferenceResult with strict binary keys (is_impersonation, urgency_or_coercion, financial_or_credential_demand) and confidence scores in [0.0, 1.0]"
+    },
+    "hardware_t4_float16_guard": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "setup_bitsandbytes_config() checks torch.cuda.is_bf16_supported() and forces torch.float16 on Turing CC 7.5 GPUs, eliminating 3-5x software emulation slowdowns"
+    },
+    "checkpoint_streaming_and_resumption": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "TrainingArguments configured with save_steps=500, save_total_limit=3, and resume_from_checkpoint=True targeting Google Drive (/content/drive/MyDrive/hares_mlops/checkpoints/slm/)"
+    },
+    "host_ram_oom_mitigation": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "merge_lora_to_fp16() unloads previous models, triggers gc.collect(), empties CUDA cache, and loads with device_map='cpu' and low_cpu_mem_usage=True to protect Colab 12.7 GB system RAM"
+    },
+    "dual_model_quantization_export": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Exporter produces both 4-bit AutoAWQ (for vLLM container) and llama.cpp GGUF Q4_K_M (for edge serving) in dedicated, separate directories"
+    }
+  },
+  "prior_audit_observations_status": {
+    "AUDIT-OBS-17": {
+      "title": "Case-Insensitive Regex XML Boundary Tag Stripping in SLM",
+      "status": "VERIFIED_ACTIVE",
+      "verification": "LocalSLMClient and ChatML training formatting strictly enforce case-insensitive stripping of </citizen_forwarded_text>"
+    },
+    "AUDIT-OBS-18": {
+      "title": "Enforce weights_only=True on PyTorch Model Deserialization",
+      "status": "VERIFIED_ACTIVE",
+      "verification": "weights_only=True enforced in train_whisper_dual_head.py, colab_whisper_dual_head_training.ipynb, verify_colab_artifacts.py, and audio_pipeline.py"
+    },
+    "AUDIT-OBS-19": {
+      "title": "Subprocess Environment Sanitization Stripping Sensitive Secrets",
+      "status": "VERIFIED_ACTIVE",
+      "verification": "AudioPreprocessor passes sanitized environment allowlist (PATH, SYSTEMROOT) stripping DB URIs and API tokens from child FFmpeg media processes"
+    },
+    "AUDIT-OBS-20": {
+      "title": "Strict Finite Value and Range Validation on Conformal Calibration Scores",
+      "status": "VERIFIED_ACTIVE",
+      "verification": "ConformalCalibrator strictly validates math.isfinite(s) and 0.0 <= s <= 1.0, filtering out NaN/Inf corruptions"
+    }
+  },
+  "new_pretrain_audit_observations": [
+    {
+      "id": "AUDIT-OBS-24",
+      "title": "Unrestricted trust_remote_code=True in Hugging Face Model & Tokenizer Loaders",
+      "severity": "LOW",
+      "cvss_v3_1": "CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:L/I:L/A:N",
+      "attack_class": "SUPPLY-CHAIN-AND-EXECUTION",
+      "affected_files": [
+        "scripts/train_slm_qlora.py",
+        "scripts/export_quantized_models.py",
+        "notebooks/colab_slm_qlora_tuning.ipynb"
+      ],
+      "finding_summary": "AutoTokenizer.from_pretrained and AutoModelForCausalLM.from_pretrained explicitly pass trust_remote_code=True without repository revision pinning. Because transformers >= 4.45 natively supports Qwen2 architectures, enabling trust_remote_code introduces supply-chain risk if an untrusted model identifier or malicious adapter is supplied.",
+      "remediation": "Default trust_remote_code to False for standard architectures. For custom models, require explicit opt-in and pin commit revisions (e.g., revision='<sha>')."
+    },
+    {
+      "id": "AUDIT-OBS-25",
+      "title": "Unfiltered tarfile.extractall() in Colab Audio Benchmark Unpacker",
+      "severity": "LOW",
+      "cvss_v3_1": "CVSS:3.1/AV:L/AC:H/PR:L/UI:R/S:U/C:N/I:L/A:N",
+      "attack_class": "INJECTION-AND-DATA-HANDLING",
+      "affected_files": [
+        "notebooks/colab_whisper_dual_head_training.ipynb"
+      ],
+      "finding_summary": "Cell 3 uses tar.extractall('/content/') without setting filter='data' (PEP 706) or verifying tarinfo member path components against parent directory traversal (CVE-2007-4559 pattern).",
+      "remediation": "Specify filter='data' when using Python 3.12+, or iterate tar.getmembers() validating that member paths resolve strictly inside the target destination before extraction."
+    },
+    {
+      "id": "AUDIT-OBS-26",
+      "title": "Defensive Finite-Value Validation in Training Conformal Quantile Computation",
+      "severity": "INFORMATIONAL",
+      "cvss_v3_1": "N/A",
+      "attack_class": "INTEGRITY-AND-NON-REPUDIATION",
+      "affected_files": [
+        "scripts/train_whisper_dual_head.py"
+      ],
+      "finding_summary": "In run_conformal_calibration_phase3(), non_conformity_scores are sorted directly from synthetic_prob.tolist() without filtering math.isnan(s) or math.isinf(s). While ConformalCalibrator guards this upon runtime ingestion (AUDIT-OBS-20), the training script should defensively filter NaNs before writing the calibration profile.",
+      "remediation": "Apply [float(s) for s in scores if math.isfinite(s) and 0.0 <= s <= 1.0] before computing sorted quantiles and serializing to JSON."
+    },
+    {
+      "id": "AUDIT-OBS-27",
+      "title": "Ambient Environment Scrubbing in Quantization Subprocesses",
+      "severity": "INFORMATIONAL",
+      "cvss_v3_1": "N/A",
+      "attack_class": "DEFENSE-IN-DEPTH",
+      "affected_files": [
+        "scripts/export_quantized_models.py"
+      ],
+      "finding_summary": "In export_gguf_quantization(), subprocess.run invokes llama-quantize and convert_hf_to_gguf.py inheriting ambient process environment variables. In shared or staging environments, inherited API tokens (e.g., HF_TOKEN, WANDB_API_KEY) could be exposed to crash dumps.",
+      "remediation": "Pass an explicit sanitized environment dictionary containing only PATH and SYSTEMROOT, identical to AudioPreprocessor._get_sanitized_subprocess_env() (AUDIT-OBS-19)."
+    },
+    {
+      "id": "AUDIT-OBS-28",
+      "title": "Cryptographic Checksum Verification of Input Dataset Packages",
+      "severity": "INFORMATIONAL",
+      "cvss_v3_1": "N/A",
+      "attack_class": "INTEGRITY-AND-NON-REPUDIATION",
+      "affected_files": [
+        "scripts/package_colab_data.py",
+        "scripts/verify_colab_artifacts.py"
+      ],
+      "finding_summary": "package_colab_data.py generates SHA-256 digests in colab_package_manifest.json. verify_colab_artifacts.py currently verifies downloaded model weights but does not verify dataset archive hashes prior to training synchronization.",
+      "remediation": "Add an optional --verify-packages flag to verify_colab_artifacts.py to assert SHA-256 digests against colab_package_manifest.json before training."
+    }
+  ],
+  "verification_tests_summary": {
+    "training_contract_tests": "6 passed in 10.83s (tests/test_model_training_contracts.py)",
+    "full_regression_suite": "95 passed in 134.00s (tests/ -v)",
+    "dataset_packaging_verification": "Verified: uae_smishing_100k.jsonl.gz (2.27 MB), uae_smishing_25k_core.jsonl.gz (0.56 MB)",
+    "overall_determination": "PASSED_WITH_OBSERVATIONS — PRODUCTION-CERTIFIED FOR COLAB PRE-TRAINING"
+  }
+}

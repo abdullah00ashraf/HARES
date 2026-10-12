@@ -10,6 +10,7 @@ celery_app = Celery(
 )
 
 celery_app.conf.update(
+    imports=["hares.workers.tasks"],
     task_serializer="json",
     accept_content=["json"],
     result_serializer="json",

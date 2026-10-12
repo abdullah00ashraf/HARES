@@ -1,0 +1,451 @@
+{
+  "model_name": "WhisperDeepfakeMLPHead (Track 2 Acoustic Classifier)",
+  "conformal_profile": "conformal_uae_opus_alpha_001_kaggle",
+  "test_samples_evaluated": 500,
+  "conformal_thresholds": {
+    "tau_synthetic_red": 0.0001,
+    "tau_bonafide_green": 0.35,
+    "alpha": 0.001,
+    "sample_size_n": 10000
+  },
+  "metrics": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "false_positive_rate": 0.0,
+    "false_negative_rate": 0.0
+  },
+  "confusion_matrix": {
+    "true_positives": 250,
+    "false_positives": 0,
+    "true_negatives": 250,
+    "false_negatives": 0
+  },
+  "tri_band_distribution": {
+    "RED_confirmed_synthetic": 250,
+    "GREEN_bonafide_verified": 250,
+    "AMBER_abstain_analyst": 0,
+    "abstention_rate": 0.0
+  },
+  "vocoder_breakdown": {
+    "phase_continuity_artifacts": {
+      "total": 250,
+      "detected": 250,
+      "recall": 1.0
+    }
+  },
+  "dialect_breakdown": {
+    "emirati_gulf_arabic": {
+      "total": 250,
+      "passed": 250,
+      "pass_rate": 1.0
+    }
+  },
+  "latency_ms": {
+    "average": 0.25,
+    "p95": 0.662
+  },
+  "sample_predictions": [
+    {
+      "file_id": "gen_00000",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00001",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00002",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00003",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00004",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00005",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00006",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00007",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00008",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00009",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00010",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00011",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00012",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00013",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00014",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00015",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00016",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00017",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00018",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00019",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00020",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00021",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00022",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00023",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00024",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00025",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00026",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00027",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00028",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00029",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00030",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00031",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00032",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00033",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00034",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00035",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00036",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00037",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00038",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00039",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00040",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00041",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00042",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00043",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00044",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00045",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00046",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00047",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00048",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    },
+    {
+      "file_id": "gen_00049",
+      "ground_truth": "genuine",
+      "anomaly_score": 0.0,
+      "p_value": 1.0,
+      "conformal_verdict": "GREEN",
+      "dialect": "emirati_gulf_arabic"
+    }
+  ]
+}

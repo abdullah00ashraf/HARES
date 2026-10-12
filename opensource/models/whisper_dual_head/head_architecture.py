@@ -36,7 +36,10 @@ class WhisperDeepfakeMLPHead(nn.Module):
             nn.Sigmoid(),
         )
 
-    def forward(self, encoder_hidden_states: torch.Tensor) -> torch.Tensor:
+    def forward(self, encoder_hidden_states: torch.Tensor, is_pre_pooled: bool = False) -> torch.Tensor:
+        if is_pre_pooled and encoder_hidden_states.dim() == 2:
+            normed = self.layer_norm(encoder_hidden_states)
+            return self.mlp(normed)
         if encoder_hidden_states.dim() == 2:
             encoder_hidden_states = encoder_hidden_states.unsqueeze(0)
         normed = self.layer_norm(encoder_hidden_states)

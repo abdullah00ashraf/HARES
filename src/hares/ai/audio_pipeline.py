@@ -52,13 +52,18 @@ class WhisperDeepfakeMLPHead(nn.Module):
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-    def forward(self, encoder_hidden_states: torch.Tensor) -> torch.Tensor:
+    def forward(self, encoder_hidden_states: torch.Tensor, is_pre_pooled: bool = False) -> torch.Tensor:
         """
         Args:
-            encoder_hidden_states: Tensor of shape (batch_size, seq_len, hidden_dim) or (seq_len, hidden_dim)
+            encoder_hidden_states: Tensor of shape (batch_size, seq_len, hidden_dim) or (seq_len, hidden_dim).
+            is_pre_pooled: If True, treats a 2D tensor as already pooled (batch_size, hidden_dim).
         Returns:
             Tensor of shape (batch_size, 1) containing spoof probability scores in [0.0, 1.0]
         """
+        if is_pre_pooled and encoder_hidden_states.dim() == 2:
+            normed = self.layer_norm(encoder_hidden_states)
+            return self.mlp(normed)
+
         if encoder_hidden_states.dim() == 2:
             encoder_hidden_states = encoder_hidden_states.unsqueeze(0)  # (1, T, D)
 

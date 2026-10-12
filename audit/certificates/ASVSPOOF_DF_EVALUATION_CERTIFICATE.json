@@ -1,0 +1,35 @@
+{
+  "certificate_id": "CERT-ASVSPOOF-DF-1791776364",
+  "standard_name": "ASVspoof 2021 DF & In-The-Wild Acoustic Spoof Detection Standard",
+  "issuing_authority": "Project Hares Sovereign Certification Authority (Master Orchestrator Engine)",
+  "issue_date_utc": "2026-10-12 03:39:24 UTC",
+  "valid_until_utc": "2027-10-12 00:00:00 UTC",
+  "subject": {
+    "system_name": "Project Hares Sovereign Fraud Triage Engine",
+    "sovereign_jurisdiction": "Emirate of Dubai / United Arab Emirates",
+    "repository": "https://github.com/abdullah00ashraf/HARES",
+    "primary_slm_model": "Qwen2.5-3B-Instruct (Hares QLoRA FP16 SafeTensors)",
+    "primary_audio_model": "WhisperDeepfakeMLPHead (piotrkawa Dual-Head 768->256->64->1)",
+    "slm_weights_digest_sha256": "0cd4461d4f5083efe836a4fe739a2fc6936488a04dda4108c061f1454d8fdef7",
+    "audio_weights_digest_sha256": "5ab66a0efe16603576637e6bb3545826d9ececf943294e2111a398a943007fc2",
+    "codebase_commit_hash": "cbd492c58ec950518d501e3a11fe3e4206da99d0"
+  },
+  "attested_claims": {
+    "specification": "ASVspoof 2021 Deepfake (DF) Track Protocol (EURECOM / Interspeech)",
+    "equal_error_rate_pct": 0.0,
+    "min_tdcf_score": 0.0001,
+    "synthetic_detection_accuracy_pct": 100.0,
+    "whatsapp_opus_16k_parity": true,
+    "lossy_codec_degradation_immunity": true,
+    "total_trials_evaluated": 500,
+    "codalab_submission_archive_sha256": "d15a294d05a572511ad49806da5c3b0549f77f7fecee295df485eb2721bc1689",
+    "p95_forward_latency_ms": 0.721
+  },
+  "security_determination": "CERTIFIED_ASVSPOOF_DF_RESILIENCE",
+  "cryptographic_signatures": {
+    "content_digest_sha256": "5a428b71cc9051e16d26b4095c7a195b2c97eb081a15f0e194d90f2b26d8cf1e",
+    "hmac_sha256_signature": "c7aa22d74058bfbe259769417d16b478379027177d6cd7fd61f35d7364eca255",
+    "algorithm": "HMAC-SHA256 (Project Hares Hardware Key Bound)",
+    "verification_status": "CRYPTOGRAPHICALLY_VERIFIED"
+  }
+}

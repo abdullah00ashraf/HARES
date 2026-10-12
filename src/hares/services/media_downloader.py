@@ -51,6 +51,17 @@ class MediaDownloader:
         if not hostname:
             raise ValueError("SSRF Protection: Missing hostname in media download URL.")
 
+        settings = get_settings()
+        if settings.ENVIRONMENT != "production":
+            mock_base_host = urlparse(settings.WHATSAPP_API_BASE_URL).hostname
+            if hostname == "mock-meta-sink" or (
+                mock_base_host
+                and hostname == mock_base_host
+                and hostname in ("localhost", "127.0.0.1")
+                and parsed.path.startswith("/media/download/")
+            ):
+                return
+
         is_valid = any(
             hostname == domain or hostname.endswith(f".{domain}")
             for domain in cls.ALLOWED_CDN_DOMAINS

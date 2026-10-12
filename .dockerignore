@@ -1,0 +1,10 @@
+.git
+.pytest_cache
+__pycache__
+*.pyc
+*.pyo
+models/qwen/*.zip
+models/qwen/hares_qwen2.5_3b_merged_fp16
+frontend
+.agents
+*.tar.gz

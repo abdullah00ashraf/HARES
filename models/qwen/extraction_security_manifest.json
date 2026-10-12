@@ -1,0 +1,67 @@
+{
+  "status": "SECURE_EXTRACTION_VERIFIED",
+  "total_files": 10,
+  "total_bytes": 6183388885,
+  "manifest": {
+    "hares_qwen2.5_3b_merged_fp16/model-00001-of-00004.safetensors": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-001.zip",
+      "file_size": 1991897040,
+      "sha256": "af657a9fa57f7adfc8288b4af51edcbca20f4cfa681536b994c37173c01b6b03",
+      "compress_size": 1752777184
+    },
+    "hares_qwen2.5_3b_merged_fp16/model.safetensors.index.json": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-001.zip",
+      "file_size": 35617,
+      "sha256": "783d54e374eb40e1e87c0fed36ceae5840f92e2f76591a6506595b4581470c31",
+      "compress_size": 1600
+    },
+    "hares_qwen2.5_3b_merged_fp16/tokenizer_config.json": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-001.zip",
+      "file_size": 693,
+      "sha256": "2e3bd3cb5055f7a903a54e7062b2fd14d21b70f4174c3ffcd9fc81ec50a25631",
+      "compress_size": 286
+    },
+    "hares_qwen2.5_3b_merged_fp16/model-00003-of-00004.safetensors": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-002.zip",
+      "file_size": 1958930544,
+      "sha256": "ebd62cc6a25723857073d814e11f2953af4ceb56218adbd9e304994ed9de07d9",
+      "compress_size": 1809889299
+    },
+    "hares_qwen2.5_3b_merged_fp16/generation_config.json": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-002.zip",
+      "file_size": 243,
+      "sha256": "03f4b41c505cb8f4e322a4e84b629aed76f3ab26f005ce2fcdb8380043fed5be",
+      "compress_size": 149
+    },
+    "hares_qwen2.5_3b_merged_fp16/config.json": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-002.zip",
+      "file_size": 1549,
+      "sha256": "577919b03c0ac168746f6dc3e7a28eefac56df1fb3ef3e98bd8417bbadb4be87",
+      "compress_size": 402
+    },
+    "hares_qwen2.5_3b_merged_fp16/model-00002-of-00004.safetensors": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-003.zip",
+      "file_size": 1957877024,
+      "sha256": "91ffb24b8021c1a6fda04beb347be04f6c9e4d963f46616d36f3d3f8ffff76ec",
+      "compress_size": 1808846850
+    },
+    "hares_qwen2.5_3b_merged_fp16/chat_template.jinja": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-003.zip",
+      "file_size": 2507,
+      "sha256": "cd8e9439f0570856fd70470bf8889ebd8b5d1107207f67a5efb46e342330527f",
+      "compress_size": 728
+    },
+    "hares_qwen2.5_3b_merged_fp16/tokenizer.json": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-003.zip",
+      "file_size": 11421892,
+      "sha256": "3fd169731d2cbde95e10bf356d66d5997fd885dd8dbb6fb4684da3f23b2585d8",
+      "compress_size": 2142112
+    },
+    "hares_qwen2.5_3b_merged_fp16/model-00004-of-00004.safetensors": {
+      "archive_source": "hares_qwen2.5_3b_merged_fp16-20261011T153811Z-1-004.zip",
+      "file_size": 263221776,
+      "sha256": "d3710b1455dd6a0fbce90feb623a92e46647281710d2fa8c5562f3f308825b21",
+      "compress_size": 243037648
+    }
+  }
+}

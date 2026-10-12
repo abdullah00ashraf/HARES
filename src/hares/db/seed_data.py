@@ -94,3 +94,32 @@ OFFICIAL_UAE_DOMAINS_SEED: list[OfficialDomainSeed] = [
 def get_default_quarterly_review() -> datetime:
     """Returns timestamp 90 days in the future for quarterly review compliance."""
     return datetime.now(timezone.utc) + timedelta(days=90)
+
+
+def seed_official_domains_if_empty() -> int:
+    """Seeds OFFICIAL_UAE_DOMAINS_SEED into official_domains table if it is currently empty.
+    Returns the number of seeded domains."""
+    from hares.db.models import OfficialDomain
+    from hares.db.session import sync_session_scope
+    from sqlalchemy import select
+
+    with sync_session_scope() as session:
+        existing = session.execute(select(OfficialDomain).limit(1)).scalar_one_or_none()
+        if existing is not None:
+            return 0
+
+        inserted_count = 0
+        review_date = get_default_quarterly_review()
+        for seed in OFFICIAL_UAE_DOMAINS_SEED:
+            domain_entry = OfficialDomain(
+                domain=seed["domain"].lower().strip(),
+                entity_name=seed["entity_name"],
+                entity_type=seed["entity_type"],
+                verified_owner=seed["verified_owner"],
+                quarterly_review_at=review_date,
+                is_active=True,
+            )
+            session.add(domain_entry)
+            inserted_count += 1
+        return inserted_count
+

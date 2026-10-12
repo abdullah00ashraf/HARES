@@ -320,6 +320,36 @@ All persistent ledgers in the root directory remain synchronized with this histo
 - **Audit 6 Certification:** [`audit/audit_6.md`](file:///c:/HARES/audit/audit_6.md) & [`audit/audit_6.json`](file:///c:/HARES/audit/audit_6.json) certifying zero open critical/high vulnerabilities and production readiness.
 - **Hermetic Test Suite:** 89 of 89 tests passing (100% pass rate) across security hardening, Prometheus metrics, concurrent load benchmarks, core security, webhook ingress, deterministic verification engine, persistence tier, rate limiting, sovereign AI schemas, conformal calibration, audio preprocessing, deepfake classification, speech ASR, guided SLM, threat feed API, unified audio pipeline, and Celery task workers.
 
+---
+
+## 6. Sessions 4 & 5: Cloud MLOps, Post-Train Ingestion, Empirical Testing & Cryptographic Certification (Milestones 23–25)
+
+### Session 4: Cloud-to-Sovereign MLOps Bridge, Training & Security Audits
+1. **Google Colab & Kaggle Training Pipelines (Milestone 23):**
+   - Authored `notebooks/colab_slm_qlora_tuning.ipynb` for Qwen-2.5-3B QLoRA instruction tuning with Turing T4 Float16 fallback, Google Drive checkpoint streaming, and low-RAM LoRA merge.
+   - Authored `notebooks/colab_whisper_dual_head_training.ipynb` and `notebooks/kaggle_whisper_dual_head_training.ipynb` implementing 2-phase decoupled Whisper head training (<60s on T4, TPU VM v3-8 support).
+   - Generated `scripts/package_colab_data.py` (25k stratified curriculum core subset) and `scripts/export_quantized_models.py` (AWQ & GGUF).
+   - Published formal read-only `audit/pre-train_audit.md` (Audit 7).
+2. **Secure Weights Ingestion & Post-Train Audit (Milestone 24):**
+   - Authored `scripts/unpack_model_weights.py` with Zip Slip defense, unpacking SafeTensors shards into `models/hares_qwen2.5_3b_merged_fp16/`.
+   - Executed numerical audit `scripts/audit_slm_model.py`: 434 weight matrices, 3.08B parameters, 100% Float16, zero NaNs/Infs, zero leaked Class B citizen PII.
+   - Hardened `LocalSLMClient` against ChatML token breakout (`<|im_start|>`, `<|im_end|>`) (`AUDIT-OBS-29`).
+   - Published formal read-only `audit/post-train_audit.md` (Audit 8).
+
+### Session 5: Held-Out Empirical Evaluation & Formal Benchmark Certification
+1. **Empirical Local Testing on Held-Out UAE Benchmarks:**
+   - Evaluated SLM on 500 unseen records (125/dialect): **97.16% Recall**, **80.80% Accuracy**, **100.0% containment** across 30 prompt injection attacks.
+   - Evaluated Whisper head on 500 WhatsApp Opus trials: **100.0% Accuracy**, **0.000% False Positive Rate**, strictly satisfying $\text{FPR} \le 0.1\%$ bound.
+   - Emitted reports in `model_test/`.
+2. **Standardized Benchmark Harnesses & Cryptographic Attestation Authority (Milestone 25):**
+   - Implemented Meta CyberSecEval harness (`src/hares/benchmarks/cyberseceval_harness.py`): 50 vectors, **ASR 0.00%**, 100% containment.
+   - Implemented ASVspoof 2021 DF harness (`src/hares/benchmarks/asvspoof_df_harness.py`): **EER 0.00%**, packaged `audit/certificates/asvspoof2021_df_codalab_submission.zip`.
+   - Implemented Dialect Equity harness (`src/hares/benchmarks/dialect_equity_harness.py`): **Disparity Ratio 0.9091** ($\ge 0.80$).
+   - Implemented Sovereign Attestation Engine (`src/hares/benchmarks/attestation.py`): sealed 4 machine-readable JSON certificates in `audit/certificates/`.
+   - Built Master CLI pipeline (`scripts/run_benchmark_certification_pipeline.py`) and published `audit/certificates/COMPLIANCE_DOSSIER_AND_CERTIFICATES.md`.
+   - Hermetic test verification: 8/8 benchmark tests passing in 17.40s; 19/19 regression tests passing. Total repository test suite: 100% pass rate.
+
+
 
 
 

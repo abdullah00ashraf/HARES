@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY pyproject.toml README.md* ./
 COPY src/ ./src/
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir .
 
 FROM python:3.12-slim-bookworm AS runner
@@ -28,7 +29,9 @@ RUN groupadd -g 10001 hares && \
 COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
+COPY alembic.ini /app/alembic.ini
 COPY src/ /app/src/
+COPY scripts/ /app/scripts/
 ENV PYTHONPATH="/app/src"
 
 USER hares:hares

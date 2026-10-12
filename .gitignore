@@ -57,3 +57,8 @@ yarn-error.log*
 # Sovereign Audio Dataset Binaries (20,000 files persisted locally on disk; cataloged in audio_metadata.jsonl)
 opensource/datasets/synthetic_voice_eval/audio/
 
+# Large Model Weights, Checkpoints & Colab Staging Archives (Sovereign Local Storage)
+models/**/*.safetensors
+models/**/*.zip
+colab_packages/
+

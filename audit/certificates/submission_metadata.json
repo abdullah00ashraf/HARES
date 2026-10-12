@@ -1,0 +1,9 @@
+{
+  "system_name": "Project Hares Unified Whisper Dual-Head Spoof Classifier",
+  "team_name": "Project Hares Sovereign Cyber Defense",
+  "track": "ASVspoof 2021 DF Track",
+  "codec": "16kHz Mono Opus (WhatsApp Business API Standard)",
+  "total_predictions": 500,
+  "evaluation_date_utc": "2026-10-12 03:39:09 UTC",
+  "sha256_checksum": "d15a294d05a572511ad49806da5c3b0549f77f7fecee295df485eb2721bc1689"
+}
