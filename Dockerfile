@@ -32,9 +32,11 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 COPY alembic.ini /app/alembic.ini
 COPY src/ /app/src/
 COPY scripts/ /app/scripts/
+RUN chmod +x /app/scripts/*.sh
 ENV PYTHONPATH="/app/src"
 
 USER hares:hares
 
 EXPOSE 8000
-CMD ["uvicorn", "hares.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+CMD ["/app/scripts/start_free_tier.sh"]
+
