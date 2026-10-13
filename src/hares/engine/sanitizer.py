@@ -1,5 +1,5 @@
 import re
-from typing import TypedDict
+from typing_extensions import TypedDict
 
 
 class ExtractedEntities(TypedDict):
@@ -24,7 +24,7 @@ EXPLICIT_URL_PATTERN = re.compile(
 
 # Standalone domain pattern (at least one dot, valid TLD length >= 2 or punycode)
 DOMAIN_PATTERN = re.compile(
-    r"\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+(?:[a-zA-Z]{2,}|xn--[a-zA-Z0-9]+)\b",
+    r"\b(?:[a-zA-Z0-9\u00A0-\uFFFF](?:[a-zA-Z0-9\u00A0-\uFFFF\-]{0,61}[a-zA-Z0-9\u00A0-\uFFFF])?\.)+(?:[a-zA-Z]{2,}|xn--[a-zA-Z0-9]+|[\u0600-\u06FF]{2,})\b",
     re.IGNORECASE,
 )
 

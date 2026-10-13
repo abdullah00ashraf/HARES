@@ -1,0 +1,17 @@
+# ==============================================================================
+# Project Hares: NeMo Guardrails Configuration
+# Enforces Sovereign Compute (NFR-1.1), Privacy (FR-4.1) & Safety (NFR-1.3)
+# ==============================================================================
+
+colang_version: "2.x"
+
+models:
+  - type: main
+    engine: vllm
+    parameters:
+      model: "models/hares_qwen2.5_3b_merged_fp16"
+      base_url: "http://localhost:8000/v1"
+
+rails:
+  config:
+    enable_rails_exceptions: false

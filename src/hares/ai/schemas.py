@@ -7,6 +7,8 @@ TacticType = Literal[
     "banking_kyc_freeze",
     "lottery_prize",
     "account_suspension",
+    "prompt_injection",
+    "crypto_investment",
     "none",
 ]
 

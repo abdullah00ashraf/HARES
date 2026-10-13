@@ -1,0 +1,272 @@
+{
+  "title": "Project Hares Multi-Modal Real-World Test Asset Suite",
+  "version": "1.0.0",
+  "description": "Comprehensive test assets across Prompts, URLs, Audio Voice Notes, and Screenshots for evaluating the Project Hares sovereign fraud triage engine.",
+  "assets_root": "c:/HARES/realtest",
+  "target_endpoints": {
+    "web_ui": "http://localhost:3000",
+    "api_verify": "http://localhost:8000/api/v1/triage/verify"
+  },
+  "test_cases": [
+    {
+      "id": "PROMPT-01",
+      "category": "prompt",
+      "filename": "prompts/01_fake_police_fine_urgent.txt",
+      "title": "Emirati Arabic Fake Traffic Fine & Vehicle Impound Extortion",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "impersonation",
+        "traffic_fine_extortion",
+        "unregistered_ioc_domain"
+      ],
+      "target_entity": "Dubai Police"
+    },
+    {
+      "id": "PROMPT-02",
+      "category": "prompt",
+      "filename": "prompts/02_enbd_kyc_suspension_bilingual.txt",
+      "title": "ENBD Banking Security Alert & Fake KYC Suspension",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "banking_credential_harvesting",
+        "credential_demand"
+      ],
+      "target_entity": "Emirates NBD"
+    },
+    {
+      "id": "PROMPT-03",
+      "category": "prompt",
+      "filename": "prompts/03_emirates_post_unpaid_customs.txt",
+      "title": "Emirates Post Parcel Delivery Fee Smishing",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "parcel_delivery_smishing",
+        "financial_demand"
+      ],
+      "target_entity": "Emirates Post"
+    },
+    {
+      "id": "PROMPT-04",
+      "category": "prompt",
+      "filename": "prompts/04_official_dewa_bill_safe.txt",
+      "title": "Authentic DEWA Billing Notification",
+      "expected_verdict": "GREEN",
+      "expected_triggers": [
+        "exact_allowlist_match"
+      ],
+      "target_entity": "DEWA (Dubai Electricity and Water Authority)"
+    },
+    {
+      "id": "PROMPT-05",
+      "category": "prompt",
+      "filename": "prompts/05_official_dubai_police_901_safe.txt",
+      "title": "Authentic Dubai Police e-Crime & 901 Advisory",
+      "expected_verdict": "GREEN",
+      "expected_triggers": [
+        "exact_allowlist_match",
+        "ecrime_ae_match"
+      ],
+      "target_entity": "Dubai Police"
+    },
+    {
+      "id": "PROMPT-06",
+      "category": "prompt",
+      "filename": "prompts/06_salik_homograph_spoof.txt",
+      "title": "Salik Toll Homograph Spoof with Accented Character",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "idn_homograph",
+        "levenshtein_distance"
+      ],
+      "target_entity": "Salik"
+    },
+    {
+      "id": "PROMPT-07",
+      "category": "prompt",
+      "filename": "prompts/07_adversarial_prompt_injection.txt",
+      "title": "ChatML System Override Adversarial Injection",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "prompt_injection_blocked",
+        "guardrail_violation"
+      ],
+      "target_entity": "System / LLM Engine"
+    },
+    {
+      "id": "PROMPT-08",
+      "category": "prompt",
+      "filename": "prompts/08_arabizi_lottery_prize_scam.txt",
+      "title": "Arabizi 500k AED Lottery Prize Scam with OTP Theft",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "prize_scam",
+        "otp_harvesting"
+      ],
+      "target_entity": "Al Ansari Exchange"
+    },
+    {
+      "id": "PROMPT-09",
+      "category": "prompt",
+      "filename": "prompts/09_whatsapp_crypto_investment.txt",
+      "title": "Dubai Golden Visa & Real Estate Crypto Fraud",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "crypto_investment_fraud",
+        "unregulated_financial_lure"
+      ],
+      "target_entity": "DFSA / Investment"
+    },
+    {
+      "id": "PROMPT-10",
+      "category": "prompt",
+      "filename": "prompts/10_casual_benign_conversation_safe.txt",
+      "title": "Casual Benign Conversation in Emirati Arabic",
+      "expected_verdict": "GREEN",
+      "expected_triggers": [
+        "benign_content"
+      ],
+      "target_entity": "None"
+    },
+    {
+      "id": "URL-01",
+      "category": "url",
+      "filename": "urls/01_official_verified_urls.txt",
+      "title": "Official UAE Municipal & Police Domains",
+      "expected_verdict": "GREEN",
+      "expected_triggers": [
+        "exact_allowlist_match"
+      ]
+    },
+    {
+      "id": "URL-02",
+      "category": "url",
+      "filename": "urls/02_homograph_spoofed_urls.txt",
+      "title": "Cyrillic & Accented Lookalike Domains",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "idn_homograph",
+        "punycode_decoding"
+      ]
+    },
+    {
+      "id": "URL-03",
+      "category": "url",
+      "filename": "urls/03_phishing_malicious_urls.txt",
+      "title": "Phishing & Fake Payment URLs",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "phishing_domain",
+        "unverified_cctld"
+      ]
+    },
+    {
+      "id": "AUDIO-01",
+      "category": "audio",
+      "filename": "audio/01_genuine_emirati_arabic_male.ogg",
+      "title": "Genuine Human Voice Note - Emirati Arabic Male",
+      "expected_verdict": "GREEN",
+      "expected_triggers": [
+        "conformal_genuine_pass",
+        "acoustic_features_human"
+      ]
+    },
+    {
+      "id": "AUDIO-02",
+      "category": "audio",
+      "filename": "audio/02_genuine_emirati_arabic_female.ogg",
+      "title": "Genuine Human Voice Note - Emirati Arabic Female",
+      "expected_verdict": "GREEN",
+      "expected_triggers": [
+        "conformal_genuine_pass",
+        "acoustic_features_human"
+      ]
+    },
+    {
+      "id": "AUDIO-03",
+      "category": "audio",
+      "filename": "audio/03_deepfake_f5tts_urgent_police.ogg",
+      "title": "Deepfake Neural Audio - Urgent Police Impersonation",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "deepfake_acoustic_anomaly",
+        "flow_matching_artifacts"
+      ]
+    },
+    {
+      "id": "AUDIO-04",
+      "category": "audio",
+      "filename": "audio/04_deepfake_diffusion_bank_kyc.ogg",
+      "title": "Deepfake Neural Audio - Bank KYC Verification Call",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "deepfake_acoustic_anomaly",
+        "diffusion_spectral_artifacts"
+      ]
+    },
+    {
+      "id": "AUDIO-05",
+      "category": "audio",
+      "filename": "audio/05_deepfake_cosyvoice_lottery_lure.ogg",
+      "title": "Deepfake Neural Audio - CosyVoice 500k AED Lottery Voice Call",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "deepfake_acoustic_anomaly",
+        "neural_vocoder_phase_distortion"
+      ]
+    },
+    {
+      "id": "IMAGE-01",
+      "category": "image",
+      "filename": "images/screenshot_01_fake_police_fine_sms.png",
+      "title": "Screenshot: Fake Traffic Fine with Malicious URL",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "ocr_extracted_threat_url",
+        "traffic_fine_extortion"
+      ]
+    },
+    {
+      "id": "IMAGE-02",
+      "category": "image",
+      "filename": "images/screenshot_02_emirates_post_unpaid_fee.png",
+      "title": "Screenshot: Emirates Post Parcel Delivery Hold",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "ocr_extracted_threat_url",
+        "parcel_delivery_smishing"
+      ]
+    },
+    {
+      "id": "IMAGE-03",
+      "category": "image",
+      "filename": "images/screenshot_03_enbd_urgent_kyc_freeze.png",
+      "title": "Screenshot: ENBD Urgent Account Suspension",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "ocr_extracted_threat_url",
+        "banking_credential_harvesting"
+      ]
+    },
+    {
+      "id": "IMAGE-04",
+      "category": "image",
+      "filename": "images/screenshot_04_official_dewa_bill_verified.png",
+      "title": "Screenshot: Legitimate DEWA Bill Statement",
+      "expected_verdict": "GREEN",
+      "expected_triggers": [
+        "ocr_extracted_allowlist_domain"
+      ]
+    },
+    {
+      "id": "IMAGE-05",
+      "category": "image",
+      "filename": "images/screenshot_05_whatsapp_voice_scam_chat.png",
+      "title": "Screenshot: WhatsApp Crypto Scam Voice Chat",
+      "expected_verdict": "RED",
+      "expected_triggers": [
+        "ocr_extracted_threat_url",
+        "crypto_investment_fraud"
+      ]
+    }
+  ]
+}

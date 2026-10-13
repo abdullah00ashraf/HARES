@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <polygon points="32,4 58,16 58,40 32,60 6,40 6,16" fill="#0B132B" stroke="#10B981" stroke-width="2.5"/>
+  <polygon points="32,10 50,20 50,38 32,53 14,38 14,20" fill="#0284C7" fill-opacity="0.2"/>
+  <!-- Falcon Wings -->
+  <path d="M32 18 L16 28 L22 36 L32 28 Z" fill="#FBBF24"/>
+  <path d="M32 18 L48 28 L42 36 L32 28 Z" fill="#FBBF24"/>
+  <!-- Sentry Head -->
+  <polygon points="32,14 36,22 32,28 28,22" fill="#F59E0B"/>
+  <!-- Core Diamond -->
+  <polygon points="32,36 37,42 32,48 27,42" fill="#06B6D4" stroke="#FFFFFF" stroke-width="1"/>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+  </defs>
+  <polygon points="60,8 108,28 108,72 60,112 12,72 12,28" fill="url(#greenGrad)" stroke="#34D399" stroke-width="3"/>
+  <polygon points="60,18 98,34 98,68 60,100 22,68 22,34" fill="#064E3B" fill-opacity="0.6" stroke="#10B981" stroke-width="1.5" stroke-dasharray="4 2"/>
+  <!-- Verified Checkmark -->
+  <path d="M42 60 L54 72 L80 44" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Sentry Stars -->
+  <circle cx="60" cy="26" r="3" fill="#FCD34D"/>
+</svg>

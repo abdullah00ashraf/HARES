@@ -1,13 +1,13 @@
 {
   "session_metadata": {
-    "session_id": "session-1",
-    "title": "Foundational Architecture, MLOps Research, Phase 1 Implementation, Verification & Publication",
-    "date": "2026-10-09",
+    "session_id": "session-6",
+    "title": "Sovereign Programmable Guardrails Engine & Live Staging Verification",
+    "date": "2026-10-12",
     "status": "COMPLETED_AND_VERIFIED",
     "repository": "abdullah00ashraf/HARES",
     "remote_origin": "https://github.com/abdullah00ashraf/HARES.git",
     "tracking_branch": "main",
-    "frameworks": ["FastAPI", "Celery", "Redis", "PostgreSQL", "Docker", "Pytest", "Pydantic v2"]
+    "frameworks": ["FastAPI", "Celery", "Redis", "PostgreSQL", "Docker", "Pytest", "Pydantic v2", "NeMo Guardrails", "Colang 2.0", "vLLM", "SafeTensors"]
   },
   "project_overview": {
     "project_name": "Project Hares",
@@ -179,15 +179,44 @@
     {
       "file": ".agents/skills/security-audit/",
       "purpose": "Cloudflare defensive source-first vulnerability audit skill suite (20 assets including SKILL.md and report-schema.json)"
+    },
+    {
+      "file": "src/hares/ai/guardrails/actions.py",
+      "purpose": "Deterministic action registry: Class B citizen PII redaction, prompt injection defense, topical gating, schema validation, Dubai Police escalation"
+    },
+    {
+      "file": "src/hares/ai/guardrails/policies/hares_guardrails.co",
+      "purpose": "Declarative Colang 2.0 asynchronous event-driven flows for input rails, topical boundaries, and output rails"
+    },
+    {
+      "file": "src/hares/ai/guardrails/config.yml",
+      "purpose": "Colang 2.x configuration binding local vLLM Qwen2.5-3B model daemon"
+    },
+    {
+      "file": "src/hares/ai/guardrails/engine.py",
+      "purpose": "SovereignGuardrailsEngine orchestrator managing input safety passes, local generator delegation, and output schema validation"
+    },
+    {
+      "file": "src/hares/ai/slm_client.py",
+      "purpose": "LocalSLMClient enhanced with SovereignGuardrailsEngine integration and triage_with_guardrails method"
+    },
+    {
+      "file": "tests/test_programmable_guardrails.py",
+      "purpose": "Automated test suite (21 tests) covering PII masking, multi-vector prompt injections, schema locking, and concurrency stress"
+    },
+    {
+      "file": "opensource/repositories/guardrails/nemo_guardrails",
+      "purpose": "Upstream NVIDIA NeMo Guardrails repository asset cloned and registered in CATALOG.json"
     }
   ],
   "automated_test_suite": {
     "framework": "pytest 9.0.3",
-    "total_tests": 11,
-    "passed_tests": 11,
+    "total_tests": 126,
+    "passed_tests": 126,
     "failed_tests": 0,
-    "pass_rate_pct": 100,
-    "duration_seconds": 1.36,
+    "pass_rate_pct": 100.0,
+    "guardrail_tests_count": 21,
+    "guardrails_concurrency_stress": "8 threads x 25 iterations (200 concurrent passes) - 100% thread safe",
     "tests": [
       "tests/test_security.py::test_verify_meta_signature_valid",
       "tests/test_security.py::test_verify_meta_signature_invalid",
@@ -301,13 +330,13 @@
     }
   ],
   "dual_ledger_state": {
-    "system_state_version": "1.7.0-datasets-populated",
-    "development_ledger_milestones_logged": 22,
-    "last_updated_utc": "2026-10-10 08:30:00",
-    "phase_completed": "Milestone 22: Local Open-Source Datasets Population (100K Smishing & 20K Audio Deepfakes)",
+    "system_state_version": "2.3.0-guardrails-verified",
+    "development_ledger_milestones_logged": 26,
+    "last_updated_utc": "2026-10-12 15:45:00",
+    "phase_completed": "Milestone 26: Sovereign Programmable Guardrails Engine Implementation & Verification",
     "test_suite_status": {
-      "total_tests": 89,
-      "passed": 89,
+      "total_tests": 126,
+      "passed": 126,
       "pass_rate_pct": 100.0
     },
     "datasets_inventory": {
@@ -400,6 +429,24 @@
         "dialect_disparity_ratio": 0.9091,
         "sovereign_boundary": "100% On-Premise UAE Execution",
         "determination": "CERTIFIED_DESC_ISR_SOVEREIGN_COMPLIANT"
+      }
+    },
+    "programmable_guardrails_engine": {
+      "framework": "NVIDIA NeMo Guardrails (v0.24.1)",
+      "colang_version": "2.0",
+      "input_rails": ["mask_citizen_pii", "detect_prompt_injection", "check_topical_boundary"],
+      "output_rails": ["validate_triage_schema", "enforce_dubai_police_escalation"],
+      "invariants": {
+        "nfr_1_1_sovereignty": "100% Local Sovereign Compute - Zero Offshore API Calls",
+        "nfr_1_3_injection_immunity": "ChatML tokens, XML boundary tags, Arabic/English jailbreaks, Base64 obfuscation",
+        "fr_4_1_pii_masking": "Emirates IDs, Payment Cards, OTPs, Submitter phone protection",
+        "fr_2_4_schema_contract": "Pydantic v2 TextTriageInferenceResult closed contract locking",
+        "fr_3_1_escalation": "Mandatory Dubai Police ecrime.ae / 901 binding on high-risk verdicts"
+      },
+      "test_verification": {
+        "guardrail_tests_total": 21,
+        "guardrail_tests_passed": 21,
+        "concurrency_stress": "8 threads x 25 iterations (200 total invocations) - 100% thread safe"
       }
     }
   }

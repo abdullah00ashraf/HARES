@@ -3,15 +3,35 @@
 @tailwind utilities;
 
 :root {
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --card-bg: #FFFFFF;
+  --card-border: #E2E8F0;
+  --muted-text: #64748B;
+  --accent-gold: #D97706;
+  --accent-emerald: #059669;
+  --accent-crimson: #DC2626;
+  --accent-cyan: #0284C7;
+}
+
+html.dark {
   --background: #0B0F19;
   --foreground: #F3F4F6;
+  --card-bg: #111827;
+  --card-border: #1F2937;
+  --muted-text: #94A3B8;
+  --accent-gold: #F59E0B;
+  --accent-emerald: #10B981;
+  --accent-crimson: #EF4444;
+  --accent-cyan: #38BDF8;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Cairo", "Tahoma", "Helvetica Neue", Arial, sans-serif;
   overflow-x: hidden;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Custom Scrollbar for Sleek Forensic Workbenches */
@@ -21,28 +41,45 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #111827;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #374151;
+  background: #94A3B8;
   border-radius: 3px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #4B5563;
+html.dark ::-webkit-scrollbar-thumb {
+  background: #374151;
 }
 
-/* Pulse animation for active sovereign feeds */
+::-webkit-scrollbar-thumb:hover {
+  background: #64748B;
+}
+
+/* Micro-animations */
 @keyframes pulse-subtle {
   0%, 100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.4;
+    opacity: 0.45;
   }
 }
 
 .animate-pulse-subtle {
   animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes radar-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-radar-sweep {
+  animation: radar-sweep 4s linear infinite;
 }

@@ -110,6 +110,21 @@ services:
       timeout: 3s
       retries: 5
 
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    container_name: hares-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - hares_ingress
+      - hares_internal
+    depends_on:
+      api:
+        condition: service_healthy
+
 networks:
   hares_ingress:
     driver: bridge

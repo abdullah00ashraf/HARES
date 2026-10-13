@@ -113,6 +113,16 @@
       "architecture": "Model Agnostic Prediction Interval Estimator (Scikit-Learn Contrib)",
       "license": "BSD-3-Clause",
       "status": "synchronized"
+    },
+    {
+      "id": "repo-nemo-guardrails",
+      "name": "nemo-guardrails",
+      "category": "guardrails",
+      "local_path": "opensource/repositories/guardrails/nemo_guardrails",
+      "upstream_url": "https://github.com/NVIDIA-NeMo/Guardrails.git",
+      "architecture": "Programmable Rails Engine (Colang 1.0/2.0) with Input, Output, Dialog, and PII Guardrails",
+      "license": "Apache-2.0",
+      "status": "synchronized"
     }
   ],
   "datasets": [

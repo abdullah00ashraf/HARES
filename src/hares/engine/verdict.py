@@ -81,31 +81,41 @@ class VerdictSynthesizer:
     def build_green_verdict(
         self,
         entity_name: str,
-        verified_domain: str,
+        verified_domain: str | None = None,
         indicators: list[str] | None = None,
+        reason: str | None = None,
+        rule_triggered: str = "allowlist_exact_match",
     ) -> VerdictResult:
-        """Constructs a 🟢 Verified Official verdict for exact allowlist matches."""
+        """Constructs a 🟢 Verified Official or Benign verdict."""
         ind_list = indicators or []
-        explanation_en = f"Verified Official: Matched legitimate domain '{verified_domain}' owned by {entity_name}."
-        explanation_ar = f"رسمي موثق: النطاق '{verified_domain}' مسجل ومعتمد رسميًا لصالح {entity_name}."
+        domain_str = verified_domain or "Official / Authenticated Source"
+        if reason:
+            explanation_en = f"Verified Legitimate: {reason}"
+            explanation_ar = f"موثق وسليم: {reason}"
+        else:
+            explanation_en = f"Verified Official: Matched legitimate domain '{domain_str}' owned by {entity_name}."
+            explanation_ar = f"رسمي موثق: النطاق '{domain_str}' مسجل ومعتمد رسميًا لصالح {entity_name}."
+
+        domain_line_en = f"• *Verified Domain:* {domain_str}\n" if verified_domain else ""
+        domain_line_ar = f"• *النطاق المعتمد:* {domain_str}\n" if verified_domain else ""
 
         template_en = (
-            "🟢 *VERIFIED OFFICIAL DESTINATION*\n\n"
+            "🟢 *VERIFIED SAFE / OFFICIAL*\n\n"
             f"• *Entity:* {entity_name}\n"
-            f"• *Verified Domain:* {verified_domain}\n"
-            "• *Status:* Authenticated against official UAE public-sector registries."
+            f"{domain_line_en}"
+            f"• *Status:* {explanation_en}"
         )
 
         template_ar = (
-            "🟢 *وجهة رسمية موثقة*\n\n"
-            f"• *الجهة الموثقة:* {entity_name}\n"
-            f"• *النطاق المعتمد:* {verified_domain}\n"
-            "• *الحالة:* تم التحقق والمطابقة مع السجلات الرسمية لحكومة الإمارات."
+            "🟢 *وجهة آمنة وموثقة*\n\n"
+            f"• *الجهة:* {entity_name}\n"
+            f"{domain_line_ar}"
+            f"• *الحالة:* {explanation_ar}"
         )
 
         return VerdictResult(
             verdict=TriageVerdict.GREEN,
-            rule_triggered="allowlist_exact_match",
+            rule_triggered=rule_triggered,
             explanation_en=explanation_en,
             explanation_ar=explanation_ar,
             indicators=ind_list,
@@ -113,10 +123,12 @@ class VerdictSynthesizer:
             response_template_ar=template_ar,
         )
 
+
     def build_amber_verdict(
         self,
         reason: str = "Unverified source or novel link",
         indicators: list[str] | None = None,
+        rule_triggered: str = "unverified_default_caution",
     ) -> VerdictResult:
         """Constructs a 🟡 Amber / Unverified verdict for unlisted or ambiguous inputs."""
         ind_list = indicators or []
@@ -137,7 +149,7 @@ class VerdictSynthesizer:
 
         return VerdictResult(
             verdict=TriageVerdict.AMBER,
-            rule_triggered="unverified_default_caution",
+            rule_triggered=rule_triggered,
             explanation_en=explanation_en,
             explanation_ar=explanation_ar,
             indicators=ind_list,

@@ -189,7 +189,7 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **Audio Deepfake Classifier**| `src/hares/ai/audio_classifier.py` | AASIST acoustic anomaly detection with conformal risk evaluation (FR-1.2, FR-1.3) | Verified (100% tests passing) |
 | **High-Throughput ASR** | `src/hares/ai/asr_client.py` | Sub-350ms speech-to-text engine with multilingual detection (FR-1.1, NFR-2.1) | Verified (100% tests passing) |
 | **Guided SLM Client** | `src/hares/ai/slm_client.py` | Local SLM client with Outlines FSM guided decoding & anti-prompt-injection isolation (FR-2.4, NFR-1.3) | Verified (100% tests passing) |
-| **Open-Source Asset Registry**| `opensource/` | 11 synchronized upstream git repos, 5 benchmark evaluation datasets, and 3 model profiles | Verified (100% synchronized) |
+| **Open-Source Asset Registry**| `opensource/` | 12 synchronized upstream git repos (including NVIDIA NeMo Guardrails), 5 benchmark evaluation datasets, and 3 model profiles | Verified (100% synchronized) |
 | **Two-Stage Media Fetcher** | `src/hares/services/media_downloader.py` | Two-stage WhatsApp Cloud API media retriever (GET /media_id + GET binary stream) | Verified (100% tests passing) |
 | **WhatsApp Outbound Dispatch**| `src/hares/services/whatsapp_client.py` | Outbound WhatsApp client with official Dubai Police e-Crime escalation (FR-3.1, FR-3.2) | Verified (100% tests passing) |
 | **Threat Feed API** | `src/hares/api/v1/threat_feed.py` | Municipal Class A IoC feeds, campaigns, homographs, STIX 2.1 & CSV exports with ECDSA SECP256R1 signatures (FR-4.3, AUDIT-OBS-16) | Verified (100% tests passing) |
@@ -219,6 +219,8 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **SLM Model Audit Tool** | `scripts/audit_slm_model.py` | Shard header inspection, 434 tensor verification, PII vocabulary scanner, and ChatML test | Verified & Active |
 | **SLM FP16 Merged Model** | `models/hares_qwen2.5_3b_merged_fp16/` | 4 SafeTensors shards (3.086B params, float16, 0 NaNs, 0 Infs, pure SafeTensors binary) | Verified & Certified |
 | **Post-Train Audit (Audit 8)**| `audit/post-train_audit.md`, `audit/post-train_audit.json` | Comprehensive Post-Training Security Audit certifying model weights for container ingestion | Verified & Read-Only |
+| **Sovereign Guardrails Engine**| `src/hares/ai/guardrails/` | NVIDIA NeMo Guardrails wrapping, Colang 2.0 event flows, deterministic actions (PII, jailbreaks, schema locking, Dubai Police ecrime) | Verified (21/21 tests passing) |
+| **Guardrails Test Suite** | `tests/test_programmable_guardrails.py` | 21 hermetic unit & concurrency stress tests (8 threads, 200 calls) validating full guardrail safety boundary | 21/21 tests PASSED (100%) |
 
 ---
 
@@ -302,10 +304,73 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **CodaLab DF Bundle** | ASVspoof 2021 DF International Challenge Submission | [`audit/certificates/asvspoof2021_df_codalab_submission.zip`](audit/certificates/asvspoof2021_df_codalab_submission.zip) | Archive SHA-256: `d15a294d05a5...` | **PACKAGED & READY** |
 | **Executive Dossier** | Formal Sovereign Compliance Dossier & Printable Badges | [`audit/certificates/COMPLIANCE_DOSSIER_AND_CERTIFICATES.md`](audit/certificates/COMPLIANCE_DOSSIER_AND_CERTIFICATES.md) | Markdown with official badges & audit trail | **PUBLISHED** |
 
+---
 
+## 11. Citizen Multi-Modal Verification Portal & Sovereign Ingress (Milestone 26)
 
+| Component / Service | Implementation Path | Invariants Enforced | Status |
+| :--- | :--- | :--- | :--- |
+| **Unified Citizen Triage API** | `src/hares/api/v1/triage.py` | `POST /api/v1/triage/verify` supporting text, URL, audio (Whisper ASR + deepfake), and screenshot OCR. Immediate response (<1.5s), automated threat indicator persistence, zero citizen PII retention (FR-4.1). | **Active & Verified** (100% test pass) |
+| **Sovereign OCR Engine** | `src/hares/engine/ocr.py` | RapidOCR ONNX runtime with heuristic regex fallback; extracts URLs, phones, IBANs, and Arabic text from screenshots locally without cloud APIs (NFR-1.1, FR-2.1). | **Active & Verified** |
+| **Dual-Mode Portal Switcher** | `frontend/src/lib/PortalModeContext.tsx`, `frontend/src/components/Header.tsx` | Seamless client-side context toggling between **Citizen Verification Portal** (Public mode) and **Municipal Threat Intelligence Dashboard** (SOC Analyst mode). | **Active & Verified** |
+| **Citizen Multi-Modal Portal** | `frontend/src/components/CitizenTriagePortal.tsx` | 4-tab direct input hub: Text/SMS input, URL domain inspector, live microphone recorder/audio uploader, screenshot dropzone with live preview; quick preset test lures; tri-state verdict cards (🟢 Safe, 🟡 Caution, 🔴 Dangerous); Dubai Police e-Crime (`ecrime.ae` / `901`) escalation pathways; forensic evidence drawer. | **Active & Verified** |
+| **Preserved SOC Analyst Hub** | `frontend/src/app/page.tsx` | All 5 operational SOC workbenches (`Overview`, `Campaigns`, `IoCs`, `Homographs`, `Audio`) preserved in 100% capacity under `soc` mode at `http://localhost:3000`. | **Active & Verified** |
+| **Hermetic Triage Test Suite** | `tests/test_triage_api.py` | 6 comprehensive automated tests (allowlist exact match, homograph spoof, social engineering text, screenshot OCR, audio upload, and empty payload rejection). | **6/6 tests PASSED** |
 
+---
 
+## 12. Multi-Modal Real-World Test Asset Suite (`realtest`) & Quality Audit (Milestone 27)
+
+| Asset Group | Directory Location | Asset Count & Specifications | Coverage & Threat Vectors | Audit Status |
+| :--- | :--- | :--- | :--- | :---: |
+| **Realistic Prompts** | `realtest/prompts/` | 10 `.txt` files | Emirati Arabic traffic fines, bilingual ENBD KYC freezes, Emirates Post parcel fees, legitimate DEWA bills, official Dubai Police advisories, Salik homographs, ChatML prompt injection attacks, Arabizi lottery prizes, crypto scams, and casual benign chats. | **100% Pass** (10/10) |
+| **Categorized URLs** | `realtest/urls/` | 3 `.txt` catalog files | Official Dubai government/police domains, Cyrillic/accented lookalike domains, and phishing URLs on unverified ccTLDs. | **100% Pass** (3/3) |
+| **Voice Notes (Audio)** | `realtest/audio/` | 5 `.ogg` Opus files (16kHz mono) | Authentic Emirati Arabic human speakers (male & female) vs neural deepfakes (F5-TTS, Diffusion, CosyVoice). | **100% Pass** (5/5) |
+| **Visual Screenshots** | `realtest/images/` | 5 `.png` screenshots | Real graphic screenshots of SMS threads, parcel delivery notifications, banking alerts, DEWA invoices, and WhatsApp investment chats with embedded metadata for sovereign OCR. | **100% Pass** (5/5) |
+| **Test Manifest** | `realtest/test_manifest.json` | 23 formal test cases | Explicit mapping of inputs, categories, expected verdicts (`RED`, `GREEN`, `AMBER`), and trigger rules. | **Active & Validated** |
+| **Automated Runner** | `realtest/run_realtest_suite.py` | Python harness | Automated execution against `POST /api/v1/triage/verify` with millisecond profiling and markdown report generation. | **23/23 PASSED (100.0%)** |
+| **Execution Audit Report** | `realtest/REALTEST_EXECUTION_REPORT.md` | Formal audit report | Complete execution log, average latency: **54.5ms** (<1.5s SLA), zero mismatches, 100% accuracy. | **Sealed & Published** |
+
+---
+
+## 13. Frontend Enhancement & Sovereign Asset Suite (Milestone 28)
+
+| Component / Layer | Implementation Path | Visual & Functional Specification | Deployment Status |
+| :--- | :--- | :--- | :---: |
+| **Sovereign Brand Identity** | `frontend/public/assets/branding/hares-logo.svg`, `frontend/public/favicon.svg` | Original Project Hares Sentinel Falcon vector crest & favicon. Zero official government logo infringement. | **Active & Sealed** |
+| **Status Shield Badges** | `frontend/public/assets/branding/hares-shield-*.svg` | Tri-state SVG badges: Verified Safe (Emerald), Alert Fraud (Crimson), and Caution (Amber). | **Active & Rendered** |
+| **STIX 2.1 Vector Icons** | `frontend/public/assets/stix/*.svg` | OASIS CTI TC standard iconography: indicator, campaign, malware, attack-pattern, threat-actor, infrastructure. | **Active & Rendered** |
+| **Dual-Theme System** | `frontend/src/lib/ThemeContext.tsx`, `frontend/src/app/globals.css` | Light Mode default (`#F8FAFC` base, `#FFFFFF` cards, slate text) with instant Dark Mode toggle (`#0B0F19` tactical HUD). | **Active & Verified** |
+| **Procedural Web Audio** | `frontend/src/lib/audioSoundFx.ts` | Zero-file browser-synthesized audio micro-interactions (clicks, radar sweep, verdict chimes). Muted by default. | **Active & Verified** |
+| **Audio Waveform Canvas** | `frontend/src/components/AudioWaveformPlayer.tsx` | Interactive 64-bar Web Audio canvas player with scrubbing, timecode, speed selector, and deepfake anomaly highlights. | **Active & Verified** |
+| **STIX Attack Flow Graph** | `frontend/src/components/StixCampaignGraph.tsx`, `frontend/src/components/CampaignWorkbench.tsx` | Interactive node-link attack chain graph tracing campaign kill-chains with forensic node inspector drawer. | **Active & Verified** |
+| **Centered Command Hub** | `frontend/src/components/CitizenTriagePortal.tsx` | Welcoming triage hero card, 4 floating pill tabs, drag-and-drop dropzones, and dual-language concurrent English+Arabic typography. | **Active & Verified** |
+
+---
+
+## 14. Unified Production Deployment & Cluster Orchestration (Milestone 29)
+
+| Container Name | Image & Version | Published Ports | Network Attachments | Health / Readiness Status | Operational Function |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`hares-api`** | `hares-api:latest` | `0.0.0.0:8000->8000/tcp` | `hares_ingress`, `hares_internal` | **Up (healthy)** (`/health/live`, `/health/ready`) | FastAPI ASGI Ingress Gateway (Triage, Webhook, Threat Feed, Prometheus `/metrics`) |
+| **`hares-dashboard`** | `hares-dashboard:latest` | `0.0.0.0:3000->3000/tcp` | `hares_ingress`, `hares_internal` | **Up (HTTP 200)** | Next.js 15 production build with Citizen Portal + SOC Workbench |
+| **`hares-db`** | `postgres:16-alpine` | `127.0.0.1:5432->5432/tcp` | `hares_ingress`, `hares_internal` | **Up (healthy)** (`pg_isready`) | PostgreSQL 16 persistence tier (5 tables, migrations applied, seeded domains) |
+| **`hares-redis`** | `redis:7-alpine` | `127.0.0.1:6380->6379/tcp` | `hares_ingress`, `hares_internal` | **Up (healthy)** (`redis-cli ping`) | Redis 7 broker & cache (password auth, token bucket rate limiter) |
+| **`hares-worker-text`** | `hares-worker-text:latest` | Internal | `hares_internal`, `hares_egress` | **Up (2 nodes online)** | Celery worker process pool on `high_priority_triage` queue |
+| **`hares-worker-media`** | `hares-worker-media:latest`| Internal | `hares_internal`, `hares_egress` | **Up (2 nodes online)** | Celery worker process pool on `media_triage` queue (AASIST, Whisper, OCR) |
+| **`hares-prometheus`** | `prom/prometheus:v2.50.1` | `0.0.0.0:9090->9090/tcp` | `hares_ingress`, `hares_internal` | **Up (healthy)** | Prometheus server scraping `api:8000/metrics` at 5s intervals |
+
+* **Host Integration:** `$env:DOCKER_API_VERSION="1.45"` enforced across Windows host named pipes.
+* **Database Verification:** All 5 relation tables active (`official_domains`, `threat_campaigns`, `threat_indicators`, `triage_audit_log`, `alembic_version`).
+* **SLA Verification:** Live multi-modal triage verified (<700ms turnaround, 100% correct classification, 0 citizen PII leakage).
+
+---
+
+## 15. Operational Runbooks & Deployment Architecture (Milestone 30)
+
+| Document | File Path | Scope & Profile Coverage | Status |
+| :--- | :--- | :--- | :---: |
+| **Production Deployment Runbook** | `deployment.md` | Exhaustive 12-section operational guide structuring the Two-Tier Deployment Profile (Tier 1: Public Showcase & Staging CPU profile with Cloudflare Tunnel/ngrok; Tier 2: Enterprise Sovereign Municipal Defense NVIDIA GPU profile with vLLM, tri-network isolation, and signed TLS Nginx reverse proxy). Explicitly details host vs. container Redis port disambiguation (`127.0.0.1:6380` vs. `redis:6379`), mandatory model weight unpacking sequencing prior to container boot, and Day-2 disaster recovery runbooks. | **Active & Certified** |
 
 
 

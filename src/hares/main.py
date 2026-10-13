@@ -7,6 +7,7 @@ from hares.core.logging import configure_logging
 from hares.api.v1.webhook import router as webhook_router
 from hares.api.v1.health import router as health_router
 from hares.api.v1.threat_feed import router as threat_feed_router
+from hares.api.v1.triage import router as triage_router
 
 
 @asynccontextmanager
@@ -60,6 +61,7 @@ def create_app() -> FastAPI:
     application.include_router(health_router, tags=["Health"])
     application.include_router(webhook_router, tags=["WhatsApp Webhook"])
     application.include_router(threat_feed_router, prefix="/api/v1", tags=["Municipal Threat Intelligence"])
+    application.include_router(triage_router, prefix="/api/v1", tags=["Citizen Fraud Triage"])
 
     # Prometheus Metrics Endpoint (Phase 6 Observability)
     @application.get("/metrics", tags=["Observability"])

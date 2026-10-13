@@ -246,7 +246,21 @@ c:/HARES/
 │       │   └── v1/
 │       │       ├── __init__.py
 │       │       ├── health.py                # Liveness & readiness probes
+│       │       ├── threat_feed.py           # Municipal IoC threat feeds, STIX 2.1 & CSV exports
 │       │       └── webhook.py               # WhatsApp GET/POST webhook endpoint
+│       ├── ai/
+│       │   ├── __init__.py
+│       │   ├── schemas.py                   # Pydantic v2 schemas (TextTriageInferenceResult, etc.)
+│       │   ├── slm_client.py                # Local SLM Client integrated with Sovereign Guardrails
+│       │   ├── audio_pipeline.py            # Unified Whisper Dual-Head pipeline
+│       │   ├── conformal.py                 # Conformal statistical risk evaluator (FPR <= 0.1%)
+│       │   └── guardrails/                  # Sovereign Programmable Guardrails (NVIDIA NeMo Guardrails)
+│       │       ├── __init__.py              # SovereignGuardrailsEngine & GuardrailResult exports
+│       │       ├── actions.py               # Deterministic action registry (PII, injection, schema, ecrime)
+│       │       ├── config.yml               # Colang 2.x config binding local vLLM daemon
+│       │       ├── engine.py                # SovereignGuardrailsEngine pipeline orchestrator
+│       │       └── policies/
+│       │           └── hares_guardrails.co  # Declarative Colang 2.0 event flows
 │       └── workers/
 │           ├── __init__.py
 │           ├── celery_app.py                # Celery app & queue routing
@@ -259,7 +273,9 @@ c:/HARES/
 │   ├── test_tasks.py                        # Celery worker task tests
 │   ├── test_engine.py                       # Deterministic engine unit tests (allowlist, homograph, PII)
 │   ├── test_db.py                           # Database ORM models and repository tests (aiosqlite)
-│   └── test_rate_limiter.py                 # Redis token-bucket rate limiter tests
+│   ├── test_rate_limiter.py                 # Redis token-bucket rate limiter tests
+│   ├── test_slm.py                          # Local SLM client unit tests
+│   └── test_programmable_guardrails.py      # 21 unit & concurrency tests for Sovereign Guardrails
 ├── .env                                     # Local developer environment variables (git-ignored)
 ├── monitoring/
 │   ├── prometheus.yml                       # Prometheus scrape config (5s interval)
@@ -274,35 +290,22 @@ c:/HARES/
 ├── docker-compose.yml                       # Dev/portable CPU topology
 ├── pyproject.toml                           # Python package definition & test settings
 ├── audit/
-│   ├── audit_1.md                           # Formal Audit 1 Markdown report (AUDIT-001-PHASE1-RECON)
-│   ├── audit_1.json                         # Formal Audit 1 machine-readable structured findings
-│   ├── audit_2.md                           # Formal Audit 2 Markdown report (AUDIT-002-PHASE2-DETERMINISTIC)
-│   ├── audit_2.json                         # Formal Audit 2 machine-readable structured findings
-│   ├── audit_3.md                           # Formal Audit 3 Markdown report (AUDIT-003-PHASE3-SOVEREIGN-AI)
-│   ├── audit_3.json                         # Formal Audit 3 machine-readable structured findings
-│   ├── audit_4.md                           # Formal Audit 4 Markdown report (AUDIT-004-PHASE4-MUNICIPAL-DASHBOARD)
-│   ├── audit_4.json                         # Formal Audit 4 machine-readable structured findings
-│   ├── audit_5.md                           # Formal Audit 5 Markdown report (AUDIT-005-PHASE5-SOVEREIGN-AI-AND-MEDIA)
-│   ├── audit_5.json                         # Formal Audit 5 machine-readable structured findings
-│   ├── audit_6.md                           # Formal Audit 6 Markdown report (AUDIT-006-PHASE6-PRODUCTION-HARDENING)
-│   └── audit_6.json                         # Formal Audit 6 machine-readable structured findings
+│   ├── audit_1.md through audit_6.md        # Formal Phase 1-6 Markdown reports
+│   ├── pre-train_audit.md                   # Formal Audit 7 (Pre-Train Defensive Security)
+│   ├── post-train_audit.md                  # Formal Audit 8 (Post-Train SafeTensors Verification)
+│   └── certificates/                        # 4 sealed cryptographic JSON attestation certificates
 ├── opensource/
-│   ├── datasets/
-│   │   ├── localized_fraud_corpus/              # 100,000 paired ChatML records (87.72 MB)
-│   │   │   ├── uae_smishing_100k.jsonl          # 40% Emirati, 30% MSA, 20% Expat English, 10% Arabizi; 70% Malicious, 30% Benign
-│   │   │   └── uae_smishing_manifest.json       # Formal dataset manifest
-│   │   ├── synthetic_voice_eval/                # 20,000 WhatsApp-compliant 16 kHz Mono Opus .ogg files
-│   │   │   ├── audio/
-│   │   │   │   ├── genuine/shard_00-09/         # 10,000 Genuine samples (Common Voice Arabic Gulf/MSA, English, Urdu)
-│   │   │   │   └── synthetic/shard_00-09/       # 10,000 Synthetic samples (F5-TTS, CosyVoice, XTTS-v2, ElevenLabs)
-│   │   │   ├── audio_metadata.jsonl             # Streaming metadata catalog (file_id, duration, SNR, artifacts)
-│   │   │   └── audio_corpus_manifest.json       # Formal audio corpus manifest
-│   │   └── generate_smishing_100k.py            # Localized text fraud corpus generator
-│   │   └── generate_audio_20k.py                # Sovereign audio deepfake & acoustic artifact generator
+│   ├── CATALOG.json                         # Open-source asset registry (repositories, models, datasets)
+│   ├── repositories/
+│   │   └── guardrails/
+│   │       └── nemo_guardrails/             # NVIDIA NeMo Guardrails upstream repository
+│   └── datasets/
+│       ├── localized_fraud_corpus/          # 100,000 paired ChatML records (87.72 MB)
+│       └── synthetic_voice_eval/            # 20,000 WhatsApp-compliant 16 kHz Mono Opus .ogg files
 ├── README.md                                # Project overview & quickstart guide
-├── SYSTEM_STATE.md                          # Living technical blueprint (v1.7.0-datasets-populated)
-├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history (Milestones 1-22)
-├── history.md                               # Complete Session 1, 2 & 3 markdown context ledger
+├── SYSTEM_STATE.md                          # Living technical blueprint (v2.3.0-guardrails-verified)
+├── DEVELOPMENT_LEDGER.md                    # Chronological execution & error history (Milestones 1-26)
+├── history.md                               # Complete engineering session context ledger
 └── history.json                             # Complete Session 1, 2 & 3 structured JSON ledger
 ```
 
@@ -349,7 +352,46 @@ All persistent ledgers in the root directory remain synchronized with this histo
    - Built Master CLI pipeline (`scripts/run_benchmark_certification_pipeline.py`) and published `audit/certificates/COMPLIANCE_DOSSIER_AND_CERTIFICATES.md`.
    - Hermetic test verification: 8/8 benchmark tests passing in 17.40s; 19/19 regression tests passing. Total repository test suite: 100% pass rate.
 
+---
 
+## 7. Session 6: Live Staging Smoke Testing, NVIDIA NeMo Guardrails Ingestion & Sovereign Programmable Guardrails Engine (Milestone 26)
 
+### A. Live Staging Smoke Testing & Source Control Closeout (v2.2.0-staging-verified)
+1. **Multi-Container Staging Cluster Verification:**
+   - Validated live container stack: PostgreSQL 16, Redis 7, FastAPI Gateway, Celery Workers (text & media pools), and Next.js 15 SOC dashboard.
+   - Verified automated Alembic migrations (`alembic upgrade head`) and active UAE official domain allowlist seeds.
+   - Confirmed 0 Class B citizen PII leaks across audit databases, structured logs, and Prometheus metrics.
+2. **Security Hardening Remediations:**
+   - Remediated loopback SSRF check in `media_downloader.py`, strictly scoping non-production mock CDN exemptions to `/media/download/` paths.
+   - Hardened authority lure classification in `slm_client.py`, requiring explicit impersonation or coercive threats before categorizing messages as active fraud.
+   - Staged release tag `v2.2.0-staging-verified`.
 
+### B. Upstream Asset Ingestion: NVIDIA NeMo Guardrails
+1. **Repository Synchronization:**
+   - Cloned upstream `NVIDIA-NeMo/Guardrails` into `opensource/repositories/guardrails/nemo_guardrails` via shallow clone (`--depth 1`).
+   - Purged inner `.git` directory to maintain clean parent repository hierarchy.
+   - Registered asset in `opensource/CATALOG.json` under `repo-nemo-guardrails`.
+2. **Architectural Evaluation:**
+   - Evaluated Colang 1.0 vs Colang 2.0 event-driven execution models.
+   - Analyzed input, output, dialog, and retrieval rails alongside built-in safety libraries (`injection_detection`, `jailbreak_detection`, `sensitive_data_detection`).
 
+### C. Milestone 26: Sovereign Programmable Guardrails Engine Implementation
+1. **Framework Implementation (`src/hares/ai/guardrails/`):**
+   - `actions.py`: Registered deterministic safety actions:
+     - `mask_citizen_pii` (FR-4.1): Masking 15-digit Emirates IDs (`[REDACTED_EID]`), 16-digit credit cards (`[REDACTED_CARD]`), and OTP verification codes (`[REDACTED_OTP]`).
+     - `detect_prompt_injection` (NFR-1.3): Multi-pattern defense neutralizing ChatML delimiters (`<|im_start|>`), XML boundary tag breakouts (`</citizen_forwarded_text>`), English instruction overrides, Arabic adversarial jailbreaks (`تجاهل جميع التعليمات السابقة`), and Base64-obfuscated injection payloads.
+     - `check_topical_boundary`: Gating off-topic conversational probes and code generation attempts while admitting legitimate cyber fraud queries.
+     - `validate_triage_schema` (FR-2.4): Normalizing raw model output and markdown codeblocks into strict `TextTriageInferenceResult` JSON contracts.
+     - `enforce_dubai_police_escalation` (FR-3.1): Enforcing official Dubai Police links (`https://www.ecrime.ae` | `901`) on all high-risk verdicts.
+   - `policies/hares_guardrails.co`: Declarative Colang 2.0 flow specifications enforcing input rails, topical boundaries, and output rails.
+   - `config.yml`: Binding local sovereign `vLLM` model daemon (`models/hares_qwen2.5_3b_merged_fp16`) under Colang 2.x standard configuration.
+   - `engine.py`: `SovereignGuardrailsEngine` orchestrator managing `process_input()`, `process_output()`, and `generate_safe_triage()`.
+2. **Client Layer Integration (`src/hares/ai/slm_client.py`):**
+   - Enriched `LocalSLMClient` with `enable_guardrails=True` by default.
+   - Added `triage_with_guardrails()` returning complete `GuardrailResult` telemetry.
+   - Preserved backward-compatible `triage_text()` seamlessly routing through guardrail pipelines.
+3. **Automated Verification & Test Harness:**
+   - Authored `tests/test_programmable_guardrails.py` covering 21 automated unit, integration, and concurrency stress tests.
+   - Stress test passed with 8 concurrent threads $\times$ 25 iterations (200 total invocations) with zero exceptions or deadlocks.
+   - Verified 100% test pass rate across the repository: **126 of 126 automated tests passing**.
+   - 100% sovereign compute maintained: zero external network transmission (NFR-1.1).

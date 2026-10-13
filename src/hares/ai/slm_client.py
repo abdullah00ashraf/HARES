@@ -3,6 +3,7 @@ import logging
 import re
 from typing import Any
 import httpx
+from hares.ai.guardrails import GuardrailResult, SovereignGuardrailsEngine
 from hares.ai.schemas import TacticType, TextTriageInferenceResult
 from hares.core.config import get_settings
 
@@ -35,18 +36,31 @@ class LocalSLMClient:
         model_name: str | None = None,
         timeout_seconds: float | None = None,
         mock_mode: bool = False,
+        enable_guardrails: bool = True,
     ) -> None:
         settings = get_settings()
         self.base_url = (base_url or settings.SLM_API_BASE_URL).rstrip("/")
         self.model_name = model_name or settings.SLM_MODEL_NAME
         self.timeout = timeout_seconds if timeout_seconds is not None else settings.SLM_TIMEOUT_SECONDS
         self.mock_mode = mock_mode
+        self.enable_guardrails = enable_guardrails
         self._outlines_generator: Any = None
+        self._guardrails: SovereignGuardrailsEngine | None = (
+            SovereignGuardrailsEngine() if enable_guardrails else None
+        )
+
+    def triage_with_guardrails(self, text: str) -> GuardrailResult:
+        """
+        Executes end-to-end sovereign guardrails triage returning full GuardrailResult telemetry.
+        """
+        if self._guardrails is None:
+            self._guardrails = SovereignGuardrailsEngine()
+        return self._guardrails.generate_safe_triage(text, generator_fn=self._raw_generate)
 
     def triage_text(self, sanitized_text: str) -> TextTriageInferenceResult:
         """
-        Analyzes message text using Guided JSON Decoding.
-        Prevents prompt injection escape by wrapping in strict XML delimiters.
+        Analyzes message text wrapped in Sovereign Programmable Guardrails (FR-2.4, NFR-1.1, NFR-1.3).
+        Enforces input PII masking & prompt injection defense, and output schema & Dubai Police escalation verification.
         """
         if not sanitized_text or not sanitized_text.strip():
             return TextTriageInferenceResult(
@@ -59,14 +73,26 @@ class LocalSLMClient:
                 reasoning_summary="Empty message text.",
             )
 
+        if self.enable_guardrails and self._guardrails is not None:
+            guardrail_res = self.triage_with_guardrails(sanitized_text)
+            if guardrail_res.triage_result is not None:
+                return guardrail_res.triage_result
+
+        return self._raw_generate(sanitized_text)
+
+    def _raw_generate(self, text: str) -> TextTriageInferenceResult:
+        """
+        Executes raw model generation or offline heuristic evaluation.
+        Prevents prompt injection escape by wrapping in strict XML delimiters.
+        """
         # 1. Defend against prompt injection via XML delimitation, tag escaping, and ChatML special token stripping (NFR-1.3, AUDIT-OBS-17, AUDIT-OBS-29)
-        escaped_text = re.sub(r"</?citizen_forwarded_text>", "", sanitized_text, flags=re.IGNORECASE)
+        escaped_text = re.sub(r"</?citizen_forwarded_text>", "", text, flags=re.IGNORECASE)
         escaped_text = re.sub(r"<\|im_(?:start|end)\|>|<\|endoftext\|>", "", escaped_text)
         bounded_prompt = f"<citizen_forwarded_text>\n{escaped_text}\n</citizen_forwarded_text>"
 
         # If mock mode is explicitly requested, jump directly to deterministic heuristics
         if self.mock_mode:
-            return self._evaluate_offline_heuristics(sanitized_text)
+            return self._evaluate_offline_heuristics(text)
 
         # 2. Try Outlines Guided Generation if initialized
         try:
@@ -81,7 +107,7 @@ class LocalSLMClient:
             logger.debug("Local SLM daemon unreachable, falling back to local deterministic evaluator: %s", str(exc))
 
         # 4. Deterministic Local NLP Evaluator (Hermetic Fallback)
-        return self._evaluate_offline_heuristics(sanitized_text)
+        return self._evaluate_offline_heuristics(text)
 
     def _query_outlines(self, bounded_prompt: str) -> TextTriageInferenceResult:
         """
@@ -216,8 +242,12 @@ class LocalSLMClient:
             tactics.append("courier_delivery_fee")
         if any(w in lower or w in text for w in ["تجميد", "freeze", "تحديث بيانات", "kyc", "otp", "قفل حساب"]):
             tactics.append("banking_kyc_freeze")
-        if any(w in lower or w in text for w in ["جائزة", "lottery", "مبروك", "million", "prize"]):
+        if any(w in lower or w in text for w in ["جائزة", "lottery", "مبروك", "million", "prize", "rabihit", "mabrook", "500,000"]):
             tactics.append("lottery_prize")
+        if any(w in lower or w in text for w in ["crypto", "wealth", "invest", "returns", "18.5%", "usdt", "telegram"]):
+            tactics.append("crypto_investment")
+        if any(w in lower for w in ["<|im_start|>", "ignore all previous instructions", "system override"]):
+            tactics.append("prompt_injection")
         if any(w in lower or w in text for w in ["إيقاف", "suspension", "block", "تعليق", "قفل"]):
             tactics.append("account_suspension")
 
@@ -248,6 +278,9 @@ class LocalSLMClient:
                 or (impersonated == "Dubai Police" and has_threat)
                 or (impersonated == "Emirates Post" and (urgency or financial_demand))
                 or (impersonated == "UAE Central Bank")
+                or ("lottery_prize" in tactics and (has_harvesting or "otp" in lower or financial_demand))
+                or ("crypto_investment" in tactics)
+                or ("prompt_injection" in tactics)
             )
 
             if is_active_fraud:

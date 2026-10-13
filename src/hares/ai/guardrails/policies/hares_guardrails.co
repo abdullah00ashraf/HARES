@@ -1,0 +1,42 @@
+# ==============================================================================
+# Project Hares: Sovereign Safety Rails Policy (Colang 2.0)
+# ==============================================================================
+
+# 1. INPUT RAIL: Mask Citizen Class B PII
+flow mask citizen pii on input
+  $response = await mask_citizen_pii(text=$user_message)
+  $user_message = $response.sanitized_text
+
+# 2. INPUT RAIL: Adversarial Prompt Injection Defense
+flow detect prompt injection on input
+  $injection_check = await detect_prompt_injection(text=$user_message)
+  if $injection_check.is_attack
+    bot say "SECURITY_ALERT: Adversarial prompt injection detected. Triage aborted."
+    abort
+
+# 3. INPUT RAIL: Topical Cyber Fraud Gating
+flow enforce topical fraud boundary on input
+  $topical_check = await check_topical_boundary(text=$user_message)
+  if not $topical_check.is_relevant
+    bot say "حارس دبي مخصص فقط لفحص الرسائل والاحتيال ومكافحة الجرائم الإلكترونية. يرجى إرسال الرسالة أو الرابط المشبوه."
+    abort
+
+# 4. OUTPUT RAIL: Enforce Pydantic Schema Format
+flow enforce pydantic schema on output
+  $schema_check = await validate_triage_schema(raw_output=$bot_message)
+  $bot_message = $schema_check.validated_json
+
+# 5. OUTPUT RAIL: Dubai Police Escalation Verification
+flow verify dubai police escalation on output
+  $escalated = await enforce_dubai_police_escalation(raw_output=$bot_message)
+  $bot_message = $escalated
+
+# 6. COLANG 2.0 TOP-LEVEL PIPELINE FLOWS
+flow input rails $input_text
+  mask citizen pii on input
+  detect prompt injection on input
+  enforce topical fraud boundary on input
+
+flow output rails $output_text
+  enforce pydantic schema on output
+  verify dubai police escalation on output

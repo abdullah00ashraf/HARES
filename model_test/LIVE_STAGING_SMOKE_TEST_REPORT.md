@@ -1,7 +1,7 @@
 # Project Hares: Live Staging Cluster & E2E Smoke Test Report
 ## Operational Verification Record
 
-**Execution Timestamp:** 2026-10-12 05:02:12 UTC  
+**Execution Timestamp:** 2026-10-13 03:52:44 UTC  
 **Environment:** Staging Multi-Container Cluster  
 **Overall Verdict:** **PASSED (ALL OPERATIONAL INVARIANTS CERTIFIED)**  
 
@@ -44,33 +44,47 @@
   },
   "phase2_metrics": {
     "status": "PASSED",
-    "metrics_length_chars": 4300
+    "metrics_length_chars": 4299
   },
   "phase3_text_ingress": {
-    "ingress_duration_ms": 913.1193000357598,
+    "ingress_duration_ms": 733.560899971053,
     "task_id": null,
-    "redis_audit_keys_checked": 1,
+    "redis_audit_keys_checked": 2,
     "raw_phone_purged": true,
     "status": "PASSED"
   },
   "phase4_audio_ingress": {
-    "ingress_duration_ms": 707.2866999660619,
+    "ingress_duration_ms": 505.180700100027,
     "task_id": null,
     "status": "PASSED"
   },
   "phase5_municipal_feed": {
     "overview": {
       "status": "success",
-      "generated_at": "2026-10-12T05:02:10.899970+00:00",
+      "generated_at": "2026-10-13T03:52:44.174144+00:00",
       "kpis": {
-        "total_scanned_24h": 1,
-        "high_risk_verdicts_24h": 1,
+        "total_scanned_24h": 3,
+        "high_risk_verdicts_24h": 3,
         "amber_fallbacks_24h": 612,
-        "avg_latency_ms": 707.0,
-        "total_class_a_iocs": 8,
+        "avg_latency_ms": 1431.7,
+        "total_class_a_iocs": 10,
         "sla_compliance_rate": 99.8
       },
       "temporal_curve": [
+        {
+          "time": "04:00",
+          "text_volume": 14,
+          "url_volume": 16,
+          "audio_volume": 7,
+          "total": 38
+        },
+        {
+          "time": "05:00",
+          "text_volume": 14,
+          "url_volume": 16,
+          "audio_volume": 7,
+          "total": 38
+        },
         {
           "time": "06:00",
           "text_volume": 14,
@@ -224,20 +238,6 @@
           "url_volume": 16,
           "audio_volume": 7,
           "total": 38
-        },
-        {
-          "time": "04:00",
-          "text_volume": 14,
-          "url_volume": 16,
-          "audio_volume": 7,
-          "total": 38
-        },
-        {
-          "time": "05:00",
-          "text_volume": 14,
-          "url_volume": 16,
-          "audio_volume": 7,
-          "total": 38
         }
       ],
       "impersonation_distribution": [
@@ -273,7 +273,7 @@
         }
       ]
     },
-    "stix_objects_count": 8,
+    "stix_objects_count": 10,
     "status": "PASSED"
   }
 }

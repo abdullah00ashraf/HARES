@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <polygon points="24,4 44,40 4,40" fill="#F59E0B" fill-opacity="0.15" stroke="#D97706" stroke-width="2"/>
+  <!-- Lightning / Threat Vector -->
+  <path d="M26 12 L16 26 L23 26 L21 36 L31 22 L24 22 Z" fill="#F59E0B" stroke="#B45309" stroke-width="1"/>
+</svg>
