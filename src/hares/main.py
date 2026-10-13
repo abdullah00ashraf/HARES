@@ -58,10 +58,23 @@ def create_app() -> FastAPI:
         return response
 
     # Master Routers
+    @application.get("/", tags=["Root"])
+    async def root_welcome() -> dict[str, str]:
+        """Root welcome handler providing service metadata and discovery links."""
+        return {
+            "service": "Project Hares (مشروع حارس)",
+            "version": "0.1.0",
+            "status": "operational",
+            "jurisdiction": "Dubai & UAE",
+            "docs": "/docs",
+            "health": "/health/ready",
+        }
+
     application.include_router(health_router, tags=["Health"])
     application.include_router(webhook_router, tags=["WhatsApp Webhook"])
     application.include_router(threat_feed_router, prefix="/api/v1", tags=["Municipal Threat Intelligence"])
     application.include_router(triage_router, prefix="/api/v1", tags=["Citizen Fraud Triage"])
+
 
     # Prometheus Metrics Endpoint (Phase 6 Observability)
     @application.get("/metrics", tags=["Observability"])
