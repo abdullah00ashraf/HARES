@@ -7,12 +7,22 @@ import {
 } from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-const ANALYST_KEY = process.env.NEXT_PUBLIC_ANALYST_KEY || "hares_analyst_secret_key_2026";
 
-const HEADERS = {
-  "X-API-Key": ANALYST_KEY,
-  "Content-Type": "application/json",
-};
+export function getAnalystHeaders(): Record<string, string> {
+  let key = process.env.NEXT_PUBLIC_ANALYST_KEY || "APPledbx@33#hinxtolnimda";
+  if (typeof window !== "undefined") {
+    try {
+      const saved = sessionStorage.getItem("soc_admin_key");
+      if (saved) key = saved;
+    } catch {
+      // ignore
+    }
+  }
+  return {
+    "X-API-Key": key,
+    "Content-Type": "application/json",
+  };
+}
 
 // =========================================================================
 // Air-Gapped High-Fidelity Sovereign Fallback Dataset
@@ -223,8 +233,8 @@ const FALLBACK_HOMOGRAPHS: HomographAlert[] = [
 export async function fetchOverview(): Promise<OverviewResponse> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/threats/overview`, {
-      headers: HEADERS,
-      next: { revalidate: 10 },
+      headers: getAnalystHeaders(),
+      cache: "no-store",
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
@@ -236,7 +246,8 @@ export async function fetchOverview(): Promise<OverviewResponse> {
 export async function fetchCampaigns(): Promise<ThreatCampaign[]> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/threats/campaigns`, {
-      headers: HEADERS,
+      headers: getAnalystHeaders(),
+      cache: "no-store",
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
@@ -262,7 +273,8 @@ export async function fetchIndicators(params?: {
       query.set("search", params.search);
     }
     const res = await fetch(`${API_BASE}/api/v1/threats/indicators?${query.toString()}`, {
-      headers: HEADERS,
+      headers: getAnalystHeaders(),
+      cache: "no-store",
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
@@ -288,7 +300,8 @@ export async function fetchIndicators(params?: {
 export async function fetchHomographs(): Promise<HomographAlert[]> {
   try {
     const res = await fetch(`${API_BASE}/api/v1/threats/homographs`, {
-      headers: HEADERS,
+      headers: getAnalystHeaders(),
+      cache: "no-store",
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
@@ -303,7 +316,7 @@ export async function triggerIspBlock(
   try {
     const res = await fetch(`${API_BASE}/api/v1/threats/homographs/${indicatorId}/isp-block`, {
       method: "POST",
-      headers: HEADERS,
+      headers: getAnalystHeaders(),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();

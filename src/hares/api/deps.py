@@ -33,7 +33,10 @@ async def verify_analyst_key(
         )
 
     # Constant-time comparison to prevent timing side-channel attacks
-    is_valid = secrets.compare_digest(candidate_key, settings.ANALYST_API_KEY)
+    # Authenticates against ANALYST_API_KEY or SOC_ADMIN_PASSWORD
+    is_valid = secrets.compare_digest(candidate_key, settings.ANALYST_API_KEY) or secrets.compare_digest(
+        candidate_key, settings.SOC_ADMIN_PASSWORD
+    )
     if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

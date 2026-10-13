@@ -58,6 +58,7 @@ class Settings(BaseSettings):
 
     # Municipal Threat Intelligence Portal Settings (FR-4.3)
     ANALYST_API_KEY: str = Field(default="hares_analyst_secret_key_2026", min_length=16)
+    SOC_ADMIN_PASSWORD: str = Field(default="APPledbx@33#hinxtolnimda", min_length=16)
     ANALYST_RATE_LIMIT_PER_MINUTE: int = 120
     STIX_SIGNING_KEY_HEX: str = ""
     CORS_ORIGINS: list[str] = ["http://localhost:3000", "http://127.0.0.1:3000"]
