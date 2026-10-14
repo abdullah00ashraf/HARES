@@ -9,6 +9,7 @@ import CampaignWorkbench from "../components/CampaignWorkbench";
 import IocWorkbench from "../components/IocWorkbench";
 import HomographWorkbench from "../components/HomographWorkbench";
 import AudioTriageWorkbench from "../components/AudioTriageWorkbench";
+import ModelMetricsWorkbench from "../components/ModelMetricsWorkbench";
 
 export default function DashboardPage() {
   const { portalMode } = usePortalMode();
@@ -36,7 +37,7 @@ export default function DashboardPage() {
             </span>
           </div>
 
-          {/* Navigation Bar for the 5 SOC Workbenches */}
+          {/* Navigation Bar for the SOC Workbenches */}
           <Navigation activeTab={activeTab} onSelectTab={setActiveTab} />
 
           {/* Dynamic Operational Workbench Viewport */}
@@ -46,6 +47,7 @@ export default function DashboardPage() {
             {activeTab === "iocs" && <IocWorkbench />}
             {activeTab === "homographs" && <HomographWorkbench />}
             {activeTab === "audio" && <AudioTriageWorkbench />}
+            {activeTab === "telemetry" && <ModelMetricsWorkbench />}
           </div>
         </div>
       )}

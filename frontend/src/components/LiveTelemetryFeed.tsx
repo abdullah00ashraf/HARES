@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { TelemetryEvent } from "../lib/types";
-import { Activity, ShieldAlert, CheckCircle2, AlertCircle } from "lucide-react";
+import { fetchLiveTelemetry } from "../lib/api";
+import { Activity, ShieldAlert, CheckCircle2, AlertCircle, Database, RefreshCw } from "lucide-react";
 
 const MAX_RING_BUFFER = 100; // Strict limit per Protocol Rule 11
 
@@ -56,71 +57,61 @@ const INITIAL_EVENTS: TelemetryEvent[] = [
 
 export default function LiveTelemetryFeed() {
   const [feed, setFeed] = useState<TelemetryEvent[]>(INITIAL_EVENTS);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string>("Active");
 
-  // Periodic simulation adding live items and enforcing oldest-element recycling ring buffer
+  const syncTelemetryFromDb = async () => {
+    try {
+      setIsSyncing(true);
+      const liveEvents = await fetchLiveTelemetry(MAX_RING_BUFFER);
+      if (liveEvents && liveEvents.length > 0) {
+        setFeed((prev) => {
+          // Merge unique events preserving newest first
+          const existingIds = new Set(prev.map((e) => e.id));
+          const newEntries = liveEvents.filter((e) => !existingIds.has(e.id));
+          const combined = [...newEntries, ...prev];
+          return combined.slice(0, MAX_RING_BUFFER);
+        });
+        setLastSyncTime(new Date().toLocaleTimeString());
+      }
+    } catch {
+      // Graceful fallback to local ring buffer
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   useEffect(() => {
-    const templates: Omit<TelemetryEvent, "id" | "timestamp">[] = [
-      {
-        payload_type: "url",
-        verdict: "RED",
-        rule_triggered: "idn_homograph_punycode",
-        latency_ms: 1120,
-        preview: "https://xn--crm-qdd1a.ae/portal/fine-payment",
-      },
-      {
-        payload_type: "audio_voice_note",
-        verdict: "RED",
-        rule_triggered: "aasist_conformal_deepfake",
-        latency_ms: 3200,
-        preview: "Voice Note: Impersonation of Dubai Municipal Authority",
-      },
-      {
-        payload_type: "text",
-        verdict: "AMBER",
-        rule_triggered: "slm_urgency_suspicious",
-        latency_ms: 1750,
-        preview: "Urgent: Your Salik tag has negative balance, recharge now",
-      },
-      {
-        payload_type: "url",
-        verdict: "GREEN",
-        rule_triggered: "allowlist_exact_match",
-        latency_ms: 510,
-        preview: "https://www.salik.ae/en/recharge",
-      },
-    ];
-
-    const interval = setInterval(() => {
-      const now = new Date();
-      const timeStr = now.toTimeString().split(" ")[0];
-      const template = templates[Math.floor(Math.random() * templates.length)];
-      const newEvent: TelemetryEvent = {
-        id: `evt-${Date.now()}`,
-        timestamp: timeStr,
-        ...template,
-      };
-
-      setFeed((prev) => {
-        // Enforce Ring Buffer: Prepend new item and slice to MAX_RING_BUFFER (Protocol Rule 11)
-        const updated = [newEvent, ...prev];
-        return updated.slice(0, MAX_RING_BUFFER);
-      });
-    }, 4500);
-
+    syncTelemetryFromDb();
+    const interval = setInterval(syncTelemetryFromDb, 6000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 shadow-lg">
-      <div className="flex items-center justify-between mb-4">
+    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm transition-colors">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-sovereign-emerald animate-pulse" />
-          <h3 className="text-base font-bold text-white">Live Ingress Triage Stream</h3>
-          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+          <Activity className="w-4 h-4 text-emerald-500 animate-pulse" />
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">Live Ingress Triage Stream</h3>
+          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
             Ring Buffer ({feed.length}/{MAX_RING_BUFFER})
           </span>
         </div>
-        <span className="text-xs text-slate-400">Zero Citizen PII • Class A Stream</span>
+        <div className="flex items-center gap-3">
+          <span className="flex items-center gap-1.5 text-xs font-mono text-emerald-600 dark:text-emerald-400">
+            <Database className="w-3.5 h-3.5" />
+            <span>DB Synced ({lastSyncTime})</span>
+          </span>
+          <button
+            type="button"
+            onClick={syncTelemetryFromDb}
+            className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition"
+            title="Force Telemetry Sync"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-cyan-500" : ""}`} />
+          </button>
+          <span className="text-xs text-slate-500 dark:text-slate-400">Zero Citizen PII • Class A Stream</span>
+        </div>
       </div>
 
       <div className="space-y-2 max-h-[360px] overflow-y-auto pr-1">

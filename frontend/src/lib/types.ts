@@ -132,3 +132,99 @@ export interface TriageVerificationResponse {
   execution_latency_ms: number;
   privacy_notice: string;
 }
+
+export interface DatabaseSyncTelemetry {
+  engine: string;
+  status: string;
+  total_triage_audit_records: number;
+  audits_last_24h: number;
+  total_threat_indicators: number;
+  total_threat_campaigns: number;
+  official_allowlist_domains: number;
+  last_db_entry_at: string;
+  persistence_latency_p99_ms: number;
+  zero_pii_compliance: string;
+}
+
+export interface SLMInferenceTelemetry {
+  model_identifier: string;
+  huggingface_repo: string;
+  architecture: string;
+  parameters_count: number;
+  precision: string;
+  decoding_engine: string;
+  mean_inference_latency_ms: number;
+  throughput_tokens_per_sec: number;
+  social_engineering_accuracy: number;
+  adversarial_prompt_injection_defense_rate: number;
+  pydantic_schema_adherence_rate: number;
+}
+
+export interface AcousticDeepfakeTelemetry {
+  pipeline: string;
+  conformal_calibration: {
+    method: string;
+    alpha_significance: number;
+    target_fpr_bound: string;
+    empirical_fpr: string;
+    conformal_threshold: number;
+    tri_band_classification: string;
+  };
+  max_duration_seconds: number;
+  codec_support: string[];
+  synthetic_detection_f1: number;
+  spoof_classification_latency_ms: number;
+}
+
+export interface DeterministicRadarTelemetry {
+  exact_allowlist_engine: string;
+  idn_homograph_detector: string;
+  punycode_interception_rate: number;
+  ocr_engine: string;
+  rate_limiter: string;
+}
+
+export interface ModelMetricsResponse {
+  timestamp: string;
+  database_sync: DatabaseSyncTelemetry;
+  slm_inference: SLMInferenceTelemetry;
+  acoustic_deepfake: AcousticDeepfakeTelemetry;
+  deterministic_radar: DeterministicRadarTelemetry;
+  audit_distribution: {
+    verdicts: Record<string, number>;
+    payloads: Record<string, number>;
+    avg_e2e_turnaround_ms: number;
+  };
+}
+
+export interface GraphTraceStep {
+  stepIndex: number;
+  stageName: string;
+  mitreTactic: string;
+  mitreTechniqueId: string;
+  activeNodeIds: string[];
+  activeLinkIds: string[];
+  description: string;
+  riskRating: "CRITICAL" | "HIGH" | "MEDIUM" | "INFO";
+}
+
+export interface GraphSnapshot {
+  id: string;
+  timestamp: string;
+  campaignId: string;
+  campaignName: string;
+  activeStep: number;
+  tracedNodesCount: number;
+  notes: string;
+  sha256Digest: string;
+}
+
+export interface GraphSessionRecord {
+  sessionId: string;
+  startedAt: string;
+  campaignName: string;
+  eventsCount: number;
+  snapshots: GraphSnapshot[];
+  isRecording: boolean;
+}
+

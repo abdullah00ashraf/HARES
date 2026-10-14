@@ -483,3 +483,26 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
 2. **Dual-Ledger & State Synchronization:**
    - Synchronized all technical truths, environment configurations, and history across `SYSTEM_STATE.md`, `DEVELOPMENT_LEDGER.md`, and `history.md`.
 
+---
+
+## 10. Session 9: SOC Analyst Panel Overhaul, Live Database Synchronization & STIX 2.1 Kill-Chain Tracing and Recording (Milestone 35)
+
+### A. Milestone 35: Real-Time Telemetry & STIX Attack Graph Engine
+1. **Database Triage Synchronization Fix:**
+   - Resolved silent persistence failure where `verify_content` was calling unmapped synchronous methods across an isolated sync session scope.
+   - Switched database operations to `async with async_session_scope() as session:`, calling `ThreatRepository.upsert_indicator_async` and `AuditRepository.record_triage_audit_async`.
+   - Added safe pseudonym hash fallback (`_DEFAULT_WEB_HASH`) to satisfy the non-null `citizen_user_hash` database constraint for web triage without violating Class B citizen privacy.
+   - Enhanced URL detection logic (`url` without `text` properly flagged as `payload_type="url"`).
+2. **Model Metrics & Telemetry APIs:**
+   - Implemented `GET /api/v1/threats/telemetry`: streaming sanitized `TriageAuditLog` entries with real-time payload classification, rule attribution, and latency metrics.
+   - Implemented `GET /api/v1/threats/model-metrics`: comprehensive health report covering Neon PostgreSQL persistence status (P99 write latency, record counts), Qwen2.5-3B SLM telemetry, Conformal calibration FPR bound ($\le 0.1\%$), AASIST/Whisper acoustic spoof detection, and deterministic radar stats.
+   - Implemented `POST /api/v1/threats/indicators`: programmatic indicator registration with automatic campaign correlation.
+3. **STIX 2.1 Attack Graph Kill-Chain Tracing & Recording Engine:**
+   - **Multi-Campaign Architecture:** Integrated 4 high-profile campaigns (Operation Salik Mirage, Operation Fake Fine, Emirates Post Delivery Lure, DEWA Emergency Disconnect) with authentic STIX 2.1 nodes and relationships.
+   - **Kill-Chain Trace Playback Engine:** Step-by-step playback ($T_0 \to T_4$) with play/pause, step navigation, playback speed toggle (1x/2x), MITRE ATT&CK technique mapping, and animated pulse traversal along active attack edges.
+   - **Cryptographic Forensic Recording Engine:** Live session tracking with event counter, client-side SHA-256 cryptographic snapshot generation via `window.crypto.subtle.digest`, ring buffer history, and one-click STIX 2.1 JSON dossier export.
+   - **Direct Postgres Synchronization:** Added "Sync to DB" trigger in the graph to persist campaign indicators directly into the PostgreSQL repository.
+4. **Frontend Architecture & Navigation:**
+   - Added the 6th operational workbench: `"6. Model & Engine Telemetry"` with real-time indicators, conformal calibration gauges, and interactive manual indicator injection.
+   - Updated `LiveTelemetryFeed.tsx` to automatically pull from `fetchLiveTelemetry()` with periodic 6-second database syncing and ring buffer recycling.
+

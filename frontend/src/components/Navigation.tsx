@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { LayoutDashboard, Flame, Database, ShieldAlert, Mic } from "lucide-react";
+import { LayoutDashboard, Flame, Database, ShieldAlert, Mic, Cpu } from "lucide-react";
 import { soundFx } from "../lib/audioSoundFx";
 
-export type WorkbenchTab = "overview" | "campaigns" | "iocs" | "homographs" | "audio";
+export type WorkbenchTab = "overview" | "campaigns" | "iocs" | "homographs" | "audio" | "telemetry";
 
 interface NavigationProps {
   activeTab: WorkbenchTab;
@@ -52,6 +52,14 @@ export default function Navigation({ activeTab, onSelectTab }: NavigationProps) 
       icon: Mic,
       badge: "60 FPS Canvas",
       badgeColor: "bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-950/60 dark:text-purple-400 dark:border-purple-800",
+    },
+    {
+      id: "telemetry" as WorkbenchTab,
+      label: "6. Model & Engine Telemetry",
+      sublabel: "مؤشرات النماذج وقاعدة البيانات",
+      icon: Cpu,
+      badge: "Postgres Sync",
+      badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950/60 dark:text-indigo-400 dark:border-indigo-800",
     },
   ];
 

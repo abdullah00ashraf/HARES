@@ -234,6 +234,8 @@ MAX_AUDIO_DURATION_SECONDS=120
 | **Hugging Face ZeroGPU Space** | `hf_space/app.py`, `hf_space/guardrails/` | Live ZeroGPU Space on dynamic NVIDIA A100 (`zero-a10g`) slice; Gradio 5.20.0 + NeMo Guardrails Colang 2.0 policy `hares_guardrails.co` + Qwen2.5-3B FP16. | Verified & Live in Cloud |
 | **SOC Hub Security Passkey Gate** | `frontend/src/components/Header.tsx`, `src/hares/api/deps.py` | Glassmorphic security modal gating SOC Analyst Hub behind Master Admin Passkey (`APPledbx@33#hinxtolnimda`), session persistence, instant lock button, constant-time validation. | Verified & Active |
 | **Dynamic Live Telemetry** | `ThreatRepository.get_overview_kpis_async`, `frontend/src/lib/api.ts` | Dynamic aggregation of `TriageAuditLog` rows from Neon DB onto municipal baseline metrics (`1420 + total`, `384 + red`, `612 + amber`); live-increments SOC Hub on refresh (`no-store`). | Verified & Active |
+| **Model & DB Telemetry Suite** | `src/hares/api/v1/threat_feed.py`, `frontend/src/components/ModelMetricsWorkbench.tsx` | Telemetry feeds `/api/v1/threats/telemetry`, `/api/v1/threats/model-metrics`, and `/api/v1/threats/indicators` tracking real-time PostgreSQL write health, Qwen2.5-3B SLM latency, and conformal calibration bounds. | Verified (100% tests passing, Next.js build clean) |
+| **STIX 2.1 Attack Graph Trace & Recorder** | `frontend/src/components/StixCampaignGraph.tsx` | Interactive 4-campaign adversary workbench with step-by-step kill-chain traversal ($T_0 \to T_4$), animated pulse edge traversal, client-side SHA-256 forensic snapshot recording, STIX 2.1 JSON bundle export, and direct PostgreSQL database synchronization. | Verified (Next.js 15 build verified) |
 
 ---
 

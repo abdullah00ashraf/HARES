@@ -212,3 +212,99 @@ async def test_zero_class_b_pii_leakage():
             assert "recipient_phone" not in text
             assert "raw_sender_phone" not in text
             assert "citizen_hash" not in text
+
+
+@pytest.mark.asyncio
+async def test_live_telemetry_feed_endpoint():
+    """Verifies that /api/v1/threats/telemetry returns structured audit events with zero citizen PII."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        resp = await client.get("/api/v1/threats/telemetry?limit=20", headers=AUTH_HEADERS)
+        assert resp.status_code == 200
+        events = resp.json()
+        assert isinstance(events, list)
+        assert len(events) >= 1
+        first_evt = events[0]
+        assert "id" in first_evt
+        assert "timestamp" in first_evt
+        assert "payload_type" in first_evt
+        assert "verdict" in first_evt
+        assert first_evt["verdict"] in ("RED", "AMBER", "GREEN")
+        assert "latency_ms" in first_evt
+
+
+@pytest.mark.asyncio
+async def test_model_and_system_metrics_endpoint():
+    """Verifies that /api/v1/threats/model-metrics exposes SLM, conformal, and database sync state."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        resp = await client.get("/api/v1/threats/model-metrics", headers=AUTH_HEADERS)
+        assert resp.status_code == 200
+        data = resp.json()
+
+        assert "database_sync" in data
+        assert data["database_sync"]["status"] == "synchronized_healthy"
+        assert "total_triage_audit_records" in data["database_sync"]
+        assert "slm_inference" in data
+        assert data["slm_inference"]["parameters_count"] == 3085938688
+        assert "acoustic_deepfake" in data
+        assert data["acoustic_deepfake"]["conformal_calibration"]["conformal_threshold"] == 0.85
+        assert "deterministic_radar" in data
+        assert "audit_distribution" in data
+
+
+@pytest.mark.asyncio
+async def test_create_threat_indicator_post():
+    """Verifies analysts can register indicators directly and correlate them with campaigns."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        # Create a new test indicator
+        payload = {
+            "indicator_type": "url",
+            "raw_indicator": "https://fake-police-fine-dubai.xyz/pay",
+            "verdict": "RED",
+            "risk_score": 0.99,
+        }
+        resp = await client.post("/api/v1/threats/indicators", json=payload, headers=AUTH_HEADERS)
+        assert resp.status_code == 201
+        created = resp.json()
+        assert created["normalized_value"] == "https://fake-police-fine-dubai.xyz/pay"
+        assert created["verdict"] == "RED"
+        assert created["risk_score"] == 0.99
+        # Auto-correlated with Dubai Police campaign
+        assert created["campaign_id"] is not None
+
+
+@pytest.mark.asyncio
+async def test_database_sync_with_triage_entry():
+    """
+    CRITICAL END-TO-END INVARIANT TEST:
+    Verifies that when a citizen or analyst submits content to /api/v1/triage/verify,
+    the database accurately syncs and updates both TriageAuditLog and ThreatIndicator tables!
+    """
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        # 1. Check pre-triage audit count
+        metrics_pre = (await client.get("/api/v1/threats/model-metrics", headers=AUTH_HEADERS)).json()
+        pre_audits = metrics_pre["database_sync"]["total_triage_audit_records"]
+
+        # 2. Perform a malicious URL triage
+        triage_resp = await client.post(
+            "/api/v1/triage/verify",
+            data={"url": "http://salik-toll-recharge-steal.com/recharge"},
+        )
+        assert triage_resp.status_code == 200
+        triage_data = triage_resp.json()
+        assert triage_data["verdict"] == "RED"
+
+        # 3. Check post-triage audit count and verify database sync
+        metrics_post = (await client.get("/api/v1/threats/model-metrics", headers=AUTH_HEADERS)).json()
+        post_audits = metrics_post["database_sync"]["total_triage_audit_records"]
+        assert post_audits == pre_audits + 1
+
+        # 4. Verify telemetry feed now includes the new entry
+        telemetry_resp = await client.get("/api/v1/threats/telemetry?limit=5", headers=AUTH_HEADERS)
+        assert telemetry_resp.status_code == 200
+        events = telemetry_resp.json()
+        assert len(events) >= 1
+        # The latest event should match the triaged payload type and verdict
+        first_event = events[0]
+        assert first_event["payload_type"] == "url"
+        assert first_event["verdict"] == "RED"
+

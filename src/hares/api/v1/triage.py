@@ -15,7 +15,7 @@ from hares.core.config import get_settings
 from hares.db.repositories.allowlist_repo import AllowlistRepository
 from hares.db.repositories.audit_repo import AuditRepository
 from hares.db.repositories.threat_repo import ThreatRepository
-from hares.db.session import sync_session_scope
+from hares.db.session import async_session_scope, sync_session_scope
 from hares.engine.allowlist import AllowlistEngine
 from hares.engine.homograph import HomographDetector
 from hares.engine.ocr import OCREngine
@@ -38,8 +38,26 @@ slm_client = LocalSLMClient()
 ocr_engine = OCREngine()
 
 
+async def _get_active_allowlist_domains_async() -> set[str]:
+    """Retrieves active official domains asynchronously from database, falling back to cached seed domains."""
+    try:
+        async with async_session_scope() as session:
+            domains = await AllowlistRepository.get_active_domain_names_async(session)
+            if domains:
+                allowlist_engine.update_domains(domains)
+                return domains
+    except Exception as exc:
+        logger.debug("Database allowlist async query unavailable: %s", str(exc))
+
+    from hares.db.seed_data import OFFICIAL_UAE_DOMAINS_SEED
+
+    seed_domains = {s["domain"].lower().strip() for s in OFFICIAL_UAE_DOMAINS_SEED}
+    allowlist_engine.update_domains(seed_domains)
+    return seed_domains
+
+
 def _get_active_allowlist_domains() -> set[str]:
-    """Retrieves active official domains from database, falling back to cached seed domains."""
+    """Retrieves active official domains synchronously from database, falling back to cached seed domains."""
     try:
         with sync_session_scope() as session:
             domains = AllowlistRepository.get_active_domain_names_sync(session)
@@ -91,13 +109,13 @@ async def verify_content(
     """
     start_time = time.perf_counter()
     request_id = str(uuid.uuid4())
-    active_domains = _get_active_allowlist_domains()
+    active_domains = await _get_active_allowlist_domains_async()
 
     combined_text = (text or "").strip()
     if url and url.strip():
         combined_text = f"{combined_text}\n{url.strip()}".strip()
 
-    input_type = "text"
+    input_type = "url" if (url and url.strip() and not (text and text.strip())) else "text"
     ocr_text: str | None = None
     audio_analysis_data: dict[str, Any] | None = None
     audio_bytes: bytes | None = None
@@ -247,9 +265,9 @@ async def verify_content(
     # 3.4 Database Known Malicious IoC Check
     if verdict_result is None and (candidate_urls or candidate_domains):
         try:
-            with sync_session_scope() as session:
+            async with async_session_scope() as session:
                 for indicator in candidate_urls + candidate_domains:
-                    existing = ThreatRepository.get_indicator_by_normalized_value_sync(session, indicator)
+                    existing = await ThreatRepository.get_indicator_by_normalized_value_async(session, indicator)
                     if existing and existing.verdict == "RED":
                         verdict_result = verdict_synthesizer.build_red_verdict(
                             rule_triggered="known_threat_ioc_match",
@@ -393,32 +411,49 @@ async def verify_content(
 
     # 5. Persist Threat Indicators & Sanitized Audit Record (FR-4.1)
     try:
-        with sync_session_scope() as session:
+        async with async_session_scope() as session:
             # If confirmed RED threat, persist Class A IoCs
             if verdict_result.verdict == TriageVerdict.RED:
-                for indicator in candidate_urls + candidate_domains:
-                    ThreatRepository.upsert_indicator_sync(
+                targets = candidate_urls + candidate_domains
+                if not targets and combined_text:
+                    targets = [combined_text[:120]]
+                for indicator in targets:
+                    await ThreatRepository.upsert_indicator_async(
                         session=session,
-                        indicator_type="url" if indicator.startswith("http") else "domain",
+                        indicator_type="url" if indicator.startswith("http") else ("domain" if "." in indicator else "lure"),
                         raw_indicator=indicator,
                         verdict="RED",
                         risk_score=Decimal(str(risk_score)),
                     )
 
             # Sanitized Audit Log (Zero Class B Citizen PII)
-            AuditRepository.record_triage_event_sync(
+            await AuditRepository.record_triage_audit_async(
                 session=session,
                 request_id=uuid.UUID(request_id),
-                user_hash=None,  # Web public queries do not record phone hash
+                citizen_user_hash=None,  # Automatically pseudonymized
                 payload_type=input_type,
-                verdict=verdict_result.verdict.value,
-                latency_ms=round((time.perf_counter() - start_time) * 1000.0, 2),
-                indicators_extracted=len(candidate_urls) + len(candidate_domains),
-                slm_invoked=slm_analysis_data is not None,
-                audio_processed=audio_analysis_data is not None,
+                triage_verdict=verdict_result.verdict.value,
+                rule_triggered=verdict_result.rule_triggered,
+                latency_ms=int(round((time.perf_counter() - start_time) * 1000.0)),
             )
     except Exception as exc:
-        logger.debug("Database telemetry persistence skipped: %s", str(exc))
+        logger.warning("Database telemetry persistence failed: %s", str(exc))
+
+    # 6. Live Prometheus Observability & Model Metrics (Phase 6)
+    try:
+        from hares.core.metrics import (
+            record_conformal_p_value,
+            record_e2e_latency,
+            record_verdict,
+        )
+
+        total_duration_sec = time.perf_counter() - start_time
+        record_e2e_latency(input_type, verdict_result.verdict.value, total_duration_sec)
+        record_verdict(verdict_result.verdict.value, verdict_result.rule_triggered)
+        if audio_analysis_data and "p_value" in audio_analysis_data and audio_analysis_data["p_value"] is not None:
+            record_conformal_p_value(float(audio_analysis_data["p_value"]))
+    except Exception as met_exc:
+        logger.debug("Prometheus telemetry observation skipped: %s", str(met_exc))
 
     elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
     logger.info("Triage complete for request %s: verdict=%s latency=%.2fms", request_id, verdict_result.verdict.value, elapsed_ms)
