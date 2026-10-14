@@ -84,8 +84,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Salik Mirage Syndicate",
         sublabel: "حملة انتحال سالك المنظمة",
         iconSrc: "/assets/stix/stix-campaign.svg",
-        x: 80,
-        y: 155,
+        x: 95,
+        y: 190,
         color: "#8B5CF6",
         details: {
           stixId: "campaign--8f20a4b1-9124-4f01-salik",
@@ -103,8 +103,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Target: Salik Dubai Tolls",
         sublabel: "الجهة المستهدفة: بوابات سالك",
         iconSrc: "/assets/stix/stix-threat-actor.svg",
-        x: 270,
-        y: 70,
+        x: 340,
+        y: 85,
         color: "#F59E0B",
         details: {
           stixId: "identity--salik-gov-ae",
@@ -122,8 +122,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Lure: SMS Urgency + Arabizi",
         sublabel: "طعم رسائل SMS الاحتيالية",
         iconSrc: "/assets/stix/stix-malware.svg",
-        x: 270,
-        y: 240,
+        x: 340,
+        y: 295,
         color: "#EF4444",
         details: {
           stixId: "attack-pattern--smishing-urgency",
@@ -141,8 +141,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "IoC: sаlik.ae (IDN Cyrillic a)",
         sublabel: "نطاق مزور بحرف سيريلي",
         iconSrc: "/assets/stix/stix-indicator.svg",
-        x: 480,
-        y: 75,
+        x: 600,
+        y: 190,
         color: "#06B6D4",
         details: {
           stixId: "indicator--idn-homograph-salik",
@@ -160,8 +160,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Exfil: Foreign Payment Trap",
         sublabel: "بوابة دفع أجنبية مسروقة",
         iconSrc: "/assets/stix/stix-infrastructure.svg",
-        x: 500,
-        y: 245,
+        x: 855,
+        y: 190,
         color: "#DC2626",
         details: {
           stixId: "infrastructure--c2-payment-drain",
@@ -250,8 +250,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Fake Fine Syndicate",
         sublabel: "عصابة المخالفات الاحتيالية",
         iconSrc: "/assets/stix/stix-campaign.svg",
-        x: 80,
-        y: 155,
+        x: 95,
+        y: 190,
         color: "#DC2626",
         details: {
           stixId: "campaign--fake-fine-police-01",
@@ -269,8 +269,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Target: Dubai Police e-Crime",
         sublabel: "الجهة المستهدفة: شرطة دبي",
         iconSrc: "/assets/stix/stix-threat-actor.svg",
-        x: 270,
-        y: 70,
+        x: 340,
+        y: 85,
         color: "#059669",
         details: {
           stixId: "identity--dubai-police-gov-ae",
@@ -288,8 +288,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Lure: WhatsApp Arrest Threat",
         sublabel: "طعم واتساب للتهديد بالحبس",
         iconSrc: "/assets/stix/stix-malware.svg",
-        x: 270,
-        y: 240,
+        x: 340,
+        y: 295,
         color: "#EF4444",
         details: {
           stixId: "attack-pattern--police-blackmail",
@@ -307,8 +307,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "IoC: еcrіme.ae (IDN Cyrillic e, i)",
         sublabel: "نطاق مزور لمنصة الجرائم",
         iconSrc: "/assets/stix/stix-indicator.svg",
-        x: 480,
-        y: 75,
+        x: 600,
+        y: 190,
         color: "#06B6D4",
         details: {
           stixId: "indicator--idn-ecrime-spoof",
@@ -323,11 +323,11 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       {
         id: "police-sink",
         type: "sink",
-        label: "Exfil: Mule Bank Account Gateway",
+        label: "Exfil: Mule Bank Gateway",
         sublabel: "حسابات بنكية وسيطة لغسيل الأموال",
         iconSrc: "/assets/stix/stix-infrastructure.svg",
-        x: 500,
-        y: 245,
+        x: 855,
+        y: 190,
         color: "#B91C1C",
         details: {
           stixId: "infrastructure--mule-drain-network",
@@ -341,7 +341,7 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       },
     ],
     links: [
-      { id: "link-pol-1", source: "police-campaign", target: "police-target", label: "Fakes Authority Of", activeInStep: 0 },
+      { id: "link-pol-1", source: "police-campaign", target: "police-target", label: "Fakes Authority", activeInStep: 0 },
       { id: "link-pol-2", source: "police-campaign", target: "police-lure", label: "Broadcasts", activeInStep: 1 },
       { id: "link-pol-3", source: "police-target", target: "police-indicator", label: "Spoofed As", activeInStep: 2 },
       { id: "link-pol-4", source: "police-lure", target: "police-indicator", label: "Coerces To", activeInStep: 3 },
@@ -416,8 +416,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Parcel Phishing Cluster",
         sublabel: "شبكة احتيال الطرود البريدية",
         iconSrc: "/assets/stix/stix-campaign.svg",
-        x: 80,
-        y: 155,
+        x: 95,
+        y: 190,
         color: "#6366F1",
         details: {
           stixId: "campaign--epg-parcel-phish",
@@ -435,8 +435,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Target: Emirates Post",
         sublabel: "الجهة المستهدفة: بريد الإمارات",
         iconSrc: "/assets/stix/stix-threat-actor.svg",
-        x: 270,
-        y: 70,
+        x: 340,
+        y: 85,
         color: "#3B82F6",
         details: {
           stixId: "identity--emirates-post-group",
@@ -451,11 +451,11 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       {
         id: "post-lure",
         type: "lure",
-        label: "Lure: AED 12 Customs Clearance SMS",
+        label: "Lure: Customs Smishing SMS",
         sublabel: "طعم رسوم الجمارك الزهيدة",
         iconSrc: "/assets/stix/stix-malware.svg",
-        x: 270,
-        y: 240,
+        x: 340,
+        y: 295,
         color: "#EF4444",
         details: {
           stixId: "attack-pattern--customs-smishing",
@@ -470,11 +470,11 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       {
         id: "post-indicator",
         type: "indicator",
-        label: "IoC: emiratespost-tracking.online",
+        label: "IoC: post-tracking.online",
         sublabel: "نطاق تتبع مزور غير رسمي",
         iconSrc: "/assets/stix/stix-indicator.svg",
-        x: 480,
-        y: 75,
+        x: 600,
+        y: 190,
         color: "#06B6D4",
         details: {
           stixId: "indicator--post-tracking-online",
@@ -489,11 +489,11 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       {
         id: "post-sink",
         type: "sink",
-        label: "Exfil: 3DS OTP Interception Trap",
+        label: "Exfil: 3DS OTP Interceptor",
         sublabel: "مصيدة اعتراض رموز التحقق",
         iconSrc: "/assets/stix/stix-infrastructure.svg",
-        x: 500,
-        y: 245,
+        x: 855,
+        y: 190,
         color: "#DC2626",
         details: {
           stixId: "infrastructure--otp-interceptor",
@@ -582,8 +582,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Utility Extortion Cell",
         sublabel: "خلية ابتزاز فواتير الخدمات",
         iconSrc: "/assets/stix/stix-campaign.svg",
-        x: 80,
-        y: 155,
+        x: 95,
+        y: 190,
         color: "#10B981",
         details: {
           stixId: "campaign--dewa-extortion-cell",
@@ -601,8 +601,8 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
         label: "Target: DEWA Utilities",
         sublabel: "الجهة المستهدفة: هيئة كهرباء ومياه دبي",
         iconSrc: "/assets/stix/stix-threat-actor.svg",
-        x: 270,
-        y: 70,
+        x: 340,
+        y: 85,
         color: "#059669",
         details: {
           stixId: "identity--dewa-gov-ae",
@@ -617,11 +617,11 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       {
         id: "dewa-lure",
         type: "lure",
-        label: "Lure: Power Disconnect Notice (2h)",
+        label: "Lure: Power Disconnect Notice",
         sublabel: "طعم إنذار فصل التيار خلال ساعتين",
         iconSrc: "/assets/stix/stix-malware.svg",
-        x: 270,
-        y: 240,
+        x: 340,
+        y: 295,
         color: "#EF4444",
         details: {
           stixId: "attack-pattern--dewa-cutoff-threat",
@@ -636,11 +636,11 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       {
         id: "dewa-indicator",
         type: "indicator",
-        label: "IoC: dewa-gov-ae.bill-portal.xyz",
+        label: "IoC: dewa-bill-portal.xyz",
         sublabel: "نطاق وهمي لسداد الفواتير",
         iconSrc: "/assets/stix/stix-indicator.svg",
-        x: 480,
-        y: 75,
+        x: 600,
+        y: 190,
         color: "#06B6D4",
         details: {
           stixId: "indicator--dewa-subdomain-spoof",
@@ -655,11 +655,11 @@ const CAMPAIGNS_DATA: Record<string, CampaignData> = {
       {
         id: "dewa-sink",
         type: "sink",
-        label: "Exfil: Cryptocurrency Mule Siphon",
+        label: "Exfil: Crypto Mule Siphon",
         sublabel: "تحويل فوري إلى محافظ العملات الرقمية",
         iconSrc: "/assets/stix/stix-infrastructure.svg",
-        x: 500,
-        y: 245,
+        x: 855,
+        y: 190,
         color: "#DC2626",
         details: {
           stixId: "infrastructure--crypto-mule-sink",
@@ -1069,14 +1069,14 @@ export default function StixCampaignGraph() {
           </div>
 
           {/* SVG Canvas Workspace */}
-          <div className="relative w-full overflow-x-auto bg-slate-50 dark:bg-slate-950/70 rounded-lg border border-slate-200/60 dark:border-slate-800/60 p-2">
-            <svg viewBox="0 0 620 310" className="w-full min-w-[560px] h-72 block">
+          <div className="relative w-full overflow-x-auto bg-slate-50 dark:bg-slate-950/70 rounded-lg border border-slate-200/60 dark:border-slate-800/60 p-2 sm:p-4">
+            <svg viewBox="0 0 960 380" className="w-full min-w-[760px] h-80 sm:h-96 block select-none">
               <defs>
                 <marker
                   id="arrowhead-normal"
                   markerWidth="8"
                   markerHeight="6"
-                  refX="7"
+                  refX="18"
                   refY="3"
                   orient="auto"
                 >
@@ -1084,15 +1084,56 @@ export default function StixCampaignGraph() {
                 </marker>
                 <marker
                   id="arrowhead-active"
-                  markerWidth="10"
+                  markerWidth="11"
                   markerHeight="8"
-                  refX="8"
+                  refX="20"
                   refY="4"
                   orient="auto"
                 >
-                  <polygon points="0 0, 10 4, 0 8" fill="#8B5CF6" />
+                  <polygon points="0 0, 11 4, 0 8" fill="#8B5CF6" />
                 </marker>
+
+                <linearGradient id="link-grad-active" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.8" />
+                  <stop offset="100%" stopColor="#EC4899" stopOpacity="0.8" />
+                </linearGradient>
+
+                <filter id="glow-filter" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
               </defs>
+
+              {/* Grid Background Pattern */}
+              <g opacity="0.15">
+                {[...Array(12)].map((_, i) => (
+                  <line
+                    key={`grid-x-${i}`}
+                    x1={i * 80 + 40}
+                    y1="20"
+                    x2={i * 80 + 40}
+                    y2="360"
+                    stroke="#94A3B8"
+                    strokeWidth="0.8"
+                    strokeDasharray="4 6"
+                  />
+                ))}
+                {[...Array(5)].map((_, i) => (
+                  <line
+                    key={`grid-y-${i}`}
+                    x1="40"
+                    y1={i * 75 + 40}
+                    x2="920"
+                    y2={i * 75 + 40}
+                    stroke="#94A3B8"
+                    strokeWidth="0.8"
+                    strokeDasharray="4 6"
+                  />
+                ))}
+              </g>
 
               {/* Links / Directed Attack Edges */}
               {activeCampaign.links.map((link) => {
@@ -1101,50 +1142,72 @@ export default function StixCampaignGraph() {
                 if (!src || !tgt) return null;
 
                 const isLinkActive = currentStep.activeLinkIds.includes(link.id);
+                const midX = (src.x + tgt.x) / 2;
+                const midY = (src.y + tgt.y) / 2;
+                const badgeWidth = Math.max(76, link.label.length * 8 + 18);
 
                 return (
                   <g key={link.id}>
+                    {/* Background Connection Line */}
                     <line
                       x1={src.x}
                       y1={src.y}
                       x2={tgt.x}
                       y2={tgt.y}
-                      stroke={isLinkActive ? "#8B5CF6" : "#94A3B8"}
+                      stroke={isLinkActive ? "url(#link-grad-active)" : "#94A3B8"}
                       strokeWidth={isLinkActive ? "3" : "1.5"}
                       strokeDasharray={isLinkActive ? "6 3" : "4 4"}
                       markerEnd={isLinkActive ? "url(#arrowhead-active)" : "url(#arrowhead-normal)"}
-                      className={isLinkActive ? "animate-pulse opacity-100" : "opacity-40"}
+                      className={isLinkActive ? "opacity-100" : "opacity-35"}
                     />
-                    {/* Animated Pulse traveling on active edge */}
+
+                    {/* Animated Pulse Beam traveling on active edge */}
                     {isLinkActive && (
-                      <circle r="4" fill="#8B5CF6">
+                      <circle r="4.5" fill="#8B5CF6">
                         <animateMotion
                           path={`M ${src.x} ${src.y} L ${tgt.x} ${tgt.y}`}
-                          dur="1.2s"
+                          dur="1.4s"
                           repeatCount="indefinite"
                         />
                       </circle>
                     )}
-                    <text
-                      x={(src.x + tgt.x) / 2}
-                      y={(src.y + tgt.y) / 2 - 8}
-                      fill={isLinkActive ? "#8B5CF6" : "#64748B"}
-                      fontSize="9"
-                      fontWeight={isLinkActive ? "bold" : "normal"}
-                      fontFamily="monospace"
-                      textAnchor="middle"
-                      className="select-none"
-                    >
-                      {link.label}
-                    </text>
+
+                    {/* Non-overlapping Pill Badge behind Link Text */}
+                    <g transform={`translate(${midX}, ${midY})`} className="pointer-events-none">
+                      <rect
+                        x={-badgeWidth / 2}
+                        y="-10"
+                        width={badgeWidth}
+                        height="20"
+                        rx="10"
+                        fill={isLinkActive ? "#FAF5FF" : "#FFFFFF"}
+                        stroke={isLinkActive ? "#A855F7" : "#CBD5E1"}
+                        strokeWidth="1.5"
+                        className="dark:fill-slate-900 dark:stroke-slate-700 shadow-sm"
+                      />
+                      <text
+                        x="0"
+                        y="0"
+                        fill={isLinkActive ? "#7E22CE" : "#475569"}
+                        fontSize="9.5"
+                        fontWeight={isLinkActive ? "700" : "600"}
+                        fontFamily="monospace"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        className="dark:fill-slate-300 select-none"
+                      >
+                        {link.label}
+                      </text>
+                    </g>
                   </g>
                 );
               })}
 
               {/* Graph Nodes */}
-              {activeCampaign.nodes.map((node) => {
+              {activeCampaign.nodes.map((node, idx) => {
                 const isSelected = selectedNode?.id === node.id;
                 const isNodeInActiveStep = currentStep.activeNodeIds.includes(node.id);
+                const stepCode = `T${idx}`;
 
                 return (
                   <g
@@ -1159,50 +1222,82 @@ export default function StixCampaignGraph() {
                     {/* Glowing Aura if in active trace step */}
                     {isNodeInActiveStep && (
                       <circle
-                        r="32"
+                        r="38"
                         fill={node.color}
-                        fillOpacity="0.22"
+                        fillOpacity="0.25"
+                        filter="url(#glow-filter)"
                         className="animate-pulse"
                       />
                     )}
 
+                    {/* Base Node Outer Ring */}
                     <circle
-                      r="24"
+                      r="26"
                       fill={node.color}
-                      fillOpacity={isNodeInActiveStep ? "0.3" : "0.15"}
+                      fillOpacity={isNodeInActiveStep ? "0.35" : "0.15"}
                       stroke={node.color}
-                      strokeWidth={isSelected ? "3.5" : isNodeInActiveStep ? "2.5" : "1.5"}
+                      strokeWidth={isSelected ? "3.5" : isNodeInActiveStep ? "2.5" : "1.8"}
                       className="transition-all"
                     />
 
                     {/* STIX Object Icon */}
                     <image
                       href={node.iconSrc}
-                      x="-12"
-                      y="-12"
-                      width="24"
-                      height="24"
+                      x="-13"
+                      y="-13"
+                      width="26"
+                      height="26"
                     />
 
-                    {/* Node Labels */}
+                    {/* Step Badge Pill (T0 - T4) */}
+                    <g transform="translate(18, -18)">
+                      <rect
+                        x="-10"
+                        y="-7"
+                        width="20"
+                        height="14"
+                        rx="7"
+                        fill={isNodeInActiveStep ? "#8B5CF6" : "#475569"}
+                        stroke="#FFFFFF"
+                        strokeWidth="1.2"
+                        className="shadow"
+                      />
+                      <text
+                        x="0"
+                        y="0"
+                        fill="#FFFFFF"
+                        fontSize="8.5"
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                      >
+                        {stepCode}
+                      </text>
+                    </g>
+
+                    {/* Node Primary Label with background plate for guaranteed readability */}
                     <text
                       x="0"
-                      y="34"
+                      y="36"
                       fill="currentColor"
-                      fontSize="10"
-                      fontWeight="600"
+                      fontSize="10.5"
+                      fontWeight="700"
                       textAnchor="middle"
-                      className="select-none text-slate-800 dark:text-slate-200"
+                      className="select-none text-slate-900 dark:text-slate-100"
                     >
                       {node.label}
                     </text>
+
+                    {/* Node Arabic Sublabel */}
                     <text
                       x="0"
-                      y="46"
-                      fill="#94A3B8"
-                      fontSize="8"
+                      y="49"
+                      fill="#64748B"
+                      fontSize="8.5"
+                      fontWeight="500"
                       textAnchor="middle"
-                      className="select-none"
+                      className="select-none text-slate-500 dark:text-slate-400 font-sans"
                     >
                       {node.sublabel}
                     </text>

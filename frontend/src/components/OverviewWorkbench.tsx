@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { OverviewResponse } from "../lib/types";
 import { fetchOverview } from "../lib/api";
 import LiveTelemetryFeed from "./LiveTelemetryFeed";
@@ -12,35 +12,62 @@ import {
   TrendingUp,
   PieChart,
   RefreshCw,
+  Database,
+  Radio,
+  Zap,
+  Activity,
+  CheckCircle2,
 } from "lucide-react";
 import { soundFx } from "../lib/audioSoundFx";
 
 export default function OverviewWorkbench() {
   const [data, setData] = useState<OverviewResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [lastSyncTime, setLastSyncTime] = useState<string>("");
+  const [hasNewEntry, setHasNewEntry] = useState<boolean>(false);
+  const prevTotalRef = useRef<number>(0);
 
-  const loadData = async () => {
-    setLoading(true);
-    const res = await fetchOverview();
-    setData(res);
-    setLoading(false);
+  const loadData = async (isManual = false) => {
+    if (isManual) setIsRefreshing(true);
+    try {
+      const res = await fetchOverview();
+      const newTotal = res?.kpis?.total_scanned_24h || 0;
+
+      if (prevTotalRef.current > 0 && newTotal > prevTotalRef.current) {
+        setHasNewEntry(true);
+        soundFx.playScanSweep();
+        setTimeout(() => setHasNewEntry(false), 3000);
+      }
+      prevTotalRef.current = newTotal;
+
+      setData(res);
+      setLastSyncTime(new Date().toLocaleTimeString());
+    } catch (err) {
+      console.error("Overview live fetch error:", err);
+    } finally {
+      setLoading(false);
+      if (isManual) setIsRefreshing(false);
+    }
   };
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 15000);
+    // High-frequency live polling: 4s interval for instant database reflection
+    const interval = setInterval(() => loadData(false), 4000);
     return () => clearInterval(interval);
   }, []);
 
   const handleManualRefresh = () => {
     soundFx.playClick();
-    loadData();
+    loadData(true);
   };
 
   if (!data && loading) {
     return (
-      <div className="p-8 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
-        Loading Sovereign Threat Telemetry...
+      <div className="p-12 text-center text-slate-500 dark:text-slate-400 font-mono text-sm">
+        <RefreshCw className="w-6 h-6 animate-spin mx-auto mb-2 text-cyan-500" />
+        Synchronizing Live Neon PostgreSQL Threat Telemetry...
       </div>
     );
   }
@@ -51,10 +78,56 @@ export default function OverviewWorkbench() {
 
   return (
     <div className="space-y-6">
+      {/* Live Synchronization Status Header Bar */}
+      <div className="p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <span className="w-3 h-3 rounded-full bg-emerald-500 block animate-ping absolute inset-0" />
+            <span className="w-3 h-3 rounded-full bg-emerald-500 block relative" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-900 dark:text-white font-mono">
+                Neon PostgreSQL 16 Database Telemetry
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                Live 4s Sync
+              </span>
+              {hasNewEntry && (
+                <span className="text-[10px] px-2 py-0.5 rounded font-mono font-bold bg-cyan-100 text-cyan-800 dark:bg-cyan-950 dark:text-cyan-300 border border-cyan-400 animate-bounce">
+                  + New Scan Ingested!
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">
+              Direct connection pool to AWS us-east-2 serverless cluster • Increments dynamically as citizens triage
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 text-xs font-mono">
+          <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+            Last Synced: <strong className="text-slate-700 dark:text-slate-200">{lastSyncTime || "Active"}</strong>
+          </span>
+          <button
+            onClick={handleManualRefresh}
+            disabled={isRefreshing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold transition shadow-sm"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin text-cyan-500" : ""}`} />
+            <span>Force Sync</span>
+          </button>
+        </div>
+      </div>
+
       {/* KPI Highlights Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Scans */}
-        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm relative overflow-hidden transition-colors">
+        <div
+          className={`rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm relative overflow-hidden transition-all ${
+            hasNewEntry ? "ring-2 ring-emerald-500 ring-offset-1 dark:ring-offset-slate-900 scale-[1.02]" : ""
+          }`}
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               Scanned Messages (24h)
@@ -69,7 +142,9 @@ export default function OverviewWorkbench() {
             </span>
             <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">100% Ingress SLA</span>
           </div>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">WhatsApp &amp; Public Ingress Verified</p>
+          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+            WhatsApp &amp; Public Ingress Verified
+          </p>
         </div>
 
         {/* High Risk Verdicts (Red) */}
@@ -86,9 +161,15 @@ export default function OverviewWorkbench() {
             <span className="text-3xl font-extrabold text-red-600 dark:text-red-400 font-mono">
               {kpis?.high_risk_verdicts_24h.toLocaleString() || "384"}
             </span>
-            <span className="text-xs text-red-600 dark:text-red-400 font-medium">27.0% Malicious</span>
+            <span className="text-xs text-red-600 dark:text-red-400 font-medium">
+              {kpis?.total_scanned_24h
+                ? `${((kpis.high_risk_verdicts_24h / kpis.total_scanned_24h) * 100).toFixed(1)}% Malicious`
+                : "27.0% Malicious"}
+            </span>
           </div>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Escalated to Dubai Police e-Crime &amp; 901</p>
+          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+            Escalated to Dubai Police e-Crime &amp; 901
+          </p>
         </div>
 
         {/* Amber Fallbacks */}
@@ -107,7 +188,9 @@ export default function OverviewWorkbench() {
             </span>
             <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">Conformal Abstention</span>
           </div>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Empirical FPR Bounded ≤ 0.1%</p>
+          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+            Empirical FPR Bounded ≤ 0.1%
+          </p>
         </div>
 
         {/* Turnaround Latency */}
@@ -126,7 +209,9 @@ export default function OverviewWorkbench() {
             </span>
             <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">&lt; 1.5s SLA Met</span>
           </div>
-          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">Sub-50ms Webhook Acknowledgment</p>
+          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+            Sub-50ms Webhook Acknowledgment
+          </p>
         </div>
       </div>
 
@@ -137,7 +222,9 @@ export default function OverviewWorkbench() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">24-Hour Threat Arrival Curve</h3>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                24-Hour Threat Arrival Curve (Live DB Stream)
+              </h3>
             </div>
             <div className="flex items-center gap-4 text-xs font-mono">
               <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
@@ -157,6 +244,8 @@ export default function OverviewWorkbench() {
             {curve.map((point, idx) => {
               const maxVol = 180;
               const heightPct = Math.min(100, Math.max(10, (point.total / maxVol) * 100));
+              const isLatestBucket = idx === curve.length - 1;
+
               return (
                 <div key={idx} className="flex-1 flex flex-col items-center gap-1 group relative">
                   {/* Tooltip */}
@@ -168,7 +257,11 @@ export default function OverviewWorkbench() {
                   <div className="w-full flex flex-col justify-end h-full">
                     <div
                       style={{ height: `${heightPct}%` }}
-                      className="w-full rounded-t bg-gradient-to-t from-cyan-600/40 via-cyan-500/80 to-cyan-400 group-hover:brightness-110 transition"
+                      className={`w-full rounded-t transition ${
+                        isLatestBucket
+                          ? "bg-gradient-to-t from-emerald-600 via-emerald-500 to-cyan-400 animate-pulse"
+                          : "bg-gradient-to-t from-cyan-600/40 via-cyan-500/80 to-cyan-400 group-hover:brightness-110"
+                      }`}
                     />
                   </div>
                   <span className="text-[9px] font-mono text-slate-400 transform -rotate-45 origin-top-left mt-2 hidden sm:block">
@@ -180,7 +273,7 @@ export default function OverviewWorkbench() {
           </div>
           <div className="mt-6 flex justify-between items-center text-xs text-slate-500 dark:text-slate-400">
             <span>Peak Surge: 13:00–16:00 GST (UAE Afternoon Scam Distribution)</span>
-            <span>Total Volume: {kpis?.total_scanned_24h} Events</span>
+            <span>Total Volume: <strong>{kpis?.total_scanned_24h}</strong> Events</span>
           </div>
         </div>
 
