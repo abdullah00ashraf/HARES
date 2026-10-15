@@ -47,6 +47,7 @@ playwright-report/
 # OS artifacts
 .DS_Store
 Thumbs.db
+~$*
 
 # Node.js & Next.js
 node_modules/
