@@ -98,9 +98,7 @@ export default function TermsPage() {
               4. Disclaimer of Liability
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-              While Project Hares employs Conformal Prediction statistical calibration to bound error rates ($\le 0.1\%$), automated models
-              are inherently advisory. The operators and municipal contributors assume no liability for fraudulent actions committed by
-              third-party criminals or unauthorized transactions conducted prior to verification.
+              Project Hares is an independent open-source public cybersecurity project developed for community fraud triage and is not an official government website, agency, or law enforcement division. While Project Hares employs Conformal Prediction statistical calibration to bound error rates (≤ 0.1%), automated models are advisory. Users must remain vigilant and apply sound judgment. The developers, open-source contributors, and operators of Project Hares disclaim any liability for direct, indirect, or consequential damages resulting from reliance on triage verdicts, third-party fraud, or actions taken prior to submitting content.
             </p>
           </section>
 

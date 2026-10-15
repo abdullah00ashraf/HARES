@@ -105,6 +105,25 @@ export default function Header() {
 
   return (
     <>
+      {/* Independent Open-Source Advisory Ribbon Banner */}
+      <aside
+        aria-label="Independent Open Source Public Advisory"
+        className="bg-amber-500/10 dark:bg-amber-500/15 border-b border-amber-500/20 text-amber-950 dark:text-amber-200 text-[11px] sm:text-xs px-4 py-1.5 transition-colors"
+      >
+        <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-center flex-wrap">
+          <span className="inline-flex items-center gap-1 font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 dark:bg-amber-500/30 text-amber-950 dark:text-amber-200 text-[10px] font-mono border border-amber-500/30">
+            <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+            Independent Open Source
+          </span>
+          <span className="font-medium text-slate-800 dark:text-slate-200">
+            Project Hares is an independent open-source cybersecurity project — not an official government agency or official state website.
+          </span>
+          <span className="hidden md:inline text-amber-800/80 dark:text-amber-300/80 font-arabic text-xs">
+            (مشروع بحثي مستقل ومفتوح المصدر لمكافحة الاحتيال، وليس جهة أو موقعاً حكومياً رسمياً)
+          </span>
+        </div>
+      </aside>
+
       <header className="border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-4 sm:px-6 py-3.5 sticky top-0 z-50 transition-colors duration-200 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
           {/* Project Hares Sovereign Branding */}

@@ -859,3 +859,18 @@
 * **Errors/Issues Encountered:** None.
 * **Rectification/Resolution:** All 6 static pages generated successfully; Next.js 15 build validated in 7.8s.
 
+### 2026-10-15 13:25:00 UTC - Milestone 46: Independent Open-Source Banner & LaTeX Syntax Correction Deployed
+* **Development Made:**
+  1. **Corrected LaTeX Math Syntax:**
+     - Replaced raw LaTeX math dollar string `($\le 0.1\%$)` with clean mathematical Unicode formatting `(≤ 0.1%)` in both `frontend/src/app/terms/page.tsx` and `frontend/src/components/LegalModal.tsx` Section 4 ("Limitation of Liability & Disclaimers").
+  2. **Independent Open-Source Advisory Ribbon Banner (`frontend/src/components/Header.tsx`):**
+     - Embedded a prominent, bilingual (English & Arabic) top advisory ribbon banner explicitly declaring that Project Hares is an independent open-source cybersecurity project and not an official government agency, department, or official state website.
+  3. **Continuous E2E Test Suite Validation (`tests-e2e/specs/01_citizen_portal.spec.ts`):**
+     - Added automated Playwright test assertion to verify the advisory ribbon banner remains permanently visible across all viewports.
+  4. **Production Build & Verification:**
+     - Next.js 15 production build compiled successfully with 0 errors across all 6 static routes.
+* **Decision Taken & Rationale:** Clarified public project identity to avoid misinterpretation of official state affiliation while guaranteeing that mathematical and statistical calibration bounds are rendered clearly without raw LaTeX formatting artifacts.
+* **Errors/Issues Encountered:** None.
+* **Rectification/Resolution:** All routes prerendered cleanly; staged and pushed to GitHub `origin/main` to trigger live automated deployments.
+
+

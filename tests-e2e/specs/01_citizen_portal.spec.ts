@@ -21,6 +21,9 @@ test.describe('Citizen Fraud Verification Portal (Live Production)', () => {
     // 4. Verify live GST time clock
     const clock = page.locator('header').getByText(/GST:/);
     await expect(clock).toBeVisible();
+
+    // 5. Verify independent open source advisory banner
+    await expect(page.getByText(/Project Hares is an independent open-source cybersecurity project/i)).toBeVisible();
   });
 
   test('TC-02: Multi-modal triage tabs switch and render active inputs', async ({ page }) => {

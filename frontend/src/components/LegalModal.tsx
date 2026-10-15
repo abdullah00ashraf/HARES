@@ -284,10 +284,7 @@ export default function LegalModal({
                   <span>Limitation of Liability &amp; Disclaimers</span>
                 </h4>
                 <p className="text-xs text-slate-600 dark:text-slate-400 pl-8">
-                  While Project Hares applies strict conformal statistical calibration to bound error rates ($\le 0.1\%$), automated models
-                  are advisory. Users must remain vigilant and apply sound judgment. The developers, municipal administrators, and operators
-                  of Project Hares disclaim any liability for direct, indirect, or consequential damages resulting from reliance on triage
-                  verdicts, third-party fraud, or actions taken prior to submitting content.
+                  Project Hares is an independent open-source public cybersecurity project developed for community fraud triage and is not an official government website, agency, or law enforcement division. While Project Hares applies strict conformal statistical calibration to bound error rates (≤ 0.1%), automated models are advisory. Users must remain vigilant and apply sound judgment. The developers, open-source contributors, and operators of Project Hares disclaim any liability for direct, indirect, or consequential damages resulting from reliance on triage verdicts, third-party fraud, or actions taken prior to submitting content.
                 </p>
               </section>
 
