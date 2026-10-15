@@ -316,26 +316,7 @@ Project Hares maintains three dedicated, localized evaluation datasets within th
 
 ---
 
-## 10. Comprehensive Post-Deployment Security Hardening (Milestone 38)
-
-Following a rigorous source-grounded post-deployment audit ([`audit/post-deployment_audit.md`](audit/post-deployment_audit.md)), all 10 identified observations (`AUDIT-OBS-30` to `AUDIT-OBS-39`) were completely remediated:
-
-| Observation ID | Vulnerability Scope | Remediation Implemented | Verification Artifact |
-| :--- | :--- | :--- | :--- |
-| **`AUDIT-OBS-30`** | Plaintext Master Passkey in Frontend Source | Removed `MASTER_SOC_KEY` from `PortalModeContext.tsx` and fallback from `api.ts`. Implemented server-side `/api/v1/threats/auth/verify` authentication endpoint with PBKDF2 hash validation. | Next.js 15 build clean (0 leaked tokens); `tests/test_post_audit_hardening.py` |
-| **`AUDIT-OBS-31`** | WhatsApp Token Expiration & Staging Fallback | Implemented `model_validator` in `config.py` that automatically falls back to `WHATSAPP_ACCESS_TOKEN_PERMAMENT`. | `test_whatsapp_token_permanent_fallback` PASSED |
-| **`AUDIT-OBS-32`** | Unauthenticated vLLM SLM Ingress (`8001:8000`) | Bound port strictly to `127.0.0.1:8001:8000` and added `--api-key` enforcing `SLM_API_KEY`. | `docker-compose.prod.yml` validated |
-| **`AUDIT-OBS-33`** | Unauthenticated Prometheus Port (`9090:9090`) | Bound port strictly to `127.0.0.1:9090:9090`. | `docker-compose.prod.yml` validated |
-| **`AUDIT-OBS-34`** | Unthrottled Citizen Web Triage Ingress | Implemented IP token-bucket rate limiter (15 req/min) in `POST /api/v1/triage/verify` returning HTTP 429. | `test_triage_web_rate_limiter` PASSED |
-| **`AUDIT-OBS-35`** | Plaintext Database / Redis Strings in Scripts | Sanitized `alembic.ini` and refactored `stage_cluster.py` to derive connections dynamically from `get_settings()`. | `alembic.ini`, `scripts/stage_cluster.py` |
-| **`AUDIT-OBS-36`** | Ephemeral STIX Signing Key | Deterministically derives private key from `STIX_SIGNING_KEY_HEX` scalar via `ec.derive_private_key`. | `test_stix_signing_key_deterministic_derivation` PASSED |
-| **`AUDIT-OBS-37`** | Database Connection Traceback Disclosure | Sanitized error strings to `"error: connection_failed"` with internal logging. | `src/hares/api/v1/health.py` |
-| **`AUDIT-OBS-38`** | Missing `ffmpeg` in Container Runner Stage | Added `ffmpeg` to `apt-get install` in `Dockerfile` runner stage. | `Dockerfile` |
-| **`AUDIT-OBS-39`** | OpenAPI Swagger Documentation in Production | Conditionally set `docs_url=None`, `redoc_url=None`, `openapi_url=None` when `ENVIRONMENT == "production"`. | `test_production_openapi_docs_disabled` PASSED |
-
----
-
-## 11. Repository Directory Structure
+## 10. Repository Directory Structure
 
 ```
 HARES/
@@ -385,7 +366,7 @@ HARES/
 
 ---
 
-## 12. Quickstart & Verification Guide
+## 11. Quickstart & Verification Guide
 
 ### 1. Environment Configuration
 Clone the repository and initialize your local environment file:
@@ -447,8 +428,9 @@ python scripts/test_meta_api.py --recipient "+97150XXXXXXX"
 
 ---
 
-## 13. License & Sovereign Attestation
+## 12. License & Sovereign Attestation
 
 Project Hares is open-source software licensed under the **Apache License, Version 2.0**.
 
 All architectural designs, sovereign guardrails, and cryptographic implementations comply with the standards set forth by the **Dubai Electronic Security Center (DESC)** Information Security Regulation (ISR v2.0), Digital Dubai Ethical AI principles, and the Telecommunications and Digital Government Regulatory Authority (TDRA) of the United Arab Emirates.
+
