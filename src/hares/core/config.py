@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     SLM_MODEL_NAME: str = "llama-3.2-3b-instruct-awq"
     SLM_API_KEY: str = Field(default="hares_internal_slm_key", min_length=16)
     SLM_TIMEOUT_SECONDS: float = 3.0
+    # Hugging Face ZeroGPU Neural Engine Settings
+    HF_SPACE_URL: str = "https://abdullahashraf122-hares-neural-engine.hf.space"
+    HF_SPACE_API_NAME: str = "/triage"
+    HF_ZERO_GPU_ENABLED: bool = True
+    HF_ZERO_GPU_TIMEOUT_SECONDS: float = 12.0
     ASR_MODEL_SIZE: str = "small"
     ASR_DEVICE: str = "cpu"
     AUDIO_MAX_DURATION_SECONDS: float = 120.0

@@ -1,0 +1,16 @@
+{
+  "name": "hares-live-production-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Isolated E2E automated test suite for Project Hares live production environment",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:citizen": "playwright test specs/01_citizen_portal.spec.ts",
+    "test:auth": "playwright test specs/02_soc_clearance_and_security.spec.ts",
+    "test:workbenches": "playwright test specs/03_soc_forensic_workbenches.spec.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
+}

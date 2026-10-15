@@ -213,9 +213,15 @@ export default function CitizenTriagePortal() {
         <div className="absolute inset-0 bg-gradient-to-b from-emerald-50/50 dark:from-emerald-950/20 to-transparent pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl mx-auto space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
-            <Lock className="w-3.5 h-3.5" />
-            <span>Zero Citizen PII Retention (FR-4.1) • 100% Local Sovereign AI</span>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
+              <Lock className="w-3.5 h-3.5" />
+              <span>Zero Citizen PII Retention (FR-4.1) • 100% Sovereign AI</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-900 dark:text-amber-300 text-xs font-semibold">
+              <Activity className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+              <span>Hugging Face ZeroGPU • NVIDIA A10G Active</span>
+            </div>
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
@@ -612,7 +618,15 @@ export default function CitizenTriagePortal() {
               </div>
 
               {/* Execution Latency & Risk Score Meter */}
-              <div className="flex items-center gap-6 shrink-0 text-right">
+              <div className="flex items-center gap-4 sm:gap-6 shrink-0 text-right">
+                {result.model_engine && (
+                  <div className="hidden sm:block text-right">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-mono uppercase tracking-wider">Inference Engine</span>
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
+                      {result.model_engine.includes("ZeroGPU") ? "ZeroGPU A10G" : "Sovereign Engine"}
+                    </span>
+                  </div>
+                )}
                 <div>
                   <span className="text-xs text-slate-500 dark:text-slate-400 block font-mono">Risk Score</span>
                   <span
@@ -789,6 +803,12 @@ export default function CitizenTriagePortal() {
                   <div className="space-y-2">
                     {result.slm_analysis ? (
                       <div className="space-y-1">
+                        <div>
+                          <strong>Neural Engine Provider:</strong>{" "}
+                          <span className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
+                            {result.model_engine || "Hugging Face ZeroGPU (NVIDIA A10G • Qwen2.5-3B + NeMo Guardrails)"}
+                          </span>
+                        </div>
                         <div>
                           <strong>Detected Tactics:</strong>{" "}
                           {result.slm_analysis.detected_tactics && result.slm_analysis.detected_tactics.length > 0

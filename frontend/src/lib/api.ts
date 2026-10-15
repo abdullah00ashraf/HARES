@@ -580,6 +580,7 @@ export async function verifyCitizenSubmission(
         },
         input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
         execution_latency_ms: 120,
+        model_engine: "Sovereign Client Heuristics (Offline Fallback)",
         privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
       };
     }
@@ -606,6 +607,7 @@ export async function verifyCitizenSubmission(
         },
         input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
         execution_latency_ms: 85,
+        model_engine: "Sovereign Allowlist Registry (Offline Fast-Path)",
         privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
       };
     }
@@ -627,6 +629,7 @@ export async function verifyCitizenSubmission(
       },
       input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
       execution_latency_ms: 95,
+      model_engine: "Sovereign Client Heuristics (Offline Fallback)",
       privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
     };
   }

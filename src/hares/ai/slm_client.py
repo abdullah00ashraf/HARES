@@ -44,9 +44,107 @@ class LocalSLMClient:
         self.timeout = timeout_seconds if timeout_seconds is not None else settings.SLM_TIMEOUT_SECONDS
         self.mock_mode = mock_mode
         self.enable_guardrails = enable_guardrails
+        self.hf_space_url = settings.HF_SPACE_URL
+        self.hf_space_api_name = settings.HF_SPACE_API_NAME
+        self.enable_hf_zerogpu = settings.HF_ZERO_GPU_ENABLED
+        self.hf_timeout = settings.HF_ZERO_GPU_TIMEOUT_SECONDS
+        self._hf_client: Any = None
+        self.last_provider_used: str = "offline_heuristics"
         self._outlines_generator: Any = None
         self._guardrails: SovereignGuardrailsEngine | None = (
             SovereignGuardrailsEngine() if enable_guardrails else None
+        )
+
+    def _get_hf_client(self) -> Any:
+        """Lazy-initializes and caches singleton gradio_client.Client for ZeroGPU Space."""
+        if self._hf_client is None:
+            try:
+                import gradio_client  # type: ignore
+
+                logger.info("Initializing Hugging Face Gradio client for %s...", self.hf_space_url)
+                self._hf_client = gradio_client.Client(self.hf_space_url)
+            except Exception as exc:
+                logger.warning("Failed to initialize Hugging Face Gradio client: %s", str(exc))
+                raise
+        return self._hf_client
+
+    def _query_hf_zerogpu(self, prompt: str) -> TextTriageInferenceResult:
+        """
+        Dispatches triage inference to Hugging Face ZeroGPU Space (Qwen2.5-3B + NVIDIA NeMo Guardrails).
+        Parses structured response, enforces schema typing, and handles edge cases.
+        """
+        valid_tactics_set = {
+            "traffic_fine_lure",
+            "courier_delivery_fee",
+            "banking_kyc_freeze",
+            "lottery_prize",
+            "account_suspension",
+            "prompt_injection",
+            "crypto_investment",
+            "none",
+        }
+
+        client = self._get_hf_client()
+        logger.info("Dispatching neural triage to Hugging Face ZeroGPU Space (%s)...", self.hf_space_url)
+        raw_result = client.predict(user_text=prompt, api_name=self.hf_space_api_name)
+
+        if not raw_result or len(raw_result) < 2:
+            raise ValueError(f"Unrecognized response tuple from ZeroGPU Space: {raw_result}")
+
+        raw_json_str = raw_result[1]
+        data = json.loads(raw_json_str) if isinstance(raw_json_str, str) else raw_json_str
+        analysis = data.get("analysis", {})
+
+        is_impersonation = bool(analysis.get("is_impersonation", False))
+        impersonated_entity = analysis.get("impersonated_entity")
+
+        # Map and sanitize tactics to exact allowed literals
+        raw_tactics = analysis.get("detected_tactics") or ["none"]
+        if not isinstance(raw_tactics, list):
+            raw_tactics = [str(raw_tactics)]
+
+        sanitized_tactics: list[TacticType] = []
+        for t in raw_tactics:
+            t_str = str(t).strip().lower()
+            if t_str in valid_tactics_set:
+                sanitized_tactics.append(t_str)  # type: ignore
+            elif "traffic" in t_str or "fine" in t_str:
+                sanitized_tactics.append("traffic_fine_lure")
+            elif "kyc" in t_str or "bank" in t_str:
+                sanitized_tactics.append("banking_kyc_freeze")
+            elif "delivery" in t_str or "post" in t_str or "courier" in t_str:
+                sanitized_tactics.append("courier_delivery_fee")
+            elif "lottery" in t_str or "prize" in t_str:
+                sanitized_tactics.append("lottery_prize")
+            elif "crypto" in t_str or "invest" in t_str:
+                sanitized_tactics.append("crypto_investment")
+            elif "suspend" in t_str or "block" in t_str:
+                sanitized_tactics.append("account_suspension")
+            elif "prompt" in t_str or "injection" in t_str or "override" in t_str:
+                sanitized_tactics.append("prompt_injection")
+
+        if not sanitized_tactics:
+            sanitized_tactics = ["none"]
+
+        urgency = bool(analysis.get("urgency_or_coercion", False))
+        financial = bool(analysis.get("financial_or_credential_demand", False))
+        confidence = float(data.get("risk_score", analysis.get("confidence_score", 0.5)))
+        confidence = max(0.0, min(1.0, round(confidence, 4)))
+
+        reasoning = (
+            analysis.get("reasoning_summary")
+            or data.get("reason")
+            or "Neural triage verification completed via Hugging Face ZeroGPU."
+        )
+
+        return TextTriageInferenceResult(
+            is_impersonation=is_impersonation,
+            impersonated_entity=impersonated_entity,
+            urgency_or_coercion=urgency,
+            financial_or_credential_demand=financial,
+            confidence_score=confidence,
+            detected_tactics=sanitized_tactics,
+            reasoning_summary=reasoning,
         )
 
     def triage_with_guardrails(self, text: str) -> GuardrailResult:
@@ -84,6 +182,7 @@ class LocalSLMClient:
         """
         Executes raw model generation or offline heuristic evaluation.
         Prevents prompt injection escape by wrapping in strict XML delimiters.
+        Prioritizes Hugging Face ZeroGPU Space when enabled.
         """
         # 1. Defend against prompt injection via XML delimitation, tag escaping, and ChatML special token stripping (NFR-1.3, AUDIT-OBS-17, AUDIT-OBS-29)
         escaped_text = re.sub(r"</?citizen_forwarded_text>", "", text, flags=re.IGNORECASE)
@@ -92,21 +191,39 @@ class LocalSLMClient:
 
         # If mock mode is explicitly requested, jump directly to deterministic heuristics
         if self.mock_mode:
+            self.last_provider_used = "mock_heuristics"
             return self._evaluate_offline_heuristics(text)
 
-        # 2. Try Outlines Guided Generation if initialized
+        # 2. Try Hugging Face ZeroGPU Space (Live NVIDIA A10G Hardware)
+        if self.enable_hf_zerogpu:
+            try:
+                res = self._query_hf_zerogpu(escaped_text)
+                self.last_provider_used = "hf_zerogpu_a10g"
+                return res
+            except Exception as exc:
+                logger.warning(
+                    "Hugging Face ZeroGPU neural engine failed or timed out (%s), attempting local fallbacks",
+                    str(exc),
+                )
+
+        # 3. Try Outlines Guided Generation if initialized
         try:
-            return self._query_outlines(bounded_prompt)
+            res = self._query_outlines(bounded_prompt)
+            self.last_provider_used = "outlines_local"
+            return res
         except (ImportError, AttributeError, Exception) as exc:
             logger.debug("Outlines generator bypassed (%s), querying local vLLM daemon", str(exc))
 
-        # 3. Query Local vLLM/Ollama Server with Structured Output Schema
+        # 4. Query Local vLLM/Ollama Server with Structured Output Schema
         try:
-            return self._query_local_slm(bounded_prompt)
+            res = self._query_local_slm(bounded_prompt)
+            self.last_provider_used = "local_vllm"
+            return res
         except Exception as exc:
             logger.debug("Local SLM daemon unreachable, falling back to local deterministic evaluator: %s", str(exc))
 
-        # 4. Deterministic Local NLP Evaluator (Hermetic Fallback)
+        # 5. Deterministic Local NLP Evaluator (Hermetic Fallback)
+        self.last_provider_used = "offline_heuristics"
         return self._evaluate_offline_heuristics(text)
 
     def _query_outlines(self, bounded_prompt: str) -> TextTriageInferenceResult:

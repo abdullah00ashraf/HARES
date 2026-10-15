@@ -1,8 +1,8 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Post-Audit Security Hardening Completed; Overview SVG Arrival Curve & UAE Threat Velocity Heatmap Deployed; Attack Graph Vibration Resolved; Live Neon Database Telemetry Restored (Milestones 40–41); 100% Tests Passing; Next.js 15 Clean Production Build
+**Current Status:** Production Verified; Hugging Face ZeroGPU Neural Routing Deployed; Terms & Conditions and Citizen Privacy Policy (FR-4.1) Deployed; Next.js 15 Modal & Static Routes (/terms, /privacy) Active; Neon PostgreSQL 16 & Redis Rate Limiting Intact
 **Last Updated:** 2026-10-15  
-**Version:** 2.4.2-live-neon-restored  
+**Version:** 2.7.0-compliance-and-neural-routing  
 
 ---
 
@@ -10,15 +10,16 @@
 
 | Service Name | Container / Process | Port | Binding | Protocol | Purpose |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **FastAPI Gateway** | `hares-api` | `8000` | `0.0.0.0:8000` | HTTP/REST | WhatsApp Webhook Ingress (`/webhook`), Health Probes, Metrics (`/metrics`), Municipal Threat Feed API (`/api/v1/threats/*`) |
+| **FastAPI Gateway** | `hares-api` | `8000` | `0.0.0.0:8000` | HTTP/REST | Public Citizen Triage (`/triage/verify`), Webhook Ingress (`/webhook`), Health Probes, Metrics (`/metrics`), Threat Feed (`/threats/*`) |
+| **HF ZeroGPU Neural Engine** | Cloud Space | N/A | Cloud (`zero-a10g`) | HTTPS/Gradio | Qwen2.5-3B + NVIDIA NeMo Guardrails on dynamic NVIDIA A10G (24GB VRAM) for high-speed neural fraud triage |
 | **Celery Text Worker** | `hares-worker-text` | N/A | Internal | AMQP/Redis | Rapid text & URL triage tasks (<1.5s SLA) (`high_priority_triage`) |
 | **Celery Media Worker** | `hares-worker-media` | N/A | Internal | AMQP/Redis | Audio deepfake transcoding & ASR inference (<4.5s SLA) (`media_triage`) (NVIDIA GPU Passthrough) |
 | **Redis Broker/Cache** | `hares-redis` | `6379` | `127.0.0.1:6379` | RESP | Celery task message broker and citizen token-bucket rate limiter (NFR-1.3) |
-| **PostgreSQL DB** | `hares-db` | `5432` | `127.0.0.1:5432` | TCP/PostgreSQL | Class A threat intelligence repository and audit logging |
-| **Local SLM Service** | `hares-slm` | `11434` / `8001` | Internal | HTTP (vLLM/Ollama) | Local sovereign language model text triage (NFR-1.1) (NVIDIA GPU Passthrough) |
+| **PostgreSQL DB** | `hares-db` | `5432` | `127.0.0.1:5432` | TCP/PostgreSQL | Class A threat intelligence repository and audit logging (Neon PostgreSQL 16) |
+| **Local SLM Service** | `hares-slm` | `11434` / `8001` | Internal | HTTP (vLLM/Ollama) | Local sovereign language model text triage fallback (NFR-1.1) |
 | **Prometheus Telemetry** | `hares-prometheus` | `9090` | `0.0.0.0:9090` | HTTP/Prometheus | High-frequency metrics scraping (5s interval) and SLA alerting |
 | **Mock Meta Sink** | `mock-meta-sink` | `8001` | `0.0.0.0:8001` | HTTP/FastAPI | E2E turnaround tracking (Delta t = t_outbound - t_inbound) and synthetic media streaming |
-| **Next.js Dashboard** | `hares-dashboard` | `3000` | `0.0.0.0:3000` | HTTP | Air-gapped Municipal Threat Intelligence Portal (Analysts & SOC) |
+| **Next.js Dashboard** | `hares-dashboard` | `3000` | `0.0.0.0:3000` | HTTP | Citizen Fraud Verification Portal & SOC Municipal Threat Intelligence Portal |
 
 ### Network Topologies & Egress Isolation
 

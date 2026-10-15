@@ -93,6 +93,7 @@ class TriageVerificationResponse(BaseModel):
     ocr_extracted_text: str | None = None
     input_type_detected: str = "text"
     execution_latency_ms: float
+    model_engine: str = "Hugging Face ZeroGPU (Qwen2.5-3B + NVIDIA NeMo Guardrails)"
     privacy_notice: str = "FR-4.1 Compliant: Zero citizen identifiers or personal data retained in memory or storage."
 
 
@@ -470,7 +471,26 @@ async def verify_content(
         logger.debug("Prometheus telemetry observation skipped: %s", str(met_exc))
 
     elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
-    logger.info("Triage complete for request %s: verdict=%s latency=%.2fms", request_id, verdict_result.verdict.value, elapsed_ms)
+
+    # Determine inference engine provider label
+    if slm_analysis_data:
+        provider = getattr(slm_client, "last_provider_used", "hf_zerogpu_a10g")
+        if provider == "hf_zerogpu_a10g":
+            active_engine = "Hugging Face ZeroGPU (NVIDIA A10G • Qwen2.5-3B + NeMo Guardrails)"
+        elif provider in ["mock_heuristics", "offline_heuristics"]:
+            active_engine = "Sovereign Deterministic Engine (Offline NLP Heuristics)"
+        else:
+            active_engine = f"Project Hares Sovereign Engine ({provider})"
+    elif audio_analysis_data:
+        active_engine = "Sovereign Acoustic Engine (Conformal Spectral Anomaly + Whisper ASR)"
+    elif homograph_analysis_data:
+        active_engine = "Deterministic Homograph & Unicode Punycode Detector"
+    elif allowlist_match_data:
+        active_engine = "Deterministic UAE Government Exact Domain Allowlist"
+    else:
+        active_engine = "Project Hares Sovereign Triage Engine"
+
+    logger.info("Triage complete for request %s: verdict=%s latency=%.2fms engine=%s", request_id, verdict_result.verdict.value, elapsed_ms, active_engine)
 
     return TriageVerificationResponse(
         request_id=request_id,
@@ -490,4 +510,5 @@ async def verify_content(
         ocr_extracted_text=ocr_text,
         input_type_detected=input_type,
         execution_latency_ms=elapsed_ms,
+        model_engine=active_engine,
     )

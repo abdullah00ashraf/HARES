@@ -37,6 +37,8 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+test-results/
+playwright-report/
 
 # Type checking & linters
 .mypy_cache/

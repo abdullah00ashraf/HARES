@@ -130,6 +130,7 @@ export interface TriageVerificationResponse {
   ocr_extracted_text?: string | null;
   input_type_detected: "text" | "url" | "audio" | "image";
   execution_latency_ms: number;
+  model_engine?: string;
   privacy_notice: string;
 }
 
