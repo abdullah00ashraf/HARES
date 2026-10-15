@@ -1,8 +1,8 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Post-Audit Security Hardening & Pre-Production Remediation Completed (Milestone 38); 142/142 Tests Passing (100%); All 10 Findings (AUDIT-OBS-30 to 39) Successfully Remediated; Frontend Decoupled from Passkey Constants; Container Topologies & Ports Hardened
+**Current Status:** Post-Audit Security Hardening Completed; Overview SVG Arrival Curve & UAE Threat Velocity Heatmap Deployed; Attack Graph Vibration Resolved (Milestone 40); 142/142 Tests Passing (100%); Next.js 15 Clean Production Build
 **Last Updated:** 2026-10-15  
-**Version:** 2.4.0-post-audit-hardened  
+**Version:** 2.4.1-frontend-hotfix-verified  
 
 ---
 

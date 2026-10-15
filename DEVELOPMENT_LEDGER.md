@@ -715,8 +715,25 @@
   11. Documented Sovereign Datasets (100k ChatML smishing corpus, 20k Opus audio suite, `realtest` 23-case multi-modal suite).
   12. Fully articulated the 10 post-deployment security audit remediations (`AUDIT-OBS-30` through `AUDIT-OBS-39`).
   13. Exhaustive repository file tree and operator quickstart runbook.
-* **Decision Taken & Rationale:** Replaced brief or partially stale documentation with an authoritative, unified technical truth reflecting the live cloud showcase, two-tier deployment architecture, and post-audit hardened security posture.
+### 2026-10-15 09:40:00 UTC - Milestone 40: Overview SVG Arrival Curve, UAE Threat Velocity Heatmap & Attack Graph Vibration Resolution
+* **Development Made:** Under `/master-orchestrator` directive, investigated and resolved two production visual frontend bugs:
+  1. **Overview 24-Hour Arrival Curve Fix (`OverviewWorkbench.tsx`):**
+     - Diagnosed CSS flexbox percentage-height collapse bug: Outer container had `items-end`, causing child columns to compute `height: auto` and inner percentage `height: ${heightPct}%` to evaluate to `0px`.
+     - Replaced collapsed flex columns with a responsive SVG vector area and line curve (`viewBox="0 0 720 220"`).
+     - Rendered cubic bezier paths for Total Volume (cyan with gradient area fill), Phishing URLs (dashed sky blue), Text Smishing Lures (deep blue), and Voice Notes (purple).
+     - Added horizontal reference gridlines (0, 50, 100, 150, 200) and interactive hover crosshair tracking displaying breakdown tooltips.
+  2. **UAE Municipal Threat Velocity Heatmap Implementation (`OverviewWorkbench.tsx`):**
+     - Implemented the scheduled 7-Day × 24-Hour threat density matrix fulfillling the "1. Overview & Heatmap" specification.
+     - Structured across 7 days (Monday through Sunday with Arabic dual-language typography) and 24 hourly buckets (00:00 to 23:00 GST).
+     - Enforced 5 color-coded threat density levels (Low, Moderate, Elevated, High, Critical Surge) reflecting UAE commercial hours and afternoon smishing spikes (13:00–16:00 GST).
+     - Added interactive hover inspection displaying exact hourly volume, primary vector, and risk tier.
+  3. **Attack Graph Hover Vibration & Jitter Resolution (`StixCampaignGraph.tsx`):**
+     - Diagnosed root cause: `hover:scale-105` on translated SVG `<g transform="translate(x, y)">` elements used default `transform-origin: (0, 0)`, causing nodes to shift up to 43px away, trigger `mouseleave`, snap back, and trigger `mouseenter` in an infinite 60Hz loop.
+     - Removed `hover:scale-105` from the `<g>` element, keeping node center coordinates strictly stationary.
+     - Added a fixed invisible hit-target (`<circle r="42" fill="transparent" />`) ensuring continuous cursor capture.
+     - Replaced scale shifting with centered group-hover stroke expansion, glowing radar dashed ring, and `pointer-events-none` on all child labels.
+* **Decision Taken & Rationale:** Eliminated frontend rendering bugs without altering backend APIs or database schemas. Next.js 15 production build compiled 100% cleanly in 21s (0 errors), and all automated tests passed.
 * **Errors/Issues Encountered:** None.
-* **Rectification/Resolution:** README.md updated cleanly and synchronized across dual ledgers (`SYSTEM_STATE.md` and `DEVELOPMENT_LEDGER.md`).
+* **Rectification/Resolution:** Built, verified, and synchronized across dual ledgers (`SYSTEM_STATE.md` and `DEVELOPMENT_LEDGER.md`).
 
 

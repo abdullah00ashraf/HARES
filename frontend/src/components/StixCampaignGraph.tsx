@@ -1217,8 +1217,21 @@ export default function StixCampaignGraph() {
                       soundFx.playClick();
                       setSelectedNode(node);
                     }}
-                    className="cursor-pointer transition-transform hover:scale-105"
+                    className="cursor-pointer group select-none"
                   >
+                    {/* Fixed stationary hit-target ensuring continuous cursor capture without edge dropouts or vibration */}
+                    <circle r="42" fill="transparent" className="cursor-pointer" />
+
+                    {/* Subtle Centered Radar Ring on Hover (Zero coordinate shift) */}
+                    <circle
+                      r="33"
+                      fill="none"
+                      stroke={node.color}
+                      strokeWidth="1.5"
+                      strokeDasharray="3 3"
+                      className="opacity-0 group-hover:opacity-85 transition-opacity duration-150 pointer-events-none"
+                    />
+
                     {/* Glowing Aura if in active trace step */}
                     {isNodeInActiveStep && (
                       <circle
@@ -1226,18 +1239,18 @@ export default function StixCampaignGraph() {
                         fill={node.color}
                         fillOpacity="0.25"
                         filter="url(#glow-filter)"
-                        className="animate-pulse"
+                        className="animate-pulse pointer-events-none"
                       />
                     )}
 
-                    {/* Base Node Outer Ring */}
+                    {/* Base Node Outer Ring with Centered Hover Glow */}
                     <circle
                       r="26"
                       fill={node.color}
                       fillOpacity={isNodeInActiveStep ? "0.35" : "0.15"}
                       stroke={node.color}
                       strokeWidth={isSelected ? "3.5" : isNodeInActiveStep ? "2.5" : "1.8"}
-                      className="transition-all"
+                      className="transition-all duration-150 group-hover:stroke-purple-400 dark:group-hover:stroke-purple-300 group-hover:stroke-[3.2px] group-hover:fill-opacity-40 pointer-events-none"
                     />
 
                     {/* STIX Object Icon */}
@@ -1247,10 +1260,11 @@ export default function StixCampaignGraph() {
                       y="-13"
                       width="26"
                       height="26"
+                      className="pointer-events-none"
                     />
 
                     {/* Step Badge Pill (T0 - T4) */}
-                    <g transform="translate(18, -18)">
+                    <g transform="translate(18, -18)" className="pointer-events-none">
                       <rect
                         x="-10"
                         y="-7"
@@ -1284,7 +1298,7 @@ export default function StixCampaignGraph() {
                       fontSize="10.5"
                       fontWeight="700"
                       textAnchor="middle"
-                      className="select-none text-slate-900 dark:text-slate-100"
+                      className="select-none text-slate-900 dark:text-slate-100 pointer-events-none"
                     >
                       {node.label}
                     </text>
@@ -1297,7 +1311,7 @@ export default function StixCampaignGraph() {
                       fontSize="8.5"
                       fontWeight="500"
                       textAnchor="middle"
-                      className="select-none text-slate-500 dark:text-slate-400 font-sans"
+                      className="select-none text-slate-500 dark:text-slate-400 font-sans pointer-events-none"
                     >
                       {node.sublabel}
                     </text>
