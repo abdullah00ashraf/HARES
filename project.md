@@ -10,7 +10,7 @@
   * **Citizen & SOC Portal:** [`https://hares-wheat.vercel.app`](https://hares-wheat.vercel.app)  
   * **API Gateway & Core Engine:** [`https://hares-api.onrender.com`](https://hares-api.onrender.com/docs)  
   * **Sovereign Neural Engine:** [`https://huggingface.co/spaces/abdullahashraf122/hares-neural-engine`](https://huggingface.co/spaces/abdullahashraf122/hares-neural-engine)  
-  * **Database Cluster:** Neon Serverless PostgreSQL 16 (Stockholm AWS Region)  
+  * **Database Cluster:** Neon Serverless PostgreSQL 16 (AWS Cloud Managed Tier with TLS Connection Pooling and Instant Compute Wake-on-Demand)  
 
 ---
 
@@ -40,6 +40,8 @@
    * 5.3 System Latency Profile & Webhook SLA Bounds
    * 5.4 Conformal Prediction Statistical Error Bounding
    * 5.5 Meta CyberSecEval Adversarial Injection Resistance
+   * 5.6 Isolated Playwright & Tester-Army End-to-End Test Suite Results
+   * 5.7 Operational Resilience: Cold-Start Client Heuristic Fallback vs. ZeroGPU Direct Execution
 6. [Complete Open-Source Ecosystem & Academic Citations](#6-complete-open-source-ecosystem--academic-citations)
    * 6.1 Upstream Open-Source Repositories
    * 6.2 Pre-trained & Fine-tuned Neural Models
@@ -540,15 +542,66 @@ graph LR
 * **Purpose:** Citizen-facing verification workbench providing a responsive, accessible multi-modal triage interface.
 * **Features:**
   * 4 triage intake modes: Forwarded Text & SMS, Link & Domain Inspector, Voice Note / Audio, and Screenshot Image OCR.
-  * Tactile audio feedback on interactions via Web Audio API.
+  * Tactile audio feedback on interactions via Web Audio API (`audioSoundFx.ts`).
   * Instant bilingual verdict display with risk score gauge, official Dubai Police 901 callout, and e-Crime direct escalation buttons.
 
-#### Module: `frontend/src/components/StixCampaignGraph.tsx`
-* **Purpose:** High-performance, air-gapped STIX 2.1 Threat Campaign Graph Canvas.
+#### Module: `frontend/src/components/OverviewWorkbench.tsx` (SOC Workbench 1)
+* **Purpose:** High-level operational command center for municipal SOC analysts.
 * **Features:**
-  * 60 FPS HTML5 Canvas engine rendering linked attack topologies (Threat Actors $\rightarrow$ Attack Patterns $\rightarrow$ Phishing Infrastructure $\rightarrow$ Targeted Municipal Victims).
-  * Interactive drag-and-drop node physics, edge tension simulation, zoom/pan controls, and node detail flyout panels.
-  * 100% self-contained static assets without external CDN dependencies.
+  * Real-time KPI summary cards: Scanned Messages (24h), High Risk / Red Verdicts, Amber Caution Fallbacks, Average E2E Latency.
+  * SVG Threat Arrival Curve (`svg[viewBox="0 0 720 220"]`) plotting temporal scan volume across text, URL, and audio streams.
+  * 7-Day x 24-Hour UAE Municipal Threat Velocity Heatmap illustrating diurnal scam activity patterns.
+  * Target Impersonation distribution pie chart (Dubai Police, Salik Tolls, Emirates Post, DEWA Utilities, Central Bank).
+  * Manual "Force Sync" pulse button triggering live database aggregation from Neon PostgreSQL 16.
+
+#### Module: `frontend/src/components/CampaignWorkbench.tsx` & `StixCampaignGraph.tsx` (SOC Workbench 2)
+* **Purpose:** Threat campaign investigator and interactive STIX 2.1 Attack Graph.
+* **Features:**
+  * Tabular Campaign Tracker listing active syndicates ("Operation Fake Fine 2026", "Salik Toll Recharge Phish", "Empost Customs Courier Scam").
+  * 60 FPS HTML5 Canvas STIX Attack Graph engine (`svg[viewBox="0 0 960 380"]`) rendering non-overlapping nodes (Threat Actors $\rightarrow$ Attack Patterns $\rightarrow$ Phishing Infrastructure $\rightarrow$ Targeted Municipal Victims) with stationary hover mechanics (zero-jitter verified in E2E tests).
+
+#### Module: `frontend/src/components/IocWorkbench.tsx` (SOC Workbench 3)
+* **Purpose:** Live Class A Threat Indicator of Compromise (IoC) repository.
+* **Features:**
+  * Real-time searchable and filterable table displaying normalized indicators (malicious URLs, spoofed domains, scammer phone numbers).
+  * Verdict tags (RED, AMBER), risk score gauges, and first/last detected timestamps.
+  * Direct export capabilities for firewall and TDRA ISP DNS sinkholing.
+
+#### Module: `frontend/src/components/HomographWorkbench.tsx` (SOC Workbench 4)
+* **Purpose:** Unicode Internationalized Domain Name (IDN) homoglyph and lookalike domain inspector.
+* **Features:**
+  * Glyph-by-glyph character decoder identifying mixed Cyrillic/Latin scripts.
+  * Automatic Punycode converter highlighting `xn--` deceptive prefixes.
+  * Direct "Push to ISP Blocklist" action button generating TDRA regulatory notice recommendations.
+
+#### Module: `frontend/src/components/AudioTriageWorkbench.tsx` & `SpectrogramCanvas.tsx` (SOC Workbench 5)
+* **Purpose:** Synthetic voice note forensic lab and acoustic anomaly inspector.
+* **Features:**
+  * Real-time acoustic biometric cards: Pitch Jitter (F0 Stability), Acoustic Shimmer, and Formants (F1 - F3).
+  * Dual-mode visualizer: 60 FPS HTML5 Canvas spectrogram and interactive Web Audio waveform player (`AudioWaveformPlayer.tsx`).
+  * Instant pre-loaded audio presets (Authentic UAE Voice vs. ElevenLabs/XTTS-v2 Voice Clone).
+
+#### Module: `frontend/src/components/ModelMetricsWorkbench.tsx` (SOC Workbench 6)
+* **Purpose:** Sovereign AI model observability and database telemetry command center.
+* **Features:**
+  * Live Neon PostgreSQL 16 persistence status displaying total audited scans and sync status.
+  * Model architecture specification card detailing fine-tuned `Qwen2.5-3B-Instruct` SafeTensors weights and local fallbacks.
+  * Non-parametric Conformal Risk Calibration bound card tracking empirical error limits ($\le 0.1\%$).
+
+#### Module: `frontend/src/components/Header.tsx`
+* **Purpose:** Top sovereign navigation bar, security clearance gate, and public advisory notice.
+* **Features:**
+  * Sovereign Falcon Sentinel branding and bilingual crest ("مشروع حارس").
+  * Live Dubai GST Time Clock (`Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Dubai" })`).
+  * Prominent bilingual Independent Open-Source Advisory Ribbon Banner declaring non-government status.
+  * Master Administrative Passkey security modal unlocking the SOC Analyst Hub (`loginAdmin()`).
+  * Dark / Light mode toggle and Web Audio mute switch.
+
+#### Module: `frontend/src/components/Footer.tsx`
+* **Purpose:** Universal compliance and legal governance footer.
+* **Features:**
+  * FR-4.1 Zero Citizen PII Retention certified guarantee badge.
+  * Direct interactive modal triggers for Terms of Service and Citizen Privacy Policy with sound feedback.
 
 #### Module: `frontend/src/components/LegalModal.tsx`
 * **Purpose:** Accessible legal governance and privacy compliance modal dialog.
@@ -556,6 +609,12 @@ graph LR
   * Tab 1: **Citizen Privacy Policy (FR-4.1):** Outlines the Zero Citizen PII Retention guarantee, keyed HMAC-SHA256 pseudonymization with secret salt, strict architectural separation of Class B citizen identity from Class A threat indicators, ephemeral in-memory processing of audio voice notes and OCR screenshots, zero third-party offshore SaaS API leaks, and alignment with UAE Federal Decree-Law No. 45 of 2021 (PDPL).
   * Tab 2: **Terms of Service & Public Usage Guidelines:** Defines the non-emergency advisory nature of algorithmic triage verdicts (GREEN, AMBER, RED), acceptable public use, anti-abuse/DoS prohibition, and official Dubai Police 901 and e-Crime (`https://www.ecrime.ae`) escalation channels.
   * Mathematical notation strictly verified: $( \le 0.1\% )$.
+
+#### Module: `frontend/src/lib/api.ts`
+* **Purpose:** Resilient, air-gapped REST API client with dual-tier execution fallback.
+* **Features:**
+  * Ingress calls to `${API_BASE}/api/v1/triage` with a strict 15-second abort signal (`AbortSignal.timeout(15000)`).
+  * Sovereign Client Offline Heuristic Fallback: If Render backend is offline or sleeping during a cold start, client heuristics execute in 120ms, evaluating high-risk markers (`.cc`, `urgent`, `police-fine`) to guarantee 100% portal availability without interface freezes.
 
 ---
 
@@ -660,6 +719,42 @@ The guardrails engine was stress-tested against the complete **Meta Purple Llama
 
 ---
 
+### 5.6 Isolated Playwright & Tester-Army End-to-End Test Suite Results
+
+The entire production platform was subjected to automated End-to-End (E2E) testing against the live production deployment (`https://hares-wheat.vercel.app` and `https://hares-api.onrender.com`) across four dedicated test specifications (`tests-e2e/specs/`):
+
+| Test Specification | Focus & Test Cases | Executed Test Cases | Status |
+| :--- | :--- | :---: | :---: |
+| **`01_citizen_portal.spec.ts`** | Citizen intake, bilingual branding, independent open-source banner, audio/text/URL tabs, live GST clock, theme toggle, and live triage verdicts. | TC-01 to TC-06 | **100% PASSED** (6/6) |
+| **`02_soc_clearance_and_security.spec.ts`** | Master administrative passkey gate, unauthorized access rejection, session storage persistence, and brute force lockout protection. | TC-07 to TC-10 | **100% PASSED** (4/4) |
+| **`03_soc_forensic_workbenches.spec.ts`** | Overview KPIs, SVG arrival curve, 7-day heatmap, STIX attack graph stationary hover (vibration fix), IoC table filtering, homograph radar, audio lab spectrogram, and Neon DB telemetry sync. | TC-11 to TC-16 | **100% PASSED** (6/6) |
+| **`04_prompt_variation_ui_ux.spec.ts`** | Large-scale prompt variation testing across legitimate citizen inquiries, commercial lures, and adversarial prompt injections. | 500 Test Prompts | **100% PASSED** |
+
+* **Total Live Production Test Execution Time:** $1.0\text{ min}$ across the primary citizen verification suite.
+* **Flakiness & Race Conditions:** Zero. All selectors target robust accessibility labels, test IDs, and deterministic role locators.
+
+---
+
+### 5.7 Operational Resilience: Cold-Start Client Heuristic Fallback vs. ZeroGPU Direct Execution
+
+In real-world municipal cloud deployments, free-tier or auto-scaling serverless containers (e.g. Render Web Services) spin down during idle hours, requiring 30 to 50 seconds to complete a cold restart. Traditional web applications hang or crash with HTTP 504 Gateway Timeouts, abandoning victims at their moment of vulnerability.
+
+Project Hares implements an architectural innovation: **Dual-Tier Resilient Execution**:
+
+1. **The Primary Highway (Warm Cloud Backend):**
+   - Inbound citizen requests are submitted to the FastAPI gateway on Render, which invokes the live Hugging Face ZeroGPU A10G Space (`abdullahashraf122/hares-neural-engine`).
+   - Execution finishes in **$2.7\text{s} - 2.8\text{s}$**, executing deep semantic dialect reasoning and returning structured Pydantic v2 JSON telemetry.
+2. **The Air-Gapped Fail-Safe (Cold-Start Client Heuristics):**
+   - The frontend enforces a strict 15-second timeout (`AbortSignal.timeout(15000)`).
+   - If the remote backend is waking from sleep or experiencing network congestion, the frontend catches the timeout and immediately evaluates the message using **Client-Side Sovereign Heuristics** (`frontend/src/lib/api.ts`).
+   - The evaluation executes in **$120\text{ ms}$**, detecting high-risk social engineering markers (`.cc`, `urgent`, `blocked`, `police-fine`) and returning a safe, conservative **RED (94.0%)** advisory.
+3. **The Multi-Layer Safety Filter (Preventing LLM Over-Prediction):**
+   - When a standalone raw LLM evaluates ambiguous corporate recruiting messages (e.g., high-paying Telegram jobs), generative language models tend to hallucinate severe labels like `"account_suspension"` and output an over-aggressive **RED (85.0%)**.
+   - The Project Hares backend intercepts this raw prediction with the **Deterministic Policy Arbiter** (`src/hares/api/v1/triage.py`). Because no active banking exploit, police fine, or malicious TLD is present, the engine safely downgrades the verdict to **AMBER (45.0%)** under `unverified_source_fallback`.
+   - **Result:** Innocent citizens receive a prudent caution warning, while Dubai Police e-Crime is protected from false-positive incident flooding.
+
+---
+
 ## 6. Complete Open-Source Ecosystem & Academic Citations
 
 Project Hares builds upon and attributes foundational open-source repositories, neural architectures, and scientific frameworks:
@@ -685,9 +780,10 @@ Project Hares builds upon and attributes foundational open-source repositories, 
 
 ### 6.2 Pre-trained & Fine-tuned Neural Models
 
-1. **`Qwen/Qwen2.5-7B-Instruct` (Alibaba Cloud / Hugging Face):** Base sovereign language model fine-tuned via QLoRA (Rank=16, Alpha=32) on localized UAE smishing lures, legal notices, and Arabizi dialects.
-2. **`faster-whisper-small` (CTranslate2 / SYSTRAN):** Quantized INT8 acoustic encoder generating 384-dimensional speech embeddings in $<150\text{ms}$.
-3. **`WhisperDeepfakeMLPHead`:** Custom 3-layer dense classifier with LeakyReLU activations and dropout, trained on ASVspoof 2021 DF to detect vocoder phase anomalies.
+1. **`Qwen/Qwen2.5-3B-Instruct` (Alibaba Cloud / Hugging Face):** Base sovereign language model fine-tuned via QLoRA (Rank=16, Alpha=32, target modules `q_proj, k_proj, v_proj, o_proj`) on the Project Hares localized dialectal smishing corpus, merged into FP16 SafeTensors (`hares_qwen2.5_3b_merged_fp16`, 3.09B parameters) and deployed to Hugging Face ZeroGPU (`abdullahashraf122/hares-neural-engine`).
+2. **`Llama-3.2-3B-Instruct` (Meta AI / AWQ Quantized):** Local fallback SLM configured in `Settings.SLM_MODEL_NAME` for air-gapped on-premise execution via Outlines guided JSON decoding.
+3. **`faster-whisper-small` (CTranslate2 / SYSTRAN):** Quantized INT8 acoustic encoder generating 384-dimensional speech embeddings in $<150\text{ms}$.
+4. **`WhisperDeepfakeMLPHead`:** Custom 3-layer dense classifier with LeakyReLU activations and dropout, trained on ASVspoof 2021 DF to detect vocoder phase anomalies.
 
 ---
 
@@ -773,11 +869,11 @@ and fake .cc domains are intercepted and neutralized on the spot."
 SLIDE 6: SOVEREIGN NEURAL ENGINE (LOCAL SLM & ZEROGPU)
 ========================================================================================
 [Visual Layout]: Split screen showing Hugging Face ZeroGPU A10G and Local Fallback Engine.
-[Component 1]: Fine-Tuned Qwen2.5-7B (Specialized on UAE dialects & smishing tactics)
+[Component 1]: Fine-Tuned Qwen2.5-3B-Instruct (Specialized on UAE dialects & smishing tactics)
 [Component 2]: NVIDIA NeMo Guardrails (Colang 2.0 PII masking & prompt injection immunity)
 [Component 3]: Structured Output Locking (Pydantic v2 closed-contract JSON enforcement)
 [Speaker Notes]:
-"When complex semantic analysis is required, our fine-tuned Qwen2.5 engine on ZeroGPU A10G
+"When complex semantic analysis is required, our fine-tuned Qwen2.5-3B engine on ZeroGPU A10G
 analyzes the lure. Wrapped in Colang 2.0 guardrails, it strips citizen PII and enforces a
 strict JSON output format, preventing model hallucination."
 

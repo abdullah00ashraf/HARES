@@ -42,7 +42,7 @@ def generate_slm_confusion_matrix():
         yticks=np.arange(cm.shape[0]),
         xticklabels=labels,
         yticklabels=labels,
-        title="SLM Text Triage Confusion Matrix\n(Qwen2.5-7B Sovereign QLoRA - 500 UAE Lures)",
+        title="SLM Text Triage Confusion Matrix\n(Qwen2.5-3B Sovereign QLoRA - 500 UAE Lures)",
         ylabel="Actual Ground Truth",
         xlabel="Predicted Verdict",
     )
