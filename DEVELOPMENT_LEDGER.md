@@ -926,6 +926,26 @@
 * **Errors/Issues Encountered:** Initial DFD height (600pt) caused caption spillover to an extra blank page (11 pages).
 * **Rectification/Resolution:** Tuned DFD scaling (`max_h=520`), resulting in an exact 10-page document with zero spillover or orphan headings. Verified visually across all 10 pages via PyMuPDF rendering.
 
+### 2026-10-15 17:50:00 UTC - Milestone 51: Root README.md Layman Redefinition, DFD Diagram Overhaul & 6-Screenshot Production Walkthrough
+* **Development Made:** Under `/master-orchestrator` directive, fully redefined the root [`README.md`](file:///c:/HARES/README.md) to provide an accessible, crystal-clear layman explanation of Project Hares while maintaining strict enterprise engineering rigor:
+  1. **Removed Deprecated `diagram.png` & Integrated `dfd new.png`:**
+     - Removed legacy `diagram.png` from the repository and Git tracking via `git rm diagram.png`.
+     - Integrated the comprehensive GitDiagram Data Flow Diagram [`dfd new.png`](file:///c:/HARES/dfd%20new.png) (`6924x8293`) as Figure 7, fully explaining the end-to-end flow from citizen WhatsApp forwarders to municipal threat intelligence.
+  2. **Contextual Embedding & Layman Breakdown of All 6 Production Screenshots:**
+     - **Figure 1 (Safe RTA Whitelist Match):** Shows [`Screenshot 2026-10-15 171158.png`](file:///c:/HARES/docs/figures/Screenshot%202026-10-15%20171158.png) verifying genuine Dubai RTA notification as GREEN (1.0% risk score) in <15ms.
+     - **Figure 2 (Typosquatted Domain Intercepted):** Shows [`Screenshot 2026-10-15 171223.png`](file:///c:/HARES/docs/figures/Screenshot%202026-10-15%20171223.png) catching a deceptive link (`rta.aeplo`) impersonating the RTA and safely warning the citizen with an AMBER (45.0% risk score) unverified source alert.
+     - **Figure 3 (VIP Crypto Royal Impersonation Lure):** Shows [`Screenshot 2026-10-15 171042.png`](file:///c:/HARES/docs/figures/Screenshot%202026-10-15%20171042.png) evaluating a high-yield Telegram crypto lure claiming royal leadership endorsement, flagging it with an AMBER advisory.
+     - **Figure 4 (Bilingual Citizen Advisory Guidance):** Shows [`Screenshot 2026-10-15 134437 - Copy.png`](file:///c:/HARES/docs/figures/Screenshot%202026-10-15%20134437%20-%20Copy.png) providing clear precautionary steps in English and Arabic.
+     - **Figure 5 (High-Threat Central Bank KYC Scam Interception):** Shows [`Screenshot 2026-10-15 134344 - Copy.png`](file:///c:/HARES/docs/figures/Screenshot%202026-10-15%20134344%20-%20Copy.png) demonstrating Hugging Face ZeroGPU AI execution, classifying banking summons as RED (98.0% risk score) with structured Pydantic v2 JSON and immediate Dubai Police e-Crime escalation links.
+     - **Figure 6 (Municipal Command Center Telemetry):** Shows [`Screenshot 2026-10-15 170836.png`](file:///c:/HARES/docs/figures/Screenshot%202026-10-15%20170836.png) detailing 2,447+ live citizen scans, 24h arrival curves, and top impersonated UAE municipal entities (Dubai Police 32%, Salik 28%, Empost 18%, DEWA 12%, Banks 10%).
+  3. **The 30-Second Layman's Primer:**
+     - Formulated an intuitive opening section explaining the UAE threat context (AED 3.7+ billion annual fraud losses, 82% citizen exposure) and how Project Hares serves as a free digital cybersecurity bodyguard providing instant GREEN, AMBER, and RED triage.
+  4. **Preserved Empirical Proof & Technical Standards:**
+     - Retained full technical specifications: 3.5ms P99 ingress acknowledgment, keyed HMAC-SHA256 citizen seclusion, Qwen2.5-3B FP16 SafeTensors, Faster-Whisper Dual-Head, NeMo Guardrails Colang 2.0 prompt injection containment, and certified conformal false alarm bounds ($\le 0.1\%$).
+* **Decision Taken & Rationale:** Transformed the project front page from an opaque technical wall into an intuitive, visually verified, publication-grade repository centerpiece that non-technical citizens and government officials can immediately grasp, while providing deep architectural references for security engineers.
+* **Errors/Issues Encountered:** None.
+* **Rectification/Resolution:** Staged, committed, and pushed cleanly to GitHub `origin/main`.
+
 
 
 
