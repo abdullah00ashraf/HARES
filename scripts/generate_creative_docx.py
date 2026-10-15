@@ -275,6 +275,11 @@ def create_brief_document():
         "Traditional defenses suffer from two structural failures: (1) manual review queues require 24 to 48 hours while victims click within 15 minutes, and (2) commercial AI triage pipes sensitive citizen communications to offshore APIs, violating national data sovereignty under UAE Federal Decree-Law No. 45 (PDPL)."
     )
 
+    # Real-World Threat Evidence
+    sms_img = Path("C:/HARES/realtest/images/screenshot_01_fake_police_fine_sms.png")
+    if sms_img.exists():
+        add_figure(doc, sms_img, "Authentic Dubai Smishing Lure: Spoofed Police Legal Fine SMS Intercepted & Classified RED")
+
     # =========================================================================
     # SECTION 2: THE 5 SOVEREIGN INVARIANTS
     # =========================================================================
@@ -335,6 +340,20 @@ def create_brief_document():
     add_bullet(doc, "Colang 2.0 / NVIDIA NeMo policies mask citizen PII and block adversarial prompt injection attempts with 100% containment.", "Tier 3: Programmable Guardrails:")
     add_bullet(doc, "Qwen2.5-3B-Instruct analyzes linguistic coercion, outputs structured JSON, and synthesizes bilingual citizen guidance.", "Tier 4: Neural ZeroGPU Inference:")
 
+    # Embedded Architecture Data Flow Diagram (DFD)
+    dfd_path = Path("C:/HARES/dfd new.png")
+    if dfd_path.exists():
+        add_figure(doc, dfd_path, "End-to-End System Architecture & Data Flow Diagram (DFD) — Citizen Ingress, Platform Operations, Triage Processing & Threat Intelligence")
+
+    # Live Citizen & Neural Inference Screenshots
+    rta_ss = FIGURES_DIR / "Screenshot 2026-10-15 171158.png"
+    if rta_ss.exists():
+        add_figure(doc, rta_ss, "Live Citizen Portal Verdict: Official RTA Communication Verified Safe (GREEN - 1.0% Risk Score)")
+
+    hf_ss = FIGURES_DIR / "Screenshot 2026-10-15 134344 - Copy.png"
+    if hf_ss.exists():
+        add_figure(doc, hf_ss, "Live Hugging Face ZeroGPU Neural Triage: Central Bank KYC Phishing Lure Intercepted (RED - 98.0% Risk Score with Pydantic JSON Schema)")
+
     add_callout(
         doc,
         "DUAL-TIER RESILIENCE MECHANISM:\n"
@@ -391,10 +410,10 @@ def create_brief_document():
     add_figure(doc, FIGURES_DIR / "figure1_slm_confusion_matrix.png", "SLM Text Triage Confusion Matrix (Qwen2.5-3B Sovereign QLoRA - 500 UAE Lures)")
     add_figure(doc, FIGURES_DIR / "figure2_dialect_performance_breakdown.png", "Digital Dubai Ethical AI Equity: UAE Dialect Breakdown (Disparity Ratio: 0.91)")
 
-    # Embed Figure 3 & Figure 4
+    # Embed Figure 3, Figure 4, and Figure 5
     add_figure(doc, FIGURES_DIR / "figure3_audio_deepfake_confusion_matrix.png", "ASVspoof 2021 DF Acoustic Deepfake Confusion Matrix (Whisper Dual-Head + SpecRNet)")
     add_figure(doc, FIGURES_DIR / "figure4_system_latency_distribution.png", "Subsystem Latency Profile Across Execution Tiers (Log Scale)")
-    add_figure(doc, FIGURES_DIR / "figure5_e2e_pipeline_sankey.png", "End-to-End Triage Resolution & Failover Sankey Pipeline (500 Verification Invocations)")
+    add_figure(doc, FIGURES_DIR / "figure5_conformal_error_bound.png", "Conformal Prediction Statistical Error Bounding Curve (Certified FPR <= 0.1% at 95% Confidence)")
 
     doc.add_page_break()
 
@@ -406,6 +425,11 @@ def create_brief_document():
         doc,
         "For municipal threat analysts, Project Hares provides an internal SOC Operations Center protected by a master administrative passkey gate. The hub integrates 6 specialized forensic workbenches:"
     )
+
+    # Embed Live SOC Screenshot
+    soc_ss = FIGURES_DIR / "Screenshot 2026-10-15 170836.png"
+    if soc_ss.exists():
+        add_figure(doc, soc_ss, "Live Municipal SOC Hub Telemetry: 24h Threat Arrival Curve, Active Indicators & Top Impersonation Entities")
 
     add_bullet(doc, "Displays 24h scan volume, SVG arrival curves, and a 7-day threat velocity heatmap.", "1. Overview & Heatmap:")
     add_bullet(doc, "60 FPS HTML5 Canvas graph rendering linked threat actors, infrastructure, and victims (zero hover-jitter).", "2. STIX 2.1 Attack Graph:")

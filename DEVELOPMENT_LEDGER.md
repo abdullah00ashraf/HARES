@@ -901,7 +901,30 @@
      - Added prominent pill badges (e.g., `[MUNICIPAL SPOOF]`, `[100% SOVEREIGN]`), large 38pt hero stats (`60%`, `<180ms`, `15 Min`, `97.16%`, `0.00%`, `≤ 0.1%`), embedded all 5 empirical figures into dedicated framing cards (Figures 1, 2, 3, 4, 5 on Slides 6, 7, 9, 10, 11), and retained complete verbatim speaker notes on all 15 slides.
 * **Decision Taken & Rationale:** Replaced monotone plain-text boxes with modern agency-grade visual card hierarchies and concise whitepaper formatting to maximize executive impact while maintaining 100% empirical truth and zero guess.
 * **Errors/Issues Encountered:** WINWORD.exe held a background file lock on `Project_Hares_Master_Technical_Report.docx`.
-* **Rectification/Resolution:** Terminated background Word instance via PowerShell and recompiled cleanly; verified both DOCX and PPTX file sizes and formatting.
+### 2026-10-15 15:45:00 UTC - Milestone 50: Publication-Grade PDF Master Technical Report Compiler, Arabic BiDi Integration, Full DFD & Live Production Screenshots
+* **Development Made:** Under `/master-orchestrator` directive, engineered and verified the publication-grade PDF technical whitepaper generator ([`scripts/generate_pdf_report.py`](file:///c:/HARES/scripts/generate_pdf_report.py)):
+  1. **Native ReportLab PDF Generator Engine (`scripts/generate_pdf_report.py`):**
+     - Engineered a deterministic 10-page document builder utilizing `SimpleDocTemplate` (Letter format, 45pt margins) and a custom corporate two-pass `NumberedCanvas` (`draw_page_decorations`) rendering dynamic running headers and `"Page X of 10"` footers on pages 2+.
+     - Integrated Windows TrueType fonts (`C:/Windows/Fonts/arial.ttf` and `arialbd.ttf`) for flawless Unicode rendering.
+     - Implemented native Arabic cursive script reshaping and bidirectional layout reordering using `arabic_reshaper` and `bidi.algorithm.get_display`, correctly rendering `PROJECT HARES (مشروع حارس)`.
+  2. **Full-Page System Architecture & Data Flow Diagram (DFD):**
+     - Centered and scaled the high-resolution architecture diagram [`dfd new.png`](file:///c:/HARES/dfd%20new.png) (`6924x8293`) as Figure 3.1 on Page 4, spanning the complete Citizen Ingress, Platform Operations, Triage Processing, and Threat Intelligence pipelines.
+  3. **Authentic Live Production Verification Screenshots Embedded:**
+     - Figure 1.1 (Page 1): Authentic Dubai Police fine smishing SMS lure (`realtest/images/screenshot_01_fake_police_fine_sms.png`).
+     - Figure 4.1 (Page 5): Citizen Verification Portal live execution verifying official Roads & Transport Authority (RTA) payment notification as GREEN (1.0% risk score, whitelist domain match `rta.ae` in <15ms) (`docs/figures/Screenshot 2026-10-15 171158.png`).
+     - Figure 4.2 (Page 6): Hugging Face ZeroGPU live inference intercepting Central Bank KYC banking phishing lure as RED (98.0% risk score, Pydantic v2 JSON contract enforcement) (`docs/figures/Screenshot 2026-10-15 134344 - Copy.png`).
+     - Figure 6.1 (Page 9): Live Municipal SOC Hub telemetry overview displaying 24-hour threat arrival curve, active indicator telemetry, and top impersonation entities (`docs/figures/Screenshot 2026-10-15 170836.png`).
+  4. **Empirical Benchmarks & Hard Evidence Figures (1 to 5):**
+     - Figure 5.1 (Page 7): SLM Text Triage Confusion Matrix (`figure1_slm_confusion_matrix.png`).
+     - Figure 5.2 (Page 7): Digital Dubai Ethical AI Equity: UAE Dialect Breakdown (`figure2_dialect_performance_breakdown.png`).
+     - Figure 5.3 (Page 8): ASVspoof 2021 DF Acoustic Deepfake Confusion Matrix (`figure3_audio_deepfake_confusion_matrix.png`).
+     - Figure 5.4 (Page 8): Subsystem Latency Profile Across Execution Tiers (`figure4_system_latency_distribution.png`).
+     - Figure 5.5 (Page 9): Non-Parametric Conformal Prediction Statistical Error Bounding Curve (`figure5_conformal_error_bound.png`).
+  5. **Synchronized DOCX Technical Whitepaper (`scripts/generate_creative_docx.py`):**
+     - Updated Word compiler to integrate `dfd new.png`, user live screenshots, and corrected `figure5_conformal_error_bound.png` path, generating [`docs/Project_Hares_Master_Technical_Report.docx`](file:///c:/HARES/docs/Project_Hares_Master_Technical_Report.docx) (2.47 MB).
+* **Decision Taken & Rationale:** Chose pure Python native ReportLab compilation with TrueType and Arabic BiDi reshaping over fragile COM automation, delivering a 100% deterministic, self-contained, publication-ready PDF artifact ([`docs/Project_Hares_Master_Technical_Report.pdf`](file:///c:/HARES/docs/Project_Hares_Master_Technical_Report.pdf), 2.88 MB) matching exact corporate standards.
+* **Errors/Issues Encountered:** Initial DFD height (600pt) caused caption spillover to an extra blank page (11 pages).
+* **Rectification/Resolution:** Tuned DFD scaling (`max_h=520`), resulting in an exact 10-page document with zero spillover or orphan headings. Verified visually across all 10 pages via PyMuPDF rendering.
 
 
 
