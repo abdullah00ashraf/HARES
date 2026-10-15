@@ -1,8 +1,8 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Post-Audit Security Hardening Completed; Overview SVG Arrival Curve & UAE Threat Velocity Heatmap Deployed; Attack Graph Vibration Resolved (Milestone 40); 142/142 Tests Passing (100%); Next.js 15 Clean Production Build
+**Current Status:** Post-Audit Security Hardening Completed; Overview SVG Arrival Curve & UAE Threat Velocity Heatmap Deployed; Attack Graph Vibration Resolved; Live Neon Database Telemetry Restored (Milestones 40–41); 100% Tests Passing; Next.js 15 Clean Production Build
 **Last Updated:** 2026-10-15  
-**Version:** 2.4.1-frontend-hotfix-verified  
+**Version:** 2.4.2-live-neon-restored  
 
 ---
 
