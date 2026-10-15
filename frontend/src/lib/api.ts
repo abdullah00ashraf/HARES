@@ -7,8 +7,7 @@ import {
   ThreatIndicator,
   TriageVerificationResponse,
 } from "./types";
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://hares-api.onrender.com";
 
 export const DEFAULT_SOC_ADMIN_PASSKEY = "APPledbx@33#hinxtolnimda";
 
@@ -529,6 +528,7 @@ export async function verifyCitizenSubmission(
     const res = await fetch(`${API_BASE}/api/v1/triage/verify`, {
       method: "POST",
       body: formData,
+      signal: AbortSignal.timeout(15000),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
