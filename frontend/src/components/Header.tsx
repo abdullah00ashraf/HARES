@@ -75,13 +75,13 @@ export default function Header() {
     }
   };
 
-  const handleAuthSubmit = (e: React.FormEvent) => {
+  const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminPassword.trim()) {
       setAuthError("Please enter the master admin passkey.");
       return;
     }
-    const success = loginAdmin(adminPassword);
+    const success = await loginAdmin(adminPassword);
     if (success) {
       soundFx.playVerdictSafe();
       setIsAuthModalOpen(false);

@@ -63,4 +63,5 @@ opensource/datasets/synthetic_voice_eval/audio/
 models/**/*.safetensors
 models/**/*.zip
 colab_packages/
+scratch/
 

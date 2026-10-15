@@ -11,7 +11,7 @@ import {
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
 
 export function getAnalystHeaders(): Record<string, string> {
-  let key = process.env.NEXT_PUBLIC_ANALYST_KEY || "APPledbx@33#hinxtolnimda";
+  let key = process.env.NEXT_PUBLIC_ANALYST_KEY || "";
   if (typeof window !== "undefined") {
     try {
       const saved = sessionStorage.getItem("soc_admin_key");
@@ -20,10 +20,31 @@ export function getAnalystHeaders(): Record<string, string> {
       // ignore
     }
   }
-  return {
-    "X-API-Key": key,
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
   };
+  if (key) {
+    headers["X-API-Key"] = key;
+  }
+  return headers;
+}
+
+export async function verifySocPasskey(passkey: string): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/api/v1/threats/auth/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-API-Key": passkey,
+      },
+      body: JSON.stringify({ passkey }),
+    });
+    if (!res.ok) return false;
+    const data = await res.json();
+    return Boolean(data.authenticated);
+  } catch {
+    return false;
+  }
 }
 
 // =========================================================================

@@ -33,11 +33,14 @@ async def verify_analyst_key(
         )
 
     # Constant-time comparison to prevent timing side-channel attacks
-    # Authenticates against ANALYST_API_KEY or SOC_ADMIN_PASSWORD
-    is_valid = secrets.compare_digest(candidate_key, settings.ANALYST_API_KEY) or secrets.compare_digest(
-        candidate_key, settings.SOC_ADMIN_PASSWORD
+    # Authenticates against ANALYST_API_KEY or salted PBKDF2 master passkey hash (NFR-1.3)
+    from hares.core.security import verify_passkey_pbkdf2
+
+    is_analyst_key = secrets.compare_digest(candidate_key, settings.ANALYST_API_KEY)
+    is_admin_passkey = verify_passkey_pbkdf2(
+        candidate_key, settings.SOC_ADMIN_SALT_HEX, settings.SOC_ADMIN_PASSWORD_HASH
     )
-    if not is_valid:
+    if not (is_analyst_key or is_admin_passkey):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Invalid Municipal Analyst API Key. Access denied.",

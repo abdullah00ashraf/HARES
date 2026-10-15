@@ -98,3 +98,22 @@ class TriageAuditLog(Base):
     rule_triggered: Mapped[str] = mapped_column(String(100), nullable=False)
     latency_ms: Mapped[int] = mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False, index=True)
+
+
+class SecurityCredential(Base):
+    """
+    Sovereign Administrative & SOC Security Credentials (NFR-1.3).
+    Stores cryptographically salted PBKDF2/SHA256 credential hashes.
+    Zero plaintext passkeys or passwords persisted.
+    """
+    __tablename__ = "security_credentials"
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    credential_name: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
+    salt_hex: Mapped[str] = mapped_column(String(64), nullable=False)
+    hash_hex: Mapped[str] = mapped_column(String(128), nullable=False)
+    algorithm: Mapped[str] = mapped_column(String(32), default="pbkdf2_sha256", nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )

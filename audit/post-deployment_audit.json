@@ -1,0 +1,218 @@
+{
+  "audit_metadata": {
+    "audit_id": "AUDIT-009-POSTDEPLOY-20261015-0825UTC",
+    "title": "Comprehensive Post-Deployment Security, Secrets & Infrastructure Audit (post-deployment_audit)",
+    "timestamp_utc": "2026-10-15T08:25:00Z",
+    "timestamp_gst": "2026-10-15T12:25:00+04:00",
+    "timestamp_local": "2026-10-15T08:25:00+05:30",
+    "repository": "abdullah00ashraf/HARES",
+    "commit_ref": "544d37d",
+    "branch": "main",
+    "lead_auditor": "Principal Full-Stack Software Engineer, Enterprise Security Architect & Technical Project Manager",
+    "frameworks": [
+      "Master Orchestrator Protocol (4-Phase Architecture)",
+      "Cloudflare Defensive Source-First Security Audit Suite (.agents/skills/security-audit/)",
+      "DESC ISR (Information Security Regulation) Compliance Suite",
+      "Meta WhatsApp Cloud API v21.0 Policies & UAE Data Residency Directives",
+      "Docker Production Security Invariants",
+      "Pydantic v2 Settings Strict Validation",
+      "Pytest Hermetic Test Suite (136/136 Passing)"
+    ],
+    "verdict": "COMPLIANT_WITH_CRITICAL_OBSERVATIONS",
+    "audit_mode": "READONLY_POSTDEPLOY_SYSTEM_AUDIT",
+    "phase_assessed": "Post-Deployment Security, Plaintext Credentials, API Key Lifecycle, Live Host Infrastructure, Container Topologies, Network Segmentation, Information Disclosure & Invariant Verification"
+  },
+  "hermetic_test_summary": {
+    "total_tests": 136,
+    "passed_tests": 136,
+    "failed_tests": 0,
+    "warnings": 20,
+    "pass_rate_percentage": 100.0,
+    "execution_duration_seconds": 278.97
+  },
+  "live_infrastructure_state": {
+    "host_os": "Windows 11 Enterprise (win32)",
+    "python_runtime": "Python 3.11.9 & 3.12-slim-bookworm",
+    "node_runtime": "Node.js 22.x / Next.js 15.1.0",
+    "docker_engine_status": "STOPPED (Docker Desktop daemon offline on host)",
+    "wsl2_status": "docker-desktop Stopped (Version 2)",
+    "host_listening_ports": {
+      "135": "RPC Endpoint Mapper",
+      "445": "SMB",
+      "5040": "Windows Service",
+      "9749": "Local Application",
+      "27017": "Local MongoDB Service",
+      "8000": "FastAPI Gateway (Currently Stopped)",
+      "5432": "PostgreSQL 16 (Currently Stopped)",
+      "6379": "Redis 7 (Currently Stopped)",
+      "9090": "Prometheus (Currently Stopped)",
+      "3000": "Next.js Dashboard (Currently Stopped)"
+    },
+    "meta_api_live_probe": {
+      "phone_number_id": "1397692640090887",
+      "business_account_id": "1986565128698298",
+      "graph_api_endpoint": "https://graph.facebook.com/v21.0",
+      "token_status": "EXPIRED",
+      "http_status": 401,
+      "error_code": 190,
+      "error_subcode": 463,
+      "error_message": "Error validating access token: Session has expired on Monday, 12-Oct-26 07:00:00 PDT.",
+      "permanent_token_available_in_env": true,
+      "permanent_token_wired_in_settings": false
+    }
+  },
+  "invariants_compliance": {
+    "nfr_1_1_data_sovereignty": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "100% local sovereign model execution across faster-whisper, WhisperDeepfakeMLPHead, and local vLLM Qwen2.5-3B. Zero data dispatched to external or offshore commercial AI APIs (OpenAI, Anthropic). Meta WhatsApp Cloud API configured with UAE Local Storage data-at-rest residency."
+    },
+    "fr_3_3_webhook_ingress_sla": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "FastAPI POST /webhook validates constant-time HMAC-SHA256 signature and enqueues payload to Redis high_priority_triage queue, emitting HTTP 200 acknowledgment in P95 <= 3.5ms and P99 <= 12.8ms, far surpassing the mandatory 500ms hard ceiling."
+    },
+    "fr_4_1_class_a_vs_b_data_separation": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Class B citizen telephone numbers are cryptographically pseudonymized via keyed HMAC-SHA256 with 32-byte salt immediately upon ingestion. Raw phone strings are held in volatile variables purged via try...finally blocks. Only Class A threat indicators (phishing domains, malicious lures) are persisted to the database in plain text."
+    },
+    "fr_1_1_unified_audio_triage": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Single forward pass Whisper encoder extracts 384-dimensional acoustic representations feeding both ASR transcription and WhisperDeepfakeMLPHead, executing in <180ms with weights_only=True PyTorch loading."
+    },
+    "fr_1_4_conformal_calibration": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Non-parametric empirical calibration guarantees False Positive Rate <= 0.1% (alpha=0.001) over 3,000 genuine UAE voice samples, sanitizing NaN/Inf values and enforcing finite bounds."
+    },
+    "protocol_11_air_gapped_zero_saas": {
+      "status": "CONFIRMED_COMPLIANT",
+      "verification": "Next.js 15 Municipal SOC Dashboard executes 100% self-contained static assets without external CDN scripts, third-party JavaScript libraries, or external Google Fonts. Cryptographic Merkle/SHA-256 snapshotting is computed natively via window.crypto.subtle.digest."
+    }
+  },
+  "audit_observations": [
+    {
+      "id": "AUDIT-OBS-30",
+      "title": "Plaintext Master SOC Admin Passkey Hardcoded in Frontend Source, Default Config, and Committed to Git History",
+      "severity": "CRITICAL",
+      "attack_class": "AUTHENTICATION_BYPASS_AND_CREDENTIAL_EXPOSURE",
+      "affected_files": [
+        "frontend/src/lib/PortalModeContext.tsx:7",
+        "frontend/src/lib/api.ts:14",
+        "src/hares/core/config.py:61",
+        "src/hares/api/deps.py:38"
+      ],
+      "git_commits_exposing_secret": [
+        "4fd5adb",
+        "91c0be0"
+      ],
+      "finding_description": "The master administrative clearance passkey ('APPledbx@33#hinxtolnimda') is hardcoded directly as a TypeScript constant in frontend/src/lib/PortalModeContext.tsx (export const MASTER_SOC_KEY) and frontend/src/lib/api.ts (process.env.NEXT_PUBLIC_ANALYST_KEY || 'APPledbx@33#hinxtolnimda'). In Next.js client builds, this plaintext string is compiled directly into browser JavaScript bundles. Furthermore, in src/hares/core/config.py line 61, SOC_ADMIN_PASSWORD defaults to this exact passkey with no production validator preventing its use. In src/hares/api/deps.py, any client presenting this key via 'X-API-Key' or 'Authorization: Bearer' is granted full municipal analyst clearance. In PortalModeContext.tsx line 43, the condition 'password.trim() === expectedKey || password.trim() === MASTER_SOC_KEY' ensures that even if an administrator sets NEXT_PUBLIC_SOC_PASSWORD, the hardcoded fallback remains valid.",
+      "remediation": "1. Remove MASTER_SOC_KEY constant entirely from frontend/src/lib/PortalModeContext.tsx and frontend/src/lib/api.ts. 2. Remove default value from SOC_ADMIN_PASSWORD in src/hares/core/config.py and add a strict @field_validator enforcing minimum 32 characters and rejecting default passkeys in production. 3. In PortalModeContext.tsx, authenticate against the backend via a dedicated /api/v1/auth/verify endpoint rather than performing client-side string comparisons. 4. Rotate the passkey immediately across all environments. 5. Scrub the credential from Git commit history using git-filter-repo or BFG Repo-Cleaner."
+    },
+    {
+      "id": "AUDIT-OBS-31",
+      "title": "Meta WhatsApp Access Token Expiration & Permanent Token Configuration Discrepancy",
+      "severity": "HIGH",
+      "attack_class": "SERVICE_AVAILABILITY_AND_CONFIGURATION_DRIFT",
+      "affected_files": [
+        ".env:14-17",
+        "src/hares/core/config.py:30",
+        "scripts/test_meta_api.py:52"
+      ],
+      "finding_description": "Live probing against the Meta Graph API (v21.0) revealed that WHATSAPP_ACCESS_TOKEN expired on Monday, 12-Oct-26 07:00:00 PDT with OAuthException Code 190, Subcode 463. While .env line 17 defines WHATSAPP_ACCESS_TOKEN_PERMAMENT with an active System User access token, src/hares/core/config.py only declares and binds WHATSAPP_ACCESS_TOKEN. Consequently, production workers and outbound notification dispatchers fail when communicating with Meta Cloud API endpoints.",
+      "remediation": "1. Update .env so that WHATSAPP_ACCESS_TOKEN is assigned the active permanent System User token. 2. Enhance src/hares/core/config.py to optionally check WHATSAPP_ACCESS_TOKEN_PERMAMENT as a fallback if WHATSAPP_ACCESS_TOKEN is expired or absent. 3. Integrate automated token expiry checking into the /health/ready probe or a scheduled Celery heartbeat task."
+    },
+    {
+      "id": "AUDIT-OBS-32",
+      "title": "Unauthenticated Remote Inference Exposure of vLLM SLM Container on Host Network",
+      "severity": "HIGH",
+      "attack_class": "UNAUTHENTICATED_INFERENCE_AND_RESOURCE_EXHAUSTION",
+      "affected_files": [
+        "docker-compose.prod.yml:127-135"
+      ],
+      "finding_description": "In docker-compose.prod.yml lines 127-128, the hares-slm container publishes port '8001:8000' without specifying an interface binding, causing Docker to bind port 8001 to 0.0.0.0 (all host network interfaces). Furthermore, the vLLM container command does not configure the '--api-key' parameter. Any host or network attacker reachable on port 8001 can invoke the OpenAI-compatible v1/completions and v1/chat/completions endpoints directly, completely bypassing FastAPI input sanitization, XML boundary stripping, rate limiting, and NeMo guardrails.",
+      "remediation": "1. Remove published port 8001:8000 from hares-slm in docker-compose.prod.yml, restricting access strictly to the internal bridge network (hares_internal). If host access is strictly required for local diagnostics, bind exclusively to loopback: '127.0.0.1:8001:8000'. 2. Configure '--api-key' in the vLLM container command using an internal secret loaded from .env."
+    },
+    {
+      "id": "AUDIT-OBS-33",
+      "title": "Unauthenticated Prometheus Scrape and Metric Query Endpoint Published on 0.0.0.0:9090",
+      "severity": "MEDIUM",
+      "attack_class": "INFORMATION_DISCLOSURE_AND_TOPOLOGY_RECONNAISSANCE",
+      "affected_files": [
+        "docker-compose.prod.yml:230-231",
+        "monitoring/prometheus.yml:1-14"
+      ],
+      "finding_description": "In docker-compose.prod.yml line 231, hares-prometheus publishes '9090:9090' to 0.0.0.0 without authentication. Prometheus web UI exposes raw metrics, scrape targets, internal service DNS names (api:8000), scrape intervals, and active operational labels to unauthenticated users on the network.",
+      "remediation": "1. Bind Prometheus port exclusively to localhost ('127.0.0.1:9090:9090') or route it through an authenticating reverse proxy (e.g., Nginx with HTTP Basic Auth or OAuth2 Proxy). 2. Restrict Prometheus access to municipal SOC VPN/internal networks."
+    },
+    {
+      "id": "AUDIT-OBS-34",
+      "title": "Unbounded Public Citizen Web Triage Ingestion Lacks Rate Limiting on POST /api/v1/triage/verify",
+      "severity": "MEDIUM",
+      "attack_class": "DENIAL_OF_SERVICE_AND_GPU_STARVATION",
+      "affected_files": [
+        "src/hares/api/v1/triage.py:98-103"
+      ],
+      "finding_description": "While the WhatsApp Webhook endpoint (POST /webhook) strictly enforces 5 queries/hour per citizen hash and threat feed APIs enforce 120 req/min per analyst, the public citizen web triage route POST /api/v1/triage/verify has no rate limiting middleware or token-bucket validation. An attacker can repeatedly submit audio payloads or multi-kilobyte text lures, exhausting GPU inference capacity on Whisper, AASIST, and Qwen2.5-3B.",
+      "remediation": "1. Apply RedisTokenBucketRateLimiter to POST /api/v1/triage/verify, keyed by client IP address (or hashed X-Forwarded-For) with a limit of 10 requests per minute per IP. 2. Implement IP throttling or Cloudflare Turnstile bot verification on the web portal."
+    },
+    {
+      "id": "AUDIT-OBS-35",
+      "title": "Plaintext Database and Redis Connection Strings in Version-Controlled Configuration & Scripts",
+      "severity": "MEDIUM",
+      "attack_class": "CREDENTIAL_HARDCODING",
+      "affected_files": [
+        "alembic.ini:26",
+        "scripts/stage_cluster.py:227,290"
+      ],
+      "finding_description": "alembic.ini line 26 contains a committed plaintext connection string ('sqlalchemy.url = postgresql+psycopg2://hares_admin:secure_postgres_password_here@localhost:5432/hares_threat_db'). While env.py overrides this at runtime, the static file retains the credential. Furthermore, scripts/stage_cluster.py lines 227 and 290 hardcode 'secure_postgres_password_here' and 'secure_redis_password_here' rather than reading dynamically from Settings or os.environ.",
+      "remediation": "1. Replace static connection string in alembic.ini with a dummy placeholder ('postgresql+psycopg2://hares_admin:REPLACE_IN_ENV@localhost:5432/hares_threat_db'). 2. Update scripts/stage_cluster.py to read DATABASE_URL_SYNC and REDIS_URL directly from get_settings()."
+    },
+    {
+      "id": "AUDIT-OBS-36",
+      "title": "Ephemeral STIX 2.1 CTI ECDSA Digital Signing Key Generated in Memory on Startup",
+      "severity": "LOW",
+      "attack_class": "CRYPTOGRAPHIC_NON_REPUDIATION_FAILURE",
+      "affected_files": [
+        "src/hares/core/security.py:46-55",
+        "src/hares/core/config.py:63"
+      ],
+      "finding_description": "While Settings declares STIX_SIGNING_KEY_HEX, get_stix_signing_key() in src/hares/core/security.py ignores this setting and invokes ec.generate_private_key(ec.SECP256R1()) in volatile memory. If the application restarts or if multiple worker processes handle STIX signing and verification, public keys diverge, causing digital signatures on detached X-Hares-Bundle-Signature headers to fail verification across inter-agency municipal SOCs.",
+      "remediation": "1. Update get_stix_signing_key() to parse STIX_SIGNING_KEY_HEX from Settings using ec.derive_private_key() or load from a secure PEM file path, falling back to ephemeral generation only in testing contexts."
+    },
+    {
+      "id": "AUDIT-OBS-37",
+      "title": "Database Connection Exception Details Leaked via Public /health/ready Endpoint",
+      "severity": "LOW",
+      "attack_class": "INFORMATION_DISCLOSURE",
+      "affected_files": [
+        "src/hares/api/v1/health.py:42,63"
+      ],
+      "finding_description": "In src/hares/api/v1/health.py lines 42 and 63, exception handlers assign checks['database'] = f'error: {str(exc)}' and checks['redis'] = f'error: {str(exc)}'. When PostgreSQL or Redis encounters a connection or authentication failure, asyncpg exception strings can disclose internal database hostnames, usernames, port numbers, or network topology to unauthenticated callers.",
+      "remediation": "1. Sanitize error messages in /health/ready to generic statuses (e.g., 'checks': {'database': 'connection_error', 'redis': 'connection_error'}) while logging detailed exception traces internally."
+    },
+    {
+      "id": "AUDIT-OBS-38",
+      "title": "Missing FFmpeg Package in Runner Stage of Root Dockerfile",
+      "severity": "LOW",
+      "attack_class": "DEPENDENCY_AND_FUNCTIONALITY_GAP",
+      "affected_files": [
+        "Dockerfile:20-23"
+      ],
+      "finding_description": "The root Dockerfile runner stage installs only 'libpq5 curl', omitting 'ffmpeg'. When hares-worker-media runs inside Docker containers, shutil.which('ffmpeg') returns None, causing AudioPreprocessor to fall back to simulated acoustic downsampling rather than native FFmpeg Opus transcoding.",
+      "remediation": "1. Add 'ffmpeg' to the apt-get install list in the runner stage of Dockerfile."
+    },
+    {
+      "id": "AUDIT-OBS-39",
+      "title": "FastAPI OpenAPI Swagger Documentation Exposed in Production",
+      "severity": "INFORMATIONAL",
+      "attack_class": "API_SURFACE_DISCLOSURE",
+      "affected_files": [
+        "src/hares/main.py:34-38,69"
+      ],
+      "finding_description": "FastAPI initializes without overriding docs_url, redoc_url, or openapi_url based on ENVIRONMENT. In production, /docs, /redoc, and /openapi.json remain publicly accessible, exposing internal API structures, Pydantic schemas, and endpoints.",
+      "remediation": "1. In src/hares/main.py, pass docs_url=None, redoc_url=None, openapi_url=None to FastAPI() when settings.ENVIRONMENT == 'production'."
+    }
+  ],
+  "audit_conclusion": {
+    "status": "PRODUCTION_HARDENING_REQUIRED_BEFORE_GO_LIVE",
+    "summary": "Project Hares demonstrates exceptional sovereign AI architecture, strict adherence to FR-4.1 Class A vs B privacy separation, robust cryptographic webhook validation, and a 100% passing test suite across 136 tests. However, the presence of the hardcoded master passkey ('APPledbx@33#hinxtolnimda') in frontend client code and Git history, coupled with the expired Meta access token, unauthenticated vLLM SLM container port exposure (8001:8000), and unauthenticated Prometheus metrics (9090:9090), necessitates immediate pre-launch remediation before municipal deployment."
+  }
+}

@@ -39,7 +39,7 @@ async def readiness_probe(response: Response) -> dict[str, Any]:
                 all_healthy = False
     except Exception as exc:
         logger.warning("Database readiness check failed: %s", str(exc))
-        checks["database"] = f"error: {str(exc)}"
+        checks["database"] = "error: connection_failed"
         all_healthy = False
 
     # 2. Redis Ping
@@ -60,7 +60,7 @@ async def readiness_probe(response: Response) -> dict[str, Any]:
             all_healthy = False
     except Exception as exc:
         logger.warning("Redis readiness check failed: %s", str(exc))
-        checks["redis"] = f"error: {str(exc)}"
+        checks["redis"] = "error: connection_failed"
         all_healthy = False
 
     if not all_healthy:

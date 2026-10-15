@@ -6,7 +6,7 @@ from hares.core.config import get_settings
 from hares.core.logging import configure_logging
 from hares.api.v1.webhook import router as webhook_router
 from hares.api.v1.health import router as health_router
-from hares.api.v1.threat_feed import router as threat_feed_router
+from hares.api.v1.threat_feed import router as threat_feed_router, auth_router
 from hares.api.v1.triage import router as triage_router
 
 
@@ -31,10 +31,17 @@ def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(level=settings.LOG_LEVEL)
 
+    docs_url = "/docs" if settings.ENVIRONMENT != "production" else None
+    redoc_url = "/redoc" if settings.ENVIRONMENT != "production" else None
+    openapi_url = "/openapi.json" if settings.ENVIRONMENT != "production" else None
+
     application = FastAPI(
         title=settings.PROJECT_NAME,
         version="0.1.0",
         lifespan=lifespan,
+        docs_url=docs_url,
+        redoc_url=redoc_url,
+        openapi_url=openapi_url,
     )
 
     # CORS Middleware for Internal Municipal Analyst Dashboard
@@ -66,12 +73,13 @@ def create_app() -> FastAPI:
             "version": "0.1.0",
             "status": "operational",
             "jurisdiction": "Dubai & UAE",
-            "docs": "/docs",
+            "docs": "/docs" if settings.ENVIRONMENT != "production" else "disabled_in_production",
             "health": "/health/ready",
         }
 
     application.include_router(health_router, tags=["Health"])
     application.include_router(webhook_router, tags=["WhatsApp Webhook"])
+    application.include_router(auth_router, prefix="/api/v1", tags=["Municipal Auth"])
     application.include_router(threat_feed_router, prefix="/api/v1", tags=["Municipal Threat Intelligence"])
     application.include_router(triage_router, prefix="/api/v1", tags=["Citizen Fraud Triage"])
 

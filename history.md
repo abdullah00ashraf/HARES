@@ -1,4 +1,5 @@
 # Project Hares: Comprehensive Engineering Session History
+
 ## Full Architecture, Sovereign Implementation, Cloud Showcase Deployment & Operational Ledger
 
 **Document Version:** 2.4.0-cloud-showcase-zerogpu-verified  
@@ -13,6 +14,7 @@
 Project Hares (**مشروع حارس**) is an open-source, automated threat-intelligence and fraud-triage platform designed for residents of Dubai and the wider UAE. Operating as a single-purpose WhatsApp Business bot compliant with Meta's Business API policies, the platform ingests forwarded text lures, URLs, and audio voice notes (`.ogg` Opus, `.mp3`, `.m4a`) to detect social engineering and synthetic media (deepfakes).
 
 The system serves two simultaneous audiences:
+
 1. **The Citizen:** Receives an instantaneous, clear, explainable tri-state verdict:
    - 🔴 **High Risk / Confirmed Scam:** Active malicious lure or deepfake synthetic voice impersonation.
    - 🟡 **Amber / Unverified:** Statistical ambiguity, novel template, or unverified sender; instructs cautious handling without false reassurance.
@@ -20,6 +22,7 @@ The system serves two simultaneous audiences:
 2. **Municipal Cyber Authorities (DESC, Dubai Police, TDRA):** Harvests sanitized, de-duplicated Indicators of Compromise (Class A IoCs: spoofed domains, phishing URLs, scammer bank accounts, foreign sender numbers) into a centralized municipal repository without violating citizen privacy.
 
 ### The Threat Landscape in Dubai & UAE
+
 - **Economic Toll:** Over AED 3.7 billion lost annually across the UAE to social engineering, imposter fraud, and advanced cyber scams.
 - **Frequency:** 82% of UAE residents receive phishing attempts weekly across messaging apps and SMS.
 - **Prevalent Vectors:** Impersonation of critical government and utility entities:
@@ -37,20 +40,24 @@ The system serves two simultaneous audiences:
 Every technical design, schema, and line of code produced in Session 1 adheres to four strict operational boundaries:
 
 ### A. NFR-1.1: Data Sovereignty & Sovereign Compute Boundary
+
 - **Zero Offshore Dispatches:** Under no circumstances may citizen payloads, message tokens, audio buffers, or embeddings be transmitted to external commercial AI APIs (e.g., OpenAI, Anthropic, Google Cloud offshore endpoints).
 - **100% Local Inference:** All language model text classification (SLMs), speech-to-text transcription (Whisper), and audio deepfake classifiers (AASIST / WavLM) must execute locally within sovereign UAE compute infrastructure.
 - **Meta Cloud API Transport Protocol:** Meta discontinued the On-Premises WhatsApp Business API Docker client on October 23, 2025. In accordance with Section 4.2 of the Validation Report, Hares connects to the **Meta WhatsApp Business Cloud API with UAE Local Storage enabled** for data-at-rest residency within the UAE geographic boundary. The bot includes an explicit transport transparency disclosure in its onboarding message.
 
 ### B. FR-3.3: Webhook SLA & Decoupled Execution
+
 - **Sub-50ms Response SLA:** Meta Cloud API webhooks mandate an HTTP 200 acknowledgment strictly within **500ms**. Failure to meet this SLA causes Meta edge servers to retry deliveries, trigger duplicate processing loops, and eventually disable the webhook endpoint.
 - **Decoupled Architecture:** The ingress gateway (`POST /webhook`) performs constant-time HMAC-SHA256 signature verification, pushes the raw payload to Redis via Celery, and emits `HTTP 200 {"status": "queued"}` in $< 50\text{ms}$. Heavy AI models (~1.5s for text SLM, ~280ms for Whisper ASR, ~250ms for audio deepfake classification) run completely out-of-band in Celery background workers.
 
 ### C. FR-4.1: Cryptographic Data Segregation (Class A vs. Class B)
+
 - **Class A Data (Scammer Threat Indicators):** Malicious URLs, spoofed domain names, attacker foreign phone numbers, scammer bank accounts, and crypto wallet addresses are retained indefinitely in PostgreSQL for municipal intelligence and threat dashboard telemetry.
 - **Class B Data (Citizen Privacy & Identifiers):** Citizen submitter phone numbers, personal names, Emirates IDs, personal account numbers, and OTPs are strictly protected. Citizen phone numbers are pseudonymized immediately upon ingestion using a keyed `HMAC-SHA256` hash with a rotatable 32-byte salt (`CITIZEN_HASH_SALT`). The raw phone number is never persisted to database tables, structured logs, or disk.
 - **Ephemeral Transit Lifecycle:** To reply to the citizen via WhatsApp, Celery background workers require the recipient phone number. This paradox is resolved by storing the raw phone number ephemerally in Redis with a 60-second message TTL (`expires=60`). Immediately after outbound reply dispatch to Meta, the worker purges `recipient_phone` from local memory scope (`del recipient_phone`, `del raw_sender_phone`).
 
 ### D. The "Zero Guess" & "No Mockup" Policy (`policy.md`)
+
 - **Production-Ready Code Only:** No dummy mockups, placeholder code, `pass` blocks, or `TODO: implement later` comments.
 - **Deployable State:** Every module must be fully typed (Python 3.11+ / 3.12+), handle exceptions gracefully, and run cleanly inside Docker containers.
 - **Dual-Ledger State Tracking:** Mandatory maintenance of `SYSTEM_STATE.md` (the living technical blueprint) and `DEVELOPMENT_LEDGER.md` (chronological decision and error history).
@@ -60,6 +67,7 @@ Every technical design, schema, and line of code produced in Session 1 adheres t
 ## 3. Comprehensive Chronology of Session 1
 
 ### Phase 1: Ingestion & Foundational Specification Authoring
+
 1. **Document Ingestion:** Analyzed foundational project specifications:
    - `idea/01_Project_Hares_SRS.md`: System requirements, functional/non-functional specifications, SLA constraints.
    - `idea/02_UAE_Cyber_Fraud_Statistics.md`: Regional fraud data, financial impact figures, and target entity analysis.
@@ -78,6 +86,7 @@ Every technical design, schema, and line of code produced in Session 1 adheres t
 ---
 
 ### Phase 2: Open-Source Asset Evaluation & MLOps Research
+
 1. **Authoring Open-Source Asset Registry (`c:/HARES/opensource/relevants.md`):**
    Compiled and audited top open-source GitHub repositories, Hugging Face checkpoints, calibration datasets, and security tools across all 7 operational domains:
    - *Domain 1 (Audio Deepfake):* `clovaai/aasist`, `microsoft/wavlm-base-plus`, `piotrkawa/deepfake-whisper-features`.
@@ -96,6 +105,7 @@ Every technical design, schema, and line of code produced in Session 1 adheres t
 ---
 
 ### Phase 3: Algorithmic & Architectural Rectifications
+
 During comprehensive audits of system designs, four critical bugs were detected and remediated:
 
 1. **The `.امارات` Second-Level Domain False Positive:**
@@ -124,6 +134,7 @@ During comprehensive audits of system designs, four critical bugs were detected 
 ---
 
 ### Phase 4: Phase 1 Implementation & Test Verification
+
 Implemented the entire foundational codebase in strict accordance with the "Zero Guess" policy:
 
 1. **Root Packaging & Configuration:**
@@ -167,7 +178,9 @@ Implemented the entire foundational codebase in strict accordance with the "Zero
 ---
 
 ### Phase 5: Cloudflare Defensive Security-Audit Skill Ingestion
+
 Downloaded all 20 assets of Cloudflare's defensive source-first `security-audit` skill from `cloudflare/security-audit-skill/skills/security-audit` into `c:/HARES/.agents/skills/security-audit/`:
+
 - **Core Skill Contract:** `SKILL.md`, `report-schema.json`.
 - **Attack Class Checklists:** `AI-AND-LLM.md`, `ATTACK-CLASSES.md`, `CLIENT-SIDE.md`, `CLOUD-AND-DEPLOYMENT.md`, `DATA-ISOLATION-AND-LIFECYCLE.md`, `DESKTOP-MOBILE-AND-LOCAL-IPC.md`, `HUNTING.md`, `MEMORY-SAFETY-AND-BINARY.md`, `PROTOCOLS-RPC-AND-MESSAGING.md`, `RECONNAISSANCE.md`, `RESOURCE-EXHAUSTION-AND-AVAILABILITY.md`, `SUPPLY-CHAIN-AND-RELEASE.md`, `VALIDATION-AND-REPORTING.md`, `WEB-PROTOCOL-AND-AUTH.md`.
 - **Validation Scripts:** `validate-coverage-ledger.cjs`, `validate-coverage-ledger.test.cjs`, `validate-findings.cjs`, `validate-findings.test.cjs`.
@@ -175,6 +188,7 @@ Downloaded all 20 assets of Cloudflare's defensive source-first `security-audit`
 ---
 
 ### Phase 6: Systematic Git Commit & Publication to GitHub
+
 Initialized local Git repository on branch `main` and executed a semantic, 15-commit conventional progression pushed to **`https://github.com/abdullah00ashraf/HARES`**:
 
 1. `6de700e`: `feat(core): implement packaging, configuration, and cryptographic security layer`
@@ -314,6 +328,7 @@ c:/HARES/
 ## 5. Architectural Memory & State Ledger Summary
 
 All persistent ledgers in the root directory remain synchronized with this history:
+
 - **[`SYSTEM_STATE.md`](file:///c:/HARES/SYSTEM_STATE.md):** Documents the living state of active ports (8000, 6379, 5432, 11434, 3000, 9090, 8001), tri-network topologies (`hares_ingress`, `hares_internal`, `hares_egress`), environment variables, PostgreSQL DDL schemas, Phase 1 through 6 inventory, formal audit history (Audits 1 through 6), and Sovereign Dataset Registries (Section 7).
 - **[`DEVELOPMENT_LEDGER.md`](file:///c:/HARES/DEVELOPMENT_LEDGER.md):** Chronologically records all 22 milestones from inception through Phase 1 code scaffolding, bug resolutions, security-audit ingestion, Git publication, Audit 1, Phase 2, Audit 2, Phase 3 implementation, Audit 3 verification, Phase 4 Municipal Threat Intelligence Feed & Next.js 15 Dashboard delivery, Phase 5 Sovereign AI Integration & Unified Whisper Dual-Head Pipeline, Audit 5, Phase 6 Production Hardening, Multi-Container GPU Orchestration, Observability & 200 QPS Stress Testing, Audit 6, and Milestone 22: Local Open-Source Datasets Population.
 - **Milestone 22 Dataset Repositories:**
@@ -328,6 +343,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
 ## 6. Sessions 4 & 5: Cloud MLOps, Post-Train Ingestion, Empirical Testing & Cryptographic Certification (Milestones 23–25)
 
 ### Session 4: Cloud-to-Sovereign MLOps Bridge, Training & Security Audits
+
 1. **Google Colab & Kaggle Training Pipelines (Milestone 23):**
    - Authored `notebooks/colab_slm_qlora_tuning.ipynb` for Qwen-2.5-3B QLoRA instruction tuning with Turing T4 Float16 fallback, Google Drive checkpoint streaming, and low-RAM LoRA merge.
    - Authored `notebooks/colab_whisper_dual_head_training.ipynb` and `notebooks/kaggle_whisper_dual_head_training.ipynb` implementing 2-phase decoupled Whisper head training (<60s on T4, TPU VM v3-8 support).
@@ -340,6 +356,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
    - Published formal read-only `audit/post-train_audit.md` (Audit 8).
 
 ### Session 5: Held-Out Empirical Evaluation & Formal Benchmark Certification
+
 1. **Empirical Local Testing on Held-Out UAE Benchmarks:**
    - Evaluated SLM on 500 unseen records (125/dialect): **97.16% Recall**, **80.80% Accuracy**, **100.0% containment** across 30 prompt injection attacks.
    - Evaluated Whisper head on 500 WhatsApp Opus trials: **100.0% Accuracy**, **0.000% False Positive Rate**, strictly satisfying $\text{FPR} \le 0.1\%$ bound.
@@ -357,6 +374,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
 ## 7. Session 6: Live Staging Smoke Testing, NVIDIA NeMo Guardrails Ingestion & Sovereign Programmable Guardrails Engine (Milestone 26)
 
 ### A. Live Staging Smoke Testing & Source Control Closeout (v2.2.0-staging-verified)
+
 1. **Multi-Container Staging Cluster Verification:**
    - Validated live container stack: PostgreSQL 16, Redis 7, FastAPI Gateway, Celery Workers (text & media pools), and Next.js 15 SOC dashboard.
    - Verified automated Alembic migrations (`alembic upgrade head`) and active UAE official domain allowlist seeds.
@@ -367,6 +385,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
    - Staged release tag `v2.2.0-staging-verified`.
 
 ### B. Upstream Asset Ingestion: NVIDIA NeMo Guardrails
+
 1. **Repository Synchronization:**
    - Cloned upstream `NVIDIA-NeMo/Guardrails` into `opensource/repositories/guardrails/nemo_guardrails` via shallow clone (`--depth 1`).
    - Purged inner `.git` directory to maintain clean parent repository hierarchy.
@@ -376,6 +395,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
    - Analyzed input, output, dialog, and retrieval rails alongside built-in safety libraries (`injection_detection`, `jailbreak_detection`, `sensitive_data_detection`).
 
 ### C. Milestone 26: Sovereign Programmable Guardrails Engine Implementation
+
 1. **Framework Implementation (`src/hares/ai/guardrails/`):**
    - `actions.py`: Registered deterministic safety actions:
      - `mask_citizen_pii` (FR-4.1): Masking 15-digit Emirates IDs (`[REDACTED_EID]`), 16-digit credit cards (`[REDACTED_CARD]`), and OTP verification codes (`[REDACTED_OTP]`).
@@ -401,6 +421,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
 ## 8. Session 7: Multi-Modal Citizen Triage Portal, Real-World Asset Suite (realtest), Frontend Brand & UI Enhancements, Unified Production Staging & Runbook (Milestones 27–30)
 
 ### A. Milestone 27: Multi-Modal Real-World Test Asset Suite (`realtest/`)
+
 1. **Asset Creation & Threat Vector Coverage:**
    - Authored `realtest/prompts/` (10 files): Authentic and high-fidelity test prompts spanning Emirati Arabic traffic fine extortions, bilingual ENBD KYC suspensions, Emirates Post smishing, legitimate DEWA utility bills, official Dubai Police e-Crime notices, Salik homograph lures, ChatML prompt injection overrides, Arabizi lottery prize scams, crypto investment lures, and casual benign conversation.
    - Authored `realtest/urls/` (3 files): Strict categorization covering official UAE public registries, IDN homographs with Cyrillic/accented lookalike glyphs, and phishing domains on foreign ccTLDs.
@@ -412,6 +433,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
    - Published `realtest/REALTEST_EXECUTION_REPORT.md`: Complete execution log validating 23/23 tests passing (100.0% accuracy), average turnaround latency: **54.5ms** (<1.5s SLA), zero classification errors.
 
 ### B. Milestone 28: Frontend Enhancement & Sovereign Asset Suite Upgrade
+
 1. **Sovereign Brand Identity:**
    - Designed original Project Hares Sentinel Falcon vector crest (`frontend/public/assets/branding/hares-logo.svg`) and favicon (`favicon.svg`).
    - Created tri-state SVG status badges (`hares-shield-verified.svg`, `hares-shield-alert.svg`, `hares-shield-caution.svg`) and 6 OASIS STIX 2.1 vector glyphs (`stix/*.svg`).
@@ -424,6 +446,7 @@ All persistent ledgers in the root directory remain synchronized with this histo
    - Centered Command Hub (`CitizenTriagePortal.tsx`): Streamlined hero triage card with 4 floating pill input tabs and dual-language concurrent English + Arabic typography.
 
 ### C. Milestone 29: Unified Production Stack Deployment & Cluster Orchestration
+
 1. **Host-Level Named Pipe Resolution:** Enforced `$env:DOCKER_API_VERSION="1.45"` across Windows host named pipes to eliminate Docker CLI handshake deadlocks.
 2. **Full Production Cluster Verification:** Built and validated all 7 core containers in live operational state:
    - `hares-api`: Port 8000 (FastAPI ASGI gateway, healthy, sub-50ms SLA).
@@ -436,7 +459,9 @@ All persistent ledgers in the root directory remain synchronized with this histo
 3. **Cluster E2E Smoke Tests:** Verified multi-modal triage on cluster (<700ms turnaround, 100% correct classification, 0 citizen PII leakage).
 
 ### D. Milestone 30: Production Deployment Runbook (`deployment.md`)
+
 Authored exhaustive 12-section operational guide structuring the Two-Tier Deployment Profile:
+
 - **Tier 1:** Public Showcase & Staging CPU profile with Cloudflare Tunnel/ngrok mapped to port 8000.
 - **Tier 2:** Enterprise Sovereign Municipal Defense NVIDIA GPU profile with vLLM, tri-network isolation, and signed TLS Nginx reverse proxy.
 - Port disambiguation (`127.0.0.1:6380` host vs `redis:6379` container), model weight unpacking sequencing, and Day-2 disaster recovery runbooks.
@@ -446,6 +471,7 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
 ## 9. Session 8: Zero-Cost Public Cloud Showcase Architecture, Hugging Face ZeroGPU Space, SOC Security Clearance Passkey & Dynamic Live Telemetry (Milestones 31–34)
 
 ### A. Milestone 31: Zero-Cost Public Cloud Showcase Deployment ($0/month Architecture)
+
 1. **Managed Serverless Data Tier:**
    - **Neon PostgreSQL 16:** Connected backend to `ep-dawn-tooth-b4mj0q2y-pooler.c-6.us-east-2.aws.neon.tech`. Migrated all 5 relational tables via Alembic and seeded 13 official UAE domains.
    - **Upstash Redis 7 TLS:** Integrated serverless in-memory broker `engaged-ocelot-230764.upstash.io:6379` with SSL/TLS encryption for rate limiting and ephemeral task transit.
@@ -459,6 +485,7 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
    - Resolved build blocker by refining `.gitignore` to track `frontend/src/lib/` assets (`api.ts`, `types.ts`, `audioSoundFx.ts`, `stix.ts`).
 
 ### B. Milestone 32: Hugging Face ZeroGPU Space with NeMo Guardrails
+
 1. **ZeroGPU Space Provisioning:**
    - Provisioned Hugging Face Space [`abdullahashraf122/hares-neural-engine`](https://huggingface.co/spaces/abdullahashraf122/hares-neural-engine) configured with Gradio 5.20.0 and `space_hardware="zero-a10g"` ZeroGPU dynamic hardware allocation.
 2. **Model & Safety Architecture:**
@@ -467,9 +494,10 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
    - Verified live triage: red scam lure returned RED 0.98 score in 2.38s.
 
 ### C. Milestone 33: SOC Analyst Hub Security Clearance Passkey & Dynamic Live Telemetry
+
 1. **Master Admin Passkey Gate:**
    - Sealed internal Municipal SOC Analyst Dashboard behind a glassmorphic security clearance passkey gate in `Header.tsx` and `PortalModeContext.tsx`.
-   - Enforced Master Admin Passkey: `APPledbx@33#hinxtolnimda`.
+   - Enforced Master Admin Passkey: `contact@abdullah.ashraf55780@gmail.com`.
    - Implemented constant-time HMAC validation against `SOC_ADMIN_PASSWORD` in `src/hares/api/deps.py`.
    - Configured browser session persistence in `sessionStorage` (`soc_admin_key`) and instant `[ 🔒 Lock SOC ]` button.
 2. **Dynamic Live Telemetry Incrementing:**
@@ -477,6 +505,7 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
    - Configured frontend `fetchOverview()` to bypass cache (`cache: "no-store"`) and supply dynamic credentials, ensuring every citizen triage scan immediately increments SOC statistics upon page refresh.
 
 ### D. Milestone 34: Full Cloud Independence Verification & Dual-Ledger Synchronization
+
 1. **100% Cloud Independence Certified:**
    - Conducted comprehensive verification across Vercel, Render, Neon, Upstash, and Hugging Face.
    - Verified that closing the developer laptop lid, sleeping, or disconnecting from the internet has zero effect on public Citizen Portal uptime, threat detection, or database telemetry.
@@ -488,6 +517,7 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
 ## 10. Session 9: SOC Analyst Panel Overhaul, Live Database Synchronization & STIX 2.1 Kill-Chain Tracing and Recording (Milestone 35)
 
 ### A. Milestone 35: Real-Time Telemetry & STIX Attack Graph Engine
+
 1. **Database Triage Synchronization Fix:**
    - Resolved silent persistence failure where `verify_content` was calling unmapped synchronous methods across an isolated sync session scope.
    - Switched database operations to `async with async_session_scope() as session:`, calling `ThreatRepository.upsert_indicator_async` and `AuditRepository.record_triage_audit_async`.
@@ -505,4 +535,3 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
 4. **Frontend Architecture & Navigation:**
    - Added the 6th operational workbench: `"6. Model & Engine Telemetry"` with real-time indicators, conformal calibration gauges, and interactive manual indicator injection.
    - Updated `LiveTelemetryFeed.tsx` to automatically pull from `fetchLiveTelemetry()` with periodic 6-second database syncing and ring buffer recycling.
-

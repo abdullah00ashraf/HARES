@@ -223,8 +223,11 @@ class ClusterStagingOrchestrator:
         """
         Runs Alembic migrations and seeds official domains.
         """
-        logger.info("Running Alembic migrations (alembic upgrade head)...")
-        host_db_sync = "postgresql+psycopg2://hares_admin:secure_postgres_password_here@127.0.0.1:5432/hares_threat_db"
+        from hares.core.config import get_settings
+        settings = get_settings()
+        host_db_sync = os.environ.get("DATABASE_URL_SYNC", settings.DATABASE_URL_SYNC)
+        if "@db:" in host_db_sync:
+            host_db_sync = host_db_sync.replace("@db:", "@127.0.0.1:")
         env = os.environ.copy()
         env["DATABASE_URL_SYNC"] = host_db_sync
 
@@ -285,9 +288,11 @@ class ClusterStagingOrchestrator:
         if self.mock_process is None or self.mock_process.poll() is not None:
             self.start_mock_meta_sink()
 
-        from scripts.run_live_smoke_test import LiveClusterSmokeTester
-
-        host_redis = "redis://:secure_redis_password_here@127.0.0.1:6380/0"
+        from hares.core.config import get_settings
+        settings = get_settings()
+        host_redis = os.environ.get("REDIS_URL", settings.REDIS_URL)
+        if "@redis:" in host_redis:
+            host_redis = host_redis.replace("@redis:6379", "@127.0.0.1:6380").replace("@redis:", "@127.0.0.1:")
         tester = LiveClusterSmokeTester(
             api_url=f"http://localhost:{self.api_port}",
             dashboard_url=f"http://localhost:{self.dashboard_port}",

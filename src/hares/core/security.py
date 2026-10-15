@@ -1,6 +1,9 @@
+import base64
 import hashlib
 import hmac
 import re
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import ec
 
 E164_CLEAN_PATTERN = re.compile(r"[\s\-\(\)\+]")
 
@@ -37,20 +40,47 @@ def derive_citizen_user_hash(raw_phone_number: str, salt: str) -> str:
 
 
 # =========================================================================
-# Cryptographic STIX 2.1 CTI Signing & Non-Repudiation (AUDIT-OBS-16)
+# Municipal SOC Security Credentials Salting & PBKDF2 Hashing (NFR-1.3)
 # =========================================================================
-import base64
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.asymmetric import ec
+def hash_passkey_pbkdf2(passkey: str, salt_hex: str, iterations: int = 100_000) -> str:
+    """
+    Computes PBKDF2-HMAC-SHA256 hash of a municipal administrator passkey (NFR-1.3).
+    Ensures zero plaintext passwords stored in database or source code.
+    """
+    salt_bytes = bytes.fromhex(salt_hex)
+    return hashlib.pbkdf2_hmac("sha256", passkey.encode("utf-8"), salt_bytes, iterations).hex()
 
+
+def verify_passkey_pbkdf2(candidate_passkey: str, salt_hex: str, expected_hash_hex: str) -> bool:
+    """Verifies candidate passkey in constant time against expected PBKDF2 hash."""
+    candidate_hash = hash_passkey_pbkdf2(candidate_passkey, salt_hex)
+    return hmac.compare_digest(candidate_hash, expected_hash_hex)
+
+
+# =========================================================================
+# Cryptographic STIX 2.1 CTI Signing & Non-Repudiation (AUDIT-OBS-16, AUDIT-OBS-36)
+# =========================================================================
 _STIX_SIGNING_KEY: ec.EllipticCurvePrivateKey | None = None
 
 
 def get_stix_signing_key() -> ec.EllipticCurvePrivateKey:
-    """Retrieves or lazily generates the sovereign municipal ECDSA SECP256R1 signing key."""
+    """
+    Retrieves or deterministically derives the sovereign municipal ECDSA SECP256R1 signing key.
+    Loads from STIX_SIGNING_KEY_HEX if configured, otherwise falls back to ephemeral key.
+    """
     global _STIX_SIGNING_KEY
     if _STIX_SIGNING_KEY is None:
-        _STIX_SIGNING_KEY = ec.generate_private_key(ec.SECP256R1())
+        try:
+            from hares.core.config import get_settings
+
+            settings = get_settings()
+            if settings.STIX_SIGNING_KEY_HEX and len(settings.STIX_SIGNING_KEY_HEX.strip()) >= 64:
+                scalar = int(settings.STIX_SIGNING_KEY_HEX.strip(), 16)
+                _STIX_SIGNING_KEY = ec.derive_private_key(scalar, ec.SECP256R1())
+            else:
+                _STIX_SIGNING_KEY = ec.generate_private_key(ec.SECP256R1())
+        except Exception:
+            _STIX_SIGNING_KEY = ec.generate_private_key(ec.SECP256R1())
     return _STIX_SIGNING_KEY
 
 

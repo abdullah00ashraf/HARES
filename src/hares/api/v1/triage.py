@@ -4,8 +4,9 @@ import time
 import uuid
 from decimal import Decimal
 from typing import Any
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile, status
 from pydantic import BaseModel, Field
+from hares.services.rate_limiter import RedisTokenBucketRateLimiter
 
 from hares.ai.asr_client import LocalASRClient
 from hares.ai.audio_classifier import AudioDeepfakeClassifier
@@ -97,6 +98,7 @@ class TriageVerificationResponse(BaseModel):
 
 @router.post("/verify", response_model=TriageVerificationResponse)
 async def verify_content(
+    request: Request,
     text: str | None = Form(None),
     url: str | None = Form(None),
     file: UploadFile | None = File(None),
@@ -107,6 +109,18 @@ async def verify_content(
     Performs deterministic verification and local sovereign AI inference, returning
     immediate tri-state verdicts with official Dubai Police escalation pathways.
     """
+    # AUDIT-OBS-34: Token-Bucket Rate Limiter per client IP for web triage
+    forwarded = request.headers.get("X-Forwarded-For")
+    client_ip = forwarded.split(",")[0].strip() if forwarded else (request.client.host if request.client else "127.0.0.1")
+    limiter = RedisTokenBucketRateLimiter()
+    rl_result = limiter.check_web_triage_rate_limit(client_ip)
+    if not rl_result.is_allowed:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=f"Rate limit exceeded for citizen web triage ({rl_result.max_allowed} requests/minute). Please slow down.",
+            headers={"Retry-After": str(rl_result.reset_seconds)},
+        )
+
     start_time = time.perf_counter()
     request_id = str(uuid.uuid4())
     active_domains = await _get_active_allowlist_domains_async()

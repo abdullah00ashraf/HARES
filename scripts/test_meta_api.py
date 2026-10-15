@@ -50,6 +50,8 @@ def test_meta_connection(recipient_phone: str | None = None) -> bool:
     env = load_env_file(env_path)
 
     token = os.environ.get("WHATSAPP_ACCESS_TOKEN") or env.get("WHATSAPP_ACCESS_TOKEN", "")
+    if not token or token.startswith("EAAG_staging") or len(token) < 15:
+        token = os.environ.get("WHATSAPP_ACCESS_TOKEN_PERMAMENT") or env.get("WHATSAPP_ACCESS_TOKEN_PERMAMENT", "")
     phone_id = os.environ.get("WHATSAPP_PHONE_NUMBER_ID") or env.get("WHATSAPP_PHONE_NUMBER_ID", "")
     api_version = os.environ.get("WHATSAPP_API_VERSION") or env.get("WHATSAPP_API_VERSION", "v21.0")
     base_url = (os.environ.get("WHATSAPP_API_BASE_URL") or env.get("WHATSAPP_API_BASE_URL", "https://graph.facebook.com")).rstrip("/")

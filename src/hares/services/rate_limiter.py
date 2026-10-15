@@ -127,6 +127,60 @@ class RedisTokenBucketRateLimiter:
                 reset_seconds=window_seconds,
             )
 
+    def check_web_triage_rate_limit(
+        self,
+        client_identifier: str,
+        max_requests: int | None = None,
+        window_seconds: int = 60,
+    ) -> RateLimitResult:
+        """
+        Atomically limits requests per client IP / identifier for web triage (AUDIT-OBS-34) (default: 15 req/min).
+        Protects the public triage pipeline from denial-of-service and brute-force probing.
+        """
+        settings = get_settings()
+        limit = max_requests if max_requests is not None else settings.TRIAGE_WEB_RATE_LIMIT_PER_MINUTE
+        key = f"rl:triage_web:{client_identifier.strip().lower()}"
+        try:
+            try:
+                res = self._redis.eval(self._LUA_RATE_LIMIT_SCRIPT, 1, key, window_seconds)
+                if isinstance(res, (list, tuple)) and len(res) >= 2:
+                    count = int(res[0])
+                    ttl = int(res[1])
+                else:
+                    count = int(res)
+                    ttl = window_seconds
+            except (redis.ResponseError, AttributeError):
+                count = self._redis.incr(key)
+                if count == 1:
+                    self._redis.expire(key, window_seconds)
+                ttl = self._redis.ttl(key)
+
+            reset_seconds = ttl if ttl > 0 else window_seconds
+            is_allowed = count <= limit
+
+            return RateLimitResult(
+                is_allowed=is_allowed,
+                current_count=count,
+                max_allowed=limit,
+                reset_seconds=reset_seconds,
+            )
+        except redis.RedisError as exc:
+            logger.error("Redis connection error during web triage rate limiting check: %s", str(exc))
+            return RateLimitResult(
+                is_allowed=True,
+                current_count=1,
+                max_allowed=limit,
+                reset_seconds=window_seconds,
+            )
+
+    def reset_web_triage_limit(self, client_identifier: str) -> None:
+        """Clears web triage rate limit key for testing or administrative resets."""
+        key = f"rl:triage_web:{client_identifier.strip().lower()}"
+        try:
+            self._redis.delete(key)
+        except redis.RedisError as exc:
+            logger.error("Failed to delete web triage rate limit key: %s", str(exc))
+
     def reset_limit(self, citizen_user_hash: str) -> None:
         """Clears rate limit key for testing or administrative resets."""
         key = f"rl:citizen:{citizen_user_hash.strip().lower()}"
@@ -134,3 +188,4 @@ class RedisTokenBucketRateLimiter:
             self._redis.delete(key)
         except redis.RedisError as exc:
             logger.error("Failed to delete rate limit key: %s", str(exc))
+

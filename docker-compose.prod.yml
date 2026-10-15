@@ -125,13 +125,14 @@ services:
     container_name: hares-slm
     restart: always
     ports:
-      - "8001:8000"
+      - "127.0.0.1:8001:8000"
     command: [
       "--model", "Qwen/Qwen2.5-3B-Instruct",
       "--dtype", "bfloat16",
       "--max-model-len", "2048",
       "--gpu-memory-utilization", "0.85",
-      "--enforce-eager"
+      "--enforce-eager",
+      "--api-key", "${SLM_API_KEY:-hares_internal_slm_key}"
     ]
     networks:
       - hares_internal
@@ -228,7 +229,7 @@ services:
     container_name: hares-prometheus
     restart: always
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     networks:

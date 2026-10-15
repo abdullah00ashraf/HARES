@@ -123,3 +123,31 @@ def seed_official_domains_if_empty() -> int:
             inserted_count += 1
         return inserted_count
 
+
+def seed_security_credentials_if_empty() -> bool:
+    """
+    Seeds hashed and salted municipal SOC administrative credentials (NFR-1.3).
+    Ensures zero plaintext passkeys or passwords persisted.
+    """
+    from hares.core.config import get_settings
+    from hares.db.models import SecurityCredential
+    from hares.db.session import sync_session_scope
+    from sqlalchemy import select
+
+    settings = get_settings()
+    with sync_session_scope() as session:
+        existing = session.execute(
+            select(SecurityCredential).where(SecurityCredential.credential_name == "soc_admin_passkey")
+        ).scalar_one_or_none()
+        if existing is not None:
+            return False
+
+        cred = SecurityCredential(
+            credential_name="soc_admin_passkey",
+            salt_hex=settings.SOC_ADMIN_SALT_HEX,
+            hash_hex=settings.SOC_ADMIN_PASSWORD_HASH,
+            algorithm="pbkdf2_sha256",
+        )
+        session.add(cred)
+        return True
+

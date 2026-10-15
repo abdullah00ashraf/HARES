@@ -1,14 +1,18 @@
 import csv
 import io
+import secrets
 import uuid
 from datetime import datetime, timezone
-from typing import Any
-from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from typing import Annotated, Any
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
 from pydantic import BaseModel, ConfigDict, Field
 from hares.api.deps import verify_analyst_key
+from hares.core.config import get_settings
+from hares.core.security import verify_passkey_pbkdf2
 from hares.db.repositories.threat_repo import ThreatRepository
 from hares.db.session import async_session_scope
 
+auth_router = APIRouter(prefix="/threats/auth", tags=["Municipal Auth"])
 router = APIRouter(prefix="/threats", dependencies=[Depends(verify_analyst_key)])
 
 
@@ -40,6 +44,67 @@ class ThreatCampaignSchema(BaseModel):
     first_detected_at: str
     last_detected_at: str
     indicator_count: int
+
+
+class AuthVerifyRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    passkey: str | None = None
+
+
+@auth_router.post("/verify", status_code=status.HTTP_200_OK)
+async def verify_soc_credentials(
+    payload: AuthVerifyRequest | None = None,
+    x_api_key: Annotated[str | None, Header(alias="X-API-Key")] = None,
+    authorization: Annotated[str | None, Header(alias="Authorization")] = None,
+) -> dict[str, Any]:
+    """
+    Verifies municipal security clearance passkey or analyst API key (NFR-1.3).
+    Supports validation via JSON body {'passkey': '...'}, 'X-API-Key' header,
+    or 'Authorization: Bearer <token>' in constant time.
+    """
+    settings = get_settings()
+    candidate: str | None = None
+    if payload and payload.passkey and payload.passkey.strip():
+        candidate = payload.passkey.strip()
+    elif x_api_key and x_api_key.strip():
+        candidate = x_api_key.strip()
+    elif authorization and authorization.strip():
+        parts = authorization.strip().split()
+        if len(parts) == 2 and parts[0].lower() == "bearer":
+            candidate = parts[1]
+        else:
+            candidate = parts[0]
+
+    if not candidate:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Security clearance passkey or API key required.",
+            headers={"WWW-Authenticate": "ApiKey"},
+        )
+
+    is_analyst = secrets.compare_digest(candidate, settings.ANALYST_API_KEY)
+    is_admin_hash = verify_passkey_pbkdf2(
+        candidate, settings.SOC_ADMIN_SALT_HEX, settings.SOC_ADMIN_PASSWORD_HASH
+    )
+    is_admin_override = (
+        secrets.compare_digest(candidate, settings.SOC_ADMIN_PASSWORD)
+        if settings.SOC_ADMIN_PASSWORD
+        else False
+    )
+
+    if not (is_analyst or is_admin_hash or is_admin_override):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Invalid security clearance passkey. Access denied.",
+        )
+
+    return {
+        "status": "authenticated",
+        "authenticated": True,
+        "role": "soc_analyst",
+        "jurisdiction": "Dubai & UAE",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
 
 
 @router.get("/overview", status_code=status.HTTP_200_OK)
