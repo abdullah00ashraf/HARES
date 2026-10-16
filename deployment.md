@@ -526,16 +526,20 @@ python scripts/stage_cluster.py --smoke-test
 * **Phase 5:** STIX 2.1 CTI bundle verification with ECDSA SECP256R1 signature and Next.js portal verification.
 
 ### Step 3: Execute Real-World Multi-Modal Test Suite
+
 ```bash
 python realtest/run_realtest_suite.py
 ```
+
 Validates all 23 real-world test cases across Arabic traffic fines, ENBD KYC suspensions, Salik homographs, voice notes, and screenshot OCR.
 
 ### Step 4: Execute Master Benchmark Certification Pipeline
+
 ```bash
 python scripts/run_benchmark_certification_pipeline.py --all --export-codalab
 ```
 Evaluates the model across:
+
 * **CyberSecEval v3.0:** Prompt injection immunity (**0.00% ASR**).
 * **ASVspoof 2021 DF:** Acoustic deepfake detection (**0.00% EER, 0.0000% FPR**).
 * **Dialect Equity:** Parity ratio $\ge 0.80$ across Emirati Gulf, MSA, English, and Arabizi.

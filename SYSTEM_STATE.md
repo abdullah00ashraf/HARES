@@ -1,8 +1,26 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Production Verified; Hugging Face ZeroGPU Neural Routing Deployed; Terms & Conditions and Citizen Privacy Policy (FR-4.1) Deployed; Next.js 15 Modal & Static Routes (/terms, /privacy) Active; Neon PostgreSQL 16 & Redis Rate Limiting Intact
-**Last Updated:** 2026-10-15  
-**Version:** 2.7.0-compliance-and-neural-routing  
+**Current Status:** Production Verified; Milestone 52 Executed: Zero-Disruption Security Hardening, Dynamic Conformal & Dialect Badges, Live 4-Tier Pipeline Progress Stepper, Cold-Start Shield, Explainable AI Token Highlighter, WhatsApp Family Protection Broadcast, STIX Pan/Zoom Viewport Stability; Neon PostgreSQL 16 & Upstash Redis 7 TLS Intact
+**Last Updated:** 2026-10-16  
+**Version:** 2.8.0-milestone-52-security-and-ux-overhaul  
+
+---
+
+## 0. Institutional Deployment Tiers: Public Evaluation vs. UAE Sovereign Production
+
+Project Hares supports two distinct operational deployment tiers depending on institutional data sovereignty and governance mandates:
+
+* **Tier 1: Public Evaluation & Showcase Tier (Free-Tier Sovereign Hybrid):**
+  * **Frontend Edge:** Vercel Edge Global CDN ([`hares-wheat.vercel.app`](https://hares-wheat.vercel.app)).
+  * **API Gateway:** Render Webhook Gateway ([`hares-api.onrender.com`](https://hares-api.onrender.com)).
+  * **Database & Queues:** Neon Serverless PostgreSQL 16 (`us-east-2`) with `pgvector` and Upstash Redis 7 TLS.
+  * **Neural Inference:** Hugging Face ZeroGPU Space ([`abdullahashraf122/hares-neural-engine`](https://huggingface.co/spaces/abdullahashraf122/hares-neural-engine)) running Qwen2.5-3B on shared NVIDIA A10G hardware.
+  * **Purpose:** Continuous zero-cost citizen triage access, community evaluation, and portfolio demonstration.
+
+* **Tier 2: UAE Sovereign Municipal Production Tier (Moro Hub / AWS me-central-1):**
+  * **Air-Gapped Clustering:** Deployed via [`docker-compose.prod.yml`](docker-compose.prod.yml) within UAE borders (Moro Hub Sovereign Cloud or AWS UAE Region `me-central-1`).
+  * **Hermetic Boundary:** 100% air-gapped from offshore cloud dependencies (`NFR-1.1`). Runs local vLLM daemons on dedicated on-premise NVIDIA A10G/T4 GPUs, containerized PostgreSQL 16 with TLS, local Redis, and sovereign FFmpeg/AASIST audio pipelines.
+  * **Regulatory Compliance:** Fully compliant with UAE Federal Decree-Law No. 45/2021 on Personal Data Protection (PDPL), Dubai Electronic Security Center (DESC) Information Security Regulation (ISR v2.0), and UAE National Cyber Security Council (NCSC) data residency mandates. Zero Class B citizen data or audio telemetry leaves UAE sovereign jurisdiction.
 
 ---
 

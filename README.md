@@ -205,6 +205,24 @@ docker compose -f docker-compose.prod.yml up -d --build
 
 ---
 
+## 🏛️ Two-Tier Deployment Architecture: Public Evaluation vs. Sovereign Production
+
+Project Hares supports two distinct operational deployment tiers depending on institutional data sovereignty and governance mandates:
+
+* **Tier 1: Public Evaluation & Showcase Tier (Free-Tier Sovereign Hybrid):**
+  * **Frontend Edge:** Vercel Edge Global CDN ([`hares-wheat.vercel.app`](https://hares-wheat.vercel.app)).
+  * **API Gateway:** Render Webhook Gateway ([`hares-api.onrender.com`](https://hares-api.onrender.com)).
+  * **Database & Queues:** Neon Serverless PostgreSQL 16 (`us-east-2`) with `pgvector` and Upstash Redis 7 TLS.
+  * **Neural Inference:** Hugging Face ZeroGPU Space ([`abdullahashraf122/hares-neural-engine`](https://huggingface.co/spaces/abdullahashraf122/hares-neural-engine)) running Qwen2.5-3B on shared NVIDIA A10G hardware.
+  * **Purpose:** Public evaluation, portfolio demonstration, and continuous zero-cost citizen triage access.
+
+* **Tier 2: UAE Sovereign Municipal Production Tier (Moro Hub / AWS me-central-1):**
+  * **Air-Gapped Clustering:** Deployed via [`docker-compose.prod.yml`](docker-compose.prod.yml) within UAE borders (Moro Hub Sovereign Cloud or AWS UAE Region `me-central-1`).
+  * **Hermetic Boundary:** 100% air-gapped from offshore cloud dependencies (`NFR-1.1`). Runs local vLLM daemons on dedicated on-premise NVIDIA A10G/T4 GPUs, containerized PostgreSQL 16 with TLS, local Redis, and sovereign FFmpeg/AASIST audio pipelines.
+  * **Regulatory Compliance:** Compliant with UAE Federal Decree-Law No. 45/2021 on Personal Data Protection (PDPL), Dubai Electronic Security Center (DESC) Information Security Regulation (ISR v2.0), and UAE National Cyber Security Council (NCSC) data residency mandates. Zero Class B citizen data or audio telemetry ever leaves UAE sovereign jurisdiction.
+
+---
+
 ## 📚 Master Documentation & Publications
 
 * **Master Technical Report (PDF):** [`docs/Project_Hares_Master_Technical_Report.pdf`](docs/Project_Hares_Master_Technical_Report.pdf) — Complete 10-page executive specification with running headers, DFD, and empirical audit figures.

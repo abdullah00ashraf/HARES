@@ -361,7 +361,7 @@ class LocalSLMClient:
             tactics.append("banking_kyc_freeze")
         if any(w in lower or w in text for w in ["جائزة", "lottery", "مبروك", "million", "prize", "rabihit", "mabrook", "500,000"]):
             tactics.append("lottery_prize")
-        if any(w in lower or w in text for w in ["crypto", "wealth", "invest", "returns", "18.5%", "usdt", "telegram"]):
+        if any(w in lower or w in text for w in ["crypto", "wealth", "invest", "returns", "18.5%", "usdt", "telegram", "t.me", "300%", "guaranteed returns"]):
             tactics.append("crypto_investment")
         if any(w in lower for w in ["<|im_start|>", "ignore all previous instructions", "system override"]):
             tactics.append("prompt_injection")
@@ -396,7 +396,7 @@ class LocalSLMClient:
                 or (impersonated == "Emirates Post" and (urgency or financial_demand))
                 or (impersonated == "UAE Central Bank")
                 or ("lottery_prize" in tactics and (has_harvesting or "otp" in lower or financial_demand))
-                or ("crypto_investment" in tactics)
+                or ("crypto_investment" in tactics and (has_harvesting or "telegram" in lower or "t.me" in lower or financial_demand or urgency or "http" in lower))
                 or ("prompt_injection" in tactics)
             )
 
@@ -423,10 +423,20 @@ class LocalSLMClient:
                 is_impersonation = False
                 confidence = 0.40
                 summary = "Unverified external destination detected without authority impersonation."
-            else:
+            elif (
+                any(t in tactics for t in ["crypto_investment", "lottery_prize"])
+                or any(w in lower for w in ["crypto", "invest", "returns", "wealth", "lottery", "prize", "rabihit", "telegram", "t.me", "300%", "guaranteed"])
+            ):
+                # Safeguard 1: Unverified speculative crypto/lottery lures stay Amber
                 is_impersonation = False
-                confidence = 0.10
-                summary = "No clear social engineering or authority impersonation pattern identified."
+                confidence = 0.45
+                summary = "Unverified speculative financial, lottery, or investment lure."
+            else:
+                # Clean benign conversational syntax (English, Arabizi, Gulf Arabic)
+                is_impersonation = False
+                confidence = 0.05
+                tactics = ["none"]
+                summary = "Benign conversational message with no threats, links, or credential demands."
 
         if not tactics:
             tactics = ["none"]

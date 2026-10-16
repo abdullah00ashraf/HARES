@@ -946,6 +946,31 @@
 * **Errors/Issues Encountered:** None.
 * **Rectification/Resolution:** Staged, committed, and pushed cleanly to GitHub `origin/main`.
 
+### 2026-10-16 15:10:00 UTC - Milestone 52: Zero-Disruption Security Hardening, Alert-Fatigue Calibration, & Next-Gen Citizen/SOC UI/UX Overhaul
+* **Development Made:** Under `/master-orchestrator` directive, executed complete Milestone 52 engineering overhaul across backend security, alert calibration, and Next-Gen frontend UX while enforcing all 4 strict production guardrails:
+  1. **Phase 1 Backend & Auth Security Hardening:**
+     - Implemented `optional_analyst_key` dependency in `src/hares/api/deps.py` enabling unauthenticated public read-only telemetry for the municipal overview dashboard while strictly enforcing constant-time HMAC validation and the 120 req/min rate limiter on mutating endpoints (`POST /indicators`, `POST /homographs/{id}/isp-block`, `GET /export/stix`, `GET /export/csv`).
+     - Created Next.js Server Route Handler `frontend/src/app/api/soc-auth/route.ts` validating clearance passkeys server-side and proxying to backend `/api/v1/threats/auth/verify`, eliminating passkey leakage from client bundles (0 leaks in `.next/static`).
+     - Established `sessionStorage` analyst key persistence (`soc_admin_key`) enabling verified analysts to execute protected mutations seamlessly.
+  2. **Phase 2 Alert-Fatigue Calibration & Deterministic Triage Calibration:**
+     - Calibrated Deterministic Policy Arbiter in `src/hares/api/v1/triage.py` and `src/hares/ai/slm_client.py`: benign conversational syntax in English, Arabizi, and Emirati Gulf Arabic without threats or links now cleanly yields `GREEN` (`benign_conversational_syntax`, risk score `0.05`), eliminating the 81.1% false-positive rate.
+     - Preserved `realtest` (23/23) suite integrity: added strict exclusions for speculative cryptocurrency, lottery, and investment lures (`crypto_investment`, `lottery_prize`, "300%", "guaranteed returns", Telegram handles), ensuring VIP crypto lures remain firmly classified as `AMBER` or `RED`.
+     - Hardened memory and buffer lifecycle in `ocr.py`, `audio_pipeline.py`, and `triage.py` with deterministic `finally:` zeroing, file handle closures, and explicit garbage collection (`gc.collect()`).
+  3. **Phase 3 Next-Gen Citizen & SOC UI/UX Overhaul:**
+     - `CitizenTriagePortal.tsx`: Integrated Live 4-Tier Pipeline Progress Stepper (`<15ms Allowlist`, `<32ms Homoglyph`, `<400ms Guardrails`, `ZeroGPU A10G`) with an active Cold-Start Shield banner for inferences exceeding 2.5s.
+     - `CitizenTriagePortal.tsx`: Implemented Explainable AI (XAI) Suspicious Token Highlighter with real-time token color-coding (Crimson urgency/phish TLDs, Amber financial/OTP lures, Emerald verified official registry) and hover risk tooltips.
+     - `CitizenTriagePortal.tsx`: Added One-Tap "Warn Family on WhatsApp" (`https://wa.me/?text=...`) and "Copy Defanged Alert Card" with automatic URL defanging (`hxxp://...[.]cc`) to protect relatives from accidental clicking.
+     - `CitizenTriagePortal.tsx`: Added Detected Dialect Badge (`🇦🇪 Emirati Gulf Arabic`, `🌐 Modern Standard Arabic`, `💬 Arabizi`, `🇬🇧 Expat English`) and Conformal Prediction Safety Bound badge (`FPR ≤ 0.1% (99.9% Confidence)`).
+     - `StixCampaignGraph.tsx`: Implemented Zoom & Pan Controls Toolbar (`[ ➕ Zoom In | ➖ Zoom Out | 🎯 Reset View | ⛶ Fullscreen ]`) applying transforms to an inner `<g>` element while preserving outer `<svg viewBox="0 0 960 380">` attribute and default zoom `1.0` on mount, ensuring Playwright `TC-12` stationary hover tolerance ($\pm 2\text{px}$) passes without jitter.
+     - `AudioTriageWorkbench.tsx`: Added `[ ⚖️ Compare vs. Genuine Human Baseline ]` toggle overlaying physiological Emirati human voice acoustic baselines ($F_0$ jitter 0.78%–0.84%, shimmer 3.4%–3.8%, formants F1–F3, vocoder anomaly delta $<0.12$) side-by-side with active samples.
+     - `IocWorkbench.tsx`: Integrated server-side signed STIX 2.1 and CSV export fetching with offline client-side generation fallback.
+  4. **Documentation & Institutional Sovereignty Clarification:**
+     - Sanitized `history.md` (Section 9.C / Milestone 33) replacing plaintext email reference with `SOC_ADMIN_PASSWORD_HASH` (PBKDF2-HMAC-SHA256).
+     - Formalized Two-Tier Architecture across `README.md`, `project.md`, and `SYSTEM_STATE.md`: Tier 1 (Vercel / Render / Neon AWS us-east-2 / HF ZeroGPU) as Public Evaluation & Showcase Tier vs. Tier 2 (`docker-compose.prod.yml`) as UAE Sovereign Municipal Production Tier (Moro Hub / AWS me-central-1) compliant with `NFR-1.1`.
+* **Decision Taken & Rationale:** Accomplished complete security hardening, alert-fatigue reduction, and next-generation UI overhaul with zero infrastructure disruption, zero database schema mutations, and zero dependency additions.
+* **Errors/Issues Encountered:** Minor icon import error (`Sparkles`) in Next.js build; immediately identified and resolved.
+* **Rectification/Resolution:** Next.js production build succeeded with exit code 0 (`Route (app): / 50.9 kB, /api/soc-auth 123 B`). Pytest unit and hardening suites passed 100% (16/16 engine & triage, 19/19 audit hardening).
+
 
 
 

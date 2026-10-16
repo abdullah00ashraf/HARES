@@ -85,6 +85,11 @@ Existing public fraud defenses suffer from three systemic shortcomings:
   └─────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
+### 1.3 Institutional Deployment Tiers: Public Evaluation vs. UAE Sovereign Production
+Project Hares formalizes two operational tiers:
+* **Tier 1 (Public Evaluation & Showcase Tier):** Vercel Edge Global CDN (`hares-wheat.vercel.app`), Render Webhook Gateway (`hares-api.onrender.com`), Neon Serverless PostgreSQL 16 (`us-east-2`), Upstash Redis 7 TLS, and Hugging Face ZeroGPU Space (`abdullahashraf122/hares-neural-engine`). Optimized for global demonstration, low cost, and portfolio review.
+* **Tier 2 (UAE Sovereign Municipal Production Tier):** Single-command hermetic deployment via `docker-compose.prod.yml` within UAE sovereign boundaries (Moro Hub Sovereign Cloud or AWS UAE Region `me-central-1`). Air-gapped from offshore networks (`NFR-1.1`), running local vLLM instances on dedicated on-premise NVIDIA A10G/T4 GPUs, containerized PostgreSQL 16 with TLS, local Redis, and sovereign FFmpeg/AASIST audio processing, fully fulfilling UAE Federal Decree-Law No. 45/2021 (PDPL) and DESC ISR v2.0 mandates. Zero Class B citizen data or audio telemetry ever leaves UAE sovereign jurisdiction.
+
 ---
 
 ## 2. Complete Repository Directory & File Inventory

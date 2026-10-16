@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ThreatIndicator } from "../lib/types";
-import { fetchIndicators } from "../lib/api";
+import { fetchIndicators, fetchServerStixExport, fetchServerCsvExport } from "../lib/api";
 import { generateCsvFeed, generateStixBundle } from "../lib/stix";
 import { soundFx } from "../lib/audioSoundFx";
 import {
@@ -58,8 +58,23 @@ export default function IocWorkbench() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  const downloadStix = () => {
+  const downloadStix = async () => {
     soundFx.playClick();
+    try {
+      const serverBundle = await fetchServerStixExport();
+      const blob = new Blob([serverBundle], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "hares_stix21_feed.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return;
+    } catch {
+      // Fallback to client-side STIX bundle generator
+    }
     const jsonStr = generateStixBundle(indicators);
     const blob = new Blob([jsonStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -72,8 +87,23 @@ export default function IocWorkbench() {
     URL.revokeObjectURL(url);
   };
 
-  const downloadCsv = () => {
+  const downloadCsv = async () => {
     soundFx.playClick();
+    try {
+      const serverCsv = await fetchServerCsvExport();
+      const blob = new Blob([serverCsv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "hares_threat_indicators.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      return;
+    } catch {
+      // Fallback to client-side CSV generator
+    }
     const csvStr = generateCsvFeed(indicators);
     const blob = new Blob([csvStr], { type: "text/csv" });
     const url = URL.createObjectURL(blob);

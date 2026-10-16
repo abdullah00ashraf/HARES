@@ -9,10 +9,8 @@ import {
 } from "./types";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://hares-api.onrender.com";
 
-export const DEFAULT_SOC_ADMIN_PASSKEY = "APPledbx@33#hinxtolnimda";
-
 export function getAnalystHeaders(): Record<string, string> {
-  let key = process.env.NEXT_PUBLIC_ANALYST_KEY || DEFAULT_SOC_ADMIN_PASSKEY;
+  let key = process.env.NEXT_PUBLIC_ANALYST_KEY || "";
   if (typeof window !== "undefined") {
     try {
       const saved = sessionStorage.getItem("soc_admin_key");
@@ -36,11 +34,22 @@ export async function verifySocPasskey(passkey: string): Promise<boolean> {
   const trimmed = passkey.trim();
   if (!trimmed) return false;
 
-  // Resilient fast-path check for master administrative passkey
-  if (trimmed === DEFAULT_SOC_ADMIN_PASSKEY) {
-    return true;
+  // 1. Next.js Server Route Handler proxy (/api/soc-auth) - keeps passkey out of client bundles
+  try {
+    const res = await fetch("/api/soc-auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passkey: trimmed }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return Boolean(data.authenticated);
+    }
+  } catch {
+    // If running in environment without Next.js server route, fallback directly to backend
   }
 
+  // 2. Direct Backend fallback
   try {
     const res = await fetch(`${API_BASE}/api/v1/threats/auth/verify`, {
       method: "POST",
@@ -54,7 +63,7 @@ export async function verifySocPasskey(passkey: string): Promise<boolean> {
     const data = await res.json();
     return Boolean(data.authenticated);
   } catch {
-    return trimmed === DEFAULT_SOC_ADMIN_PASSKEY;
+    return false;
   }
 }
 
@@ -612,14 +621,71 @@ export async function verifyCitizenSubmission(
       };
     }
 
+    // Check for benign conversational syntax (zero links, zero threats, zero credential demands)
+    const hasUrls = Boolean(url && url.trim()) || combined.includes("http://") || combined.includes("https://");
+    const hasFinancialOrCoercion =
+      combined.includes("otp") ||
+      combined.includes("emirates id") ||
+      combined.includes("cvv") ||
+      combined.includes("iban") ||
+      combined.includes("password") ||
+      combined.includes("credit card") ||
+      combined.includes("card") ||
+      combined.includes("lottery") ||
+      combined.includes("prize") ||
+      combined.includes("crypto") ||
+      combined.includes("300%") ||
+      combined.includes("investment") ||
+      combined.includes("wealth") ||
+      combined.includes("telegram") ||
+      combined.includes("t.me") ||
+      combined.includes("pay") ||
+      combined.includes("fee") ||
+      combined.includes("derham") ||
+      combined.includes("aed") ||
+      combined.includes("police") ||
+      combined.includes("fine") ||
+      combined.includes("court") ||
+      combined.includes("arrest") ||
+      combined.includes("freeze");
+
+    if (!hasUrls && !hasFinancialOrCoercion && text.trim().length > 0) {
+      return {
+        request_id: `offline-${Date.now()}`,
+        verdict: "GREEN",
+        rule_triggered: "benign_conversational_syntax",
+        reason: "Benign conversational syntax with no authority impersonation, financial demands, or threat indicators.",
+        risk_score: 0.05,
+        response_template_en: "🟢 BENIGN CONVERSATIONAL COMMUNICATION: No phishing markers, authority claims, or financial demands detected.",
+        response_template_ar: "🟢 محادثة عادية آمنة: لم يتم رصد أي مؤشرات احتيال أو طلبات بيانات أو انتحال لجهات رسمية.",
+        extracted_entities: {
+          urls: [],
+          domains: [],
+          phone_numbers: [],
+          ibans: [],
+          crypto_wallets: [],
+        },
+        input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
+        execution_latency_ms: 65,
+        model_engine: "Sovereign Deterministic Engine (NLP Heuristics)",
+        privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
+      };
+    }
+
     return {
       request_id: `offline-${Date.now()}`,
       verdict: "AMBER",
-      rule_triggered: "unverified_default_caution",
-      reason: "Submission does not match authenticated official allowlist; authenticity cannot be proven.",
+      rule_triggered: "unverified_source_fallback",
+      reason: hasUrls
+        ? "External commercial or third-party web link detected without direct phishing indicators or government impersonation. Verify the sender independently before clicking."
+        : "Submission does not match authenticated official allowlist; authenticity cannot be proven.",
       risk_score: 0.45,
-      response_template_en: "🟡 UNVERIFIED / PROCEED WITH CAUTION: Do not share OTPs, credit cards, or passwords.",
-      response_template_ar: "🟡 تنبيه: غير موثق / يرجى توخي الحذر وتجنب مشاركة بياناتك السرية.",
+      response_template_en: hasUrls
+        ? "🟡 UNVERIFIED COMMERCIAL LINK: External commercial destination. Exercise normal caution and verify the sender."
+        : "🟡 UNVERIFIED / PROCEED WITH CAUTION: Do not share OTPs, credit cards, or passwords.",
+      response_template_ar: hasUrls
+        ? "🟡 رابط خارجي غير موثق: وجهة إلكترونية تجارية خارجية. يرجى توخي الحذر المعتاد والتأكد من المرسل."
+        : "🟡 تنبيه: غير موثق / يرجى توخي الحذر وتجنب مشاركة بياناتك السرية.",
       extracted_entities: {
         urls: url ? [url] : [],
         domains: [],
@@ -633,4 +699,20 @@ export async function verifyCitizenSubmission(
       privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
     };
   }
+}
+
+export async function fetchServerStixExport(): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/v1/threats/export/stix`, {
+    headers: getAnalystHeaders(),
+  });
+  if (!res.ok) throw new Error(`STIX export failed: HTTP ${res.status}`);
+  return await res.text();
+}
+
+export async function fetchServerCsvExport(): Promise<string> {
+  const res = await fetch(`${API_BASE}/api/v1/threats/export/csv`, {
+    headers: getAnalystHeaders(),
+  });
+  if (!res.ok) throw new Error(`CSV export failed: HTTP ${res.status}`);
+  return await res.text();
 }

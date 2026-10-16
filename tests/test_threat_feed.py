@@ -169,17 +169,24 @@ async def test_export_csv_feed():
 
 @pytest.mark.asyncio
 async def test_threat_feed_authentication_enforcement():
-    """Verifies rejection on missing or invalid API key."""
+    """Verifies public read telemetry access and strict authentication on mutating/sensitive endpoints (Milestone 52)."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        # 1. Missing API Key -> 401
-        resp_missing = await client.get("/api/v1/threats/overview")
-        assert resp_missing.status_code == 401
+        # 1. Missing API Key on protected mutating/sensitive endpoints -> 401
+        resp_post_missing = await client.post("/api/v1/threats/indicators", json={"indicator_type": "url", "raw_indicator": "http://evil.com"})
+        assert resp_post_missing.status_code == 401
 
-        # 2. Invalid API Key -> 403
+        resp_stix_missing = await client.get("/api/v1/threats/export/stix")
+        assert resp_stix_missing.status_code == 401
+
+        # 2. Public Read Telemetry without API key -> 200 (Zero citizen PII, Class A only)
+        resp_public_overview = await client.get("/api/v1/threats/overview")
+        assert resp_public_overview.status_code == 200
+
+        # 3. Invalid API Key on read endpoint -> 403 (optional_analyst_key validates when provided)
         resp_invalid = await client.get("/api/v1/threats/overview", headers={"X-API-Key": "invalid_analyst_key"})
         assert resp_invalid.status_code == 403
 
-        # 3. Bearer Token Auth -> 200
+        # 4. Bearer Token Auth -> 200
         resp_bearer = await client.get(
             "/api/v1/threats/overview",
             headers={"Authorization": f"Bearer {settings.ANALYST_API_KEY}"},

@@ -112,3 +112,11 @@ class OCREngine:
         except Exception as exc:
             logger.error("Failed to parse image bytes for %s: %s", filename_hint, str(exc))
             return ""
+        finally:
+            if "image" in locals():
+                try:
+                    image.close()
+                except Exception:
+                    pass
+            import gc
+            gc.collect()

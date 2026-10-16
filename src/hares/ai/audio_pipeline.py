@@ -131,36 +131,42 @@ class UnifiedAudioTriage:
             ValueError: If audio container is corrupted.
         """
         # 1. Container Ingestion & Duration Validation (120s limit per FR-1.5)
-        pcm_bytes, duration = self.preprocessor.preprocess(audio_bytes, filename_hint)
+        try:
+            pcm_bytes, duration = self.preprocessor.preprocess(audio_bytes, filename_hint)
 
-        # 2. Extract Acoustic Representations & Transcribe
-        transcript_text, detected_lang, raw_anomaly_score = self._execute_dual_head_inference(pcm_bytes, duration)
+            # 2. Extract Acoustic Representations & Transcribe
+            transcript_text, detected_lang, raw_anomaly_score = self._execute_dual_head_inference(pcm_bytes, duration)
 
-        # 3. Conformal Statistical Calibration (NFR-3.1, NFR-3.2)
-        conformal_eval = self.calibrator.evaluate_score(raw_anomaly_score)
+            # 3. Conformal Statistical Calibration (NFR-3.1, NFR-3.2)
+            conformal_eval = self.calibrator.evaluate_score(raw_anomaly_score)
 
-        logger.info(
-            "Unified Audio Triage complete: duration=%.2fs lang=%s anomaly=%.4f p_val=%.4f verdict=%s synthetic=%s abstain=%s",
-            duration,
-            detected_lang,
-            raw_anomaly_score,
-            conformal_eval["p_value"],
-            conformal_eval["verdict_band"],
-            conformal_eval["is_synthetic"],
-            conformal_eval["is_abstaining"],
-        )
+            logger.info(
+                "Unified Audio Triage complete: duration=%.2fs lang=%s anomaly=%.4f p_val=%.4f verdict=%s synthetic=%s abstain=%s",
+                duration,
+                detected_lang,
+                raw_anomaly_score,
+                conformal_eval["p_value"],
+                conformal_eval["verdict_band"],
+                conformal_eval["is_synthetic"],
+                conformal_eval["is_abstaining"],
+            )
 
-        return UnifiedAudioTriageResult(
-            transcript_text=transcript_text,
-            detected_language=detected_lang,
-            is_synthetic=bool(conformal_eval["is_synthetic"]),
-            non_conformity_score=float(conformal_eval["non_conformity_score"]),
-            p_value=float(conformal_eval["p_value"]),
-            is_abstaining=bool(conformal_eval["is_abstaining"]),
-            duration_seconds=duration,
-            anomaly_score=round(raw_anomaly_score, 4),
-            verdict_band=conformal_eval["verdict_band"],
-        )
+            return UnifiedAudioTriageResult(
+                transcript_text=transcript_text,
+                detected_language=detected_lang,
+                is_synthetic=bool(conformal_eval["is_synthetic"]),
+                non_conformity_score=float(conformal_eval["non_conformity_score"]),
+                p_value=float(conformal_eval["p_value"]),
+                is_abstaining=bool(conformal_eval["is_abstaining"]),
+                duration_seconds=duration,
+                anomaly_score=round(raw_anomaly_score, 4),
+                verdict_band=conformal_eval["verdict_band"],
+            )
+        finally:
+            if "pcm_bytes" in locals():
+                del pcm_bytes
+            import gc
+            gc.collect()
 
     def _execute_dual_head_inference(
         self,

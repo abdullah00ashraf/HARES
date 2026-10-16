@@ -6,14 +6,14 @@ from datetime import datetime, timezone
 from typing import Annotated, Any
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response, status
 from pydantic import BaseModel, ConfigDict, Field
-from hares.api.deps import verify_analyst_key
+from hares.api.deps import optional_analyst_key, verify_analyst_key
 from hares.core.config import get_settings
 from hares.core.security import verify_passkey_pbkdf2
 from hares.db.repositories.threat_repo import ThreatRepository
 from hares.db.session import async_session_scope
 
 auth_router = APIRouter(prefix="/threats/auth", tags=["Municipal Auth"])
-router = APIRouter(prefix="/threats", dependencies=[Depends(verify_analyst_key)])
+router = APIRouter(prefix="/threats", dependencies=[Depends(optional_analyst_key)])
 
 
 # Pydantic Schemas for Threat Intelligence Outputs (FR-4.3)
@@ -275,7 +275,7 @@ async def list_homographs(
         return homographs
 
 
-@router.post("/homographs/{indicator_id}/isp-block", status_code=status.HTTP_200_OK)
+@router.post("/homographs/{indicator_id}/isp-block", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_analyst_key)])
 async def trigger_isp_block(indicator_id: str) -> dict[str, str]:
     """Initiates an automated national ISP / TDRA firewall block request for a verified spoof."""
     try:
@@ -293,7 +293,7 @@ async def trigger_isp_block(indicator_id: str) -> dict[str, str]:
     }
 
 
-@router.get("/export/stix", status_code=status.HTTP_200_OK)
+@router.get("/export/stix", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_analyst_key)])
 async def export_stix_bundle() -> Response:
     """
     Serializes Class A threat indicators into an OASIS STIX 2.1 Cyber Threat Intelligence JSON bundle.
@@ -366,7 +366,7 @@ async def export_stix_bundle() -> Response:
 
 
 
-@router.get("/export/csv", status_code=status.HTTP_200_OK)
+@router.get("/export/csv", status_code=status.HTTP_200_OK, dependencies=[Depends(verify_analyst_key)])
 async def export_csv_feed() -> Response:
     """Exports all Class A indicators as a standardized CSV feed for forensic intelligence."""
     async with async_session_scope() as session:
@@ -542,7 +542,7 @@ async def get_model_and_system_metrics() -> dict[str, Any]:
     return metrics_data
 
 
-@router.post("/indicators", response_model=ThreatIndicatorSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/indicators", response_model=ThreatIndicatorSchema, status_code=status.HTTP_201_CREATED, dependencies=[Depends(verify_analyst_key)])
 async def create_threat_indicator(
     payload: CreateIndicatorRequest,
 ) -> ThreatIndicatorSchema:

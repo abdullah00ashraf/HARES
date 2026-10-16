@@ -497,8 +497,8 @@ Authored exhaustive 12-section operational guide structuring the Two-Tier Deploy
 
 1. **Master Admin Passkey Gate:**
    - Sealed internal Municipal SOC Analyst Dashboard behind a glassmorphic security clearance passkey gate in `Header.tsx` and `PortalModeContext.tsx`.
-   - Enforced Master Admin Passkey: `contact@abdullah.ashraf55780@gmail.com`.
-   - Implemented constant-time HMAC validation against `SOC_ADMIN_PASSWORD` in `src/hares/api/deps.py`.
+   - Enforced Master Admin Passkey verified against `SOC_ADMIN_PASSWORD_HASH` (PBKDF2-HMAC-SHA256 with 100,000 iterations and dedicated 32-byte salt).
+   - Implemented constant-time verification against PBKDF2 hash in `src/hares/api/deps.py` and `src/hares/core/security.py`.
    - Configured browser session persistence in `sessionStorage` (`soc_admin_key`) and instant `[ 🔒 Lock SOC ]` button.
 2. **Dynamic Live Telemetry Incrementing:**
    - Enhanced `ThreatRepository.get_overview_kpis_async` to count real audit records in `TriageAuditLog` and dynamically sum onto baseline municipal statistics (`1420 + total_scans`, `384 + red_count`, `612 + amber_count`).

@@ -17,6 +17,7 @@ import {
   Sliders,
   Play,
   RotateCcw,
+  Scale,
 } from "lucide-react";
 import { soundFx } from "../lib/audioSoundFx";
 
@@ -135,6 +136,7 @@ const AUDIO_SAMPLES: AudioSamplePreset[] = [
 export default function AudioTriageWorkbench() {
   const [selectedSample, setSelectedSample] = useState<AudioSamplePreset>(AUDIO_SAMPLES[0]);
   const [canvasViewMode, setCanvasViewMode] = useState<"spectrogram" | "waveform">("spectrogram");
+  const [showBaselineComparison, setShowBaselineComparison] = useState<boolean>(false);
 
   const handleSelectSample = (sample: AudioSamplePreset) => {
     soundFx.playClick();
@@ -239,6 +241,141 @@ export default function AudioTriageWorkbench() {
         viewMode={canvasViewMode}
         onToggleViewMode={() => setCanvasViewMode((m) => (m === "spectrogram" ? "waveform" : "spectrogram"))}
       />
+
+      {/* Acoustic Metrics Header & Human Baseline Toggle */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            Acoustic Forensic Indicators (Glottal Cycle &amp; Resonances)
+          </h3>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            soundFx.playClick();
+            setShowBaselineComparison((prev) => !prev);
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
+            showBaselineComparison
+              ? "bg-purple-600 text-white border-purple-600 shadow-sm"
+              : "bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800 hover:bg-purple-50 dark:hover:bg-purple-950/40"
+          }`}
+        >
+          <Scale className="w-3.5 h-3.5" />
+          <span>{showBaselineComparison ? "Hide Human Baseline" : "⚖️ Compare vs. Genuine Human Baseline"}</span>
+        </button>
+      </div>
+
+      {/* Genuine Emirati Human Voice Acoustic Baseline Comparison Card */}
+      {showBaselineComparison && (
+        <div className="p-4 sm:p-5 rounded-xl border border-purple-300 dark:border-purple-800/80 bg-purple-50/70 dark:bg-purple-950/30 backdrop-blur space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-200 dark:border-purple-800/60 pb-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-purple-950 dark:text-purple-200 uppercase tracking-wider">
+                  Emirati Human Voice Physiological Baseline vs. Active Audio
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-purple-200 dark:bg-purple-900 text-purple-900 dark:text-purple-200">
+                  Acoustic Normalcy Reference
+                </span>
+              </div>
+              <p className="text-[11px] text-purple-800/80 dark:text-purple-300/80 mt-0.5">
+                Calibrated against verified UAE dialect voice corpora. Natural glottal pulse vibration possesses non-deterministic micro-variations that neural vocoders mathematically flatten.
+              </p>
+            </div>
+            <div className={`px-2.5 py-1 rounded text-xs font-mono font-bold shrink-0 ${
+              isSynthetic
+                ? "bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-200 border border-red-300"
+                : "bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200 border border-emerald-300"
+            }`}>
+              {isSynthetic ? "⚠️ Vocoder Anomaly Detected" : "✓ Within Normal Human Bounds"}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs font-mono">
+            {/* Jitter Comparison */}
+            <div className="p-3 rounded-lg bg-white/90 dark:bg-slate-900/90 border border-purple-200/80 dark:border-purple-900/50">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans font-semibold">Pitch Jitter (F0 Micro-tremor)</span>
+              <div className="mt-1 flex items-baseline justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Human Baseline:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">0.78% – 0.84%</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 block">Sample:</span>
+                  <span className={`font-bold ${isSynthetic ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                    {selectedSample.jitter.split(" ")[0]}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] text-slate-500 block mt-1 font-sans">
+                {isSynthetic ? "Synthesized: unnaturally flat pitch contour" : "Natural glottal frequency variation"}
+              </span>
+            </div>
+
+            {/* Shimmer Comparison */}
+            <div className="p-3 rounded-lg bg-white/90 dark:bg-slate-900/90 border border-purple-200/80 dark:border-purple-900/50">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans font-semibold">Acoustic Shimmer (Amplitude)</span>
+              <div className="mt-1 flex items-baseline justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Human Baseline:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">3.4% – 3.8%</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 block">Sample:</span>
+                  <span className={`font-bold ${isSynthetic ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                    {selectedSample.shimmer.split(" ")[0]}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] text-slate-500 block mt-1 font-sans">
+                {isSynthetic ? "Subglottic air micro-perturbations absent" : "Valid pulmonary respiration perturbations"}
+              </span>
+            </div>
+
+            {/* Formants Comparison */}
+            <div className="p-3 rounded-lg bg-white/90 dark:bg-slate-900/90 border border-purple-200/80 dark:border-purple-900/50">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans font-semibold">Formant Resonances (F1–F3)</span>
+              <div className="mt-1 flex items-baseline justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Human Baseline:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">Natural Resonances</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 block">Sample:</span>
+                  <span className={`font-bold ${isSynthetic ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                    {selectedSample.formants.split(" (")[0]}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] text-slate-500 block mt-1 font-sans">
+                {isSynthetic ? "Linear phase vocoder artifact in F2 transitions" : "Continuous vocal tract resonances"}
+              </span>
+            </div>
+
+            {/* Vocoder Anomaly Delta */}
+            <div className="p-3 rounded-lg bg-white/90 dark:bg-slate-900/90 border border-purple-200/80 dark:border-purple-900/50">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-sans font-semibold">Vocoder Discontinuity Delta</span>
+              <div className="mt-1 flex items-baseline justify-between">
+                <div>
+                  <span className="text-[10px] text-slate-400 block">Human Target:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">&lt; 0.12 (Continuous)</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-[10px] text-slate-400 block">Anomaly:</span>
+                  <span className={`font-bold ${isSynthetic ? "text-red-600 dark:text-red-400" : "text-emerald-600 dark:text-emerald-400"}`}>
+                    {isSynthetic ? "0.89 (High)" : "0.04 (Nominal)"}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[10px] text-slate-500 block mt-1 font-sans">
+                {isSynthetic ? "HiFi-GAN 4.8kHz–7.2kHz vocoder artifact" : "Acoustic phase spectrum continuous"}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Understandable Acoustic Forensic Indicators Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

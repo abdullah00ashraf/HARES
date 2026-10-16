@@ -14,6 +14,10 @@ import {
   Flame,
   Layers,
   Activity,
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { soundFx } from "../lib/audioSoundFx";
 import { registerThreatIndicator } from "../lib/api";
@@ -757,6 +761,40 @@ export default function StixCampaignGraph() {
   const [dbSyncStatus, setDbSyncStatus] = useState<"idle" | "syncing" | "synced" | "error">("idle");
   const [lastDbSyncAt, setLastDbSyncAt] = useState<string | null>(null);
 
+  // Zoom & Pan Canvas State (Safeguard 4: default zoom 1.0, pan (0,0) on mount for stationary hover)
+  const [zoom, setZoom] = useState<number>(1.0);
+  const [pan, setPan] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const graphContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const handleZoomIn = () => {
+    soundFx.playClick();
+    setZoom((z) => Math.min(2.5, +(z + 0.15).toFixed(2)));
+  };
+
+  const handleZoomOut = () => {
+    soundFx.playClick();
+    setZoom((z) => Math.max(0.6, +(z - 0.15).toFixed(2)));
+  };
+
+  const handleResetZoom = () => {
+    soundFx.playClick();
+    setZoom(1.0);
+    setPan({ x: 0, y: 0 });
+  };
+
+  const toggleFullscreen = () => {
+    soundFx.playClick();
+    if (!graphContainerRef.current) return;
+    if (!document.fullscreenElement) {
+      graphContainerRef.current.requestFullscreen().catch(() => {});
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen().catch(() => {});
+      setIsFullscreen(false);
+    }
+  };
+
   const activeCampaign = CAMPAIGNS_DATA[selectedCampaignId] || CAMPAIGNS_DATA["camp-salik"];
   const totalSteps = activeCampaign.traceSteps.length;
   const currentStep = activeCampaign.traceSteps[activeStepIndex] || activeCampaign.traceSteps[0];
@@ -1055,21 +1093,61 @@ export default function StixCampaignGraph() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Column: Visual Graph Canvas & Interactive Node Rendering */}
         <div className="lg:col-span-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur p-4 shadow-sm flex flex-col justify-between transition-colors">
-          <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-2">
               <Layers className="w-4 h-4 text-purple-600 dark:text-purple-400" />
               <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
                 Adversary Campaign Topology &amp; Attack Vector
               </span>
             </div>
-            <div className="flex items-center gap-2 text-[11px] font-mono text-slate-500 dark:text-slate-400">
-              <span>Target:</span>
-              <strong className="text-slate-700 dark:text-slate-300">{activeCampaign.targetEntity}</strong>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                <span>Target:</span>
+                <strong className="text-slate-700 dark:text-slate-300">{activeCampaign.targetEntity}</strong>
+              </div>
+              {/* Zoom & Pan Controls Toolbar */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                <button
+                  type="button"
+                  onClick={handleZoomIn}
+                  title="Zoom In"
+                  className="p-1 rounded hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition"
+                >
+                  <ZoomIn className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleZoomOut}
+                  title="Zoom Out"
+                  className="p-1 rounded hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition"
+                >
+                  <ZoomOut className="w-3.5 h-3.5" />
+                </button>
+                <span className="text-[10px] font-mono font-semibold px-1 text-slate-600 dark:text-slate-400 select-none">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={handleResetZoom}
+                  title="Reset View"
+                  className="p-1 rounded hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                  className="p-1 rounded hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition"
+                >
+                  {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                </button>
+              </div>
             </div>
           </div>
 
           {/* SVG Canvas Workspace */}
-          <div className="relative w-full overflow-x-auto bg-slate-50 dark:bg-slate-950/70 rounded-lg border border-slate-200/60 dark:border-slate-800/60 p-2 sm:p-4">
+          <div ref={graphContainerRef} className="relative w-full overflow-x-auto bg-slate-50 dark:bg-slate-950/70 rounded-lg border border-slate-200/60 dark:border-slate-800/60 p-2 sm:p-4">
             <svg viewBox="0 0 960 380" className="w-full min-w-[760px] h-80 sm:h-96 block select-none">
               <defs>
                 <marker
@@ -1107,8 +1185,10 @@ export default function StixCampaignGraph() {
                 </filter>
               </defs>
 
-              {/* Grid Background Pattern */}
-              <g opacity="0.15">
+              {/* Inner Transform Group for Pan & Zoom (Safeguard 4: Keeps outer SVG viewBox stationary) */}
+              <g transform={`translate(${pan.x}, ${pan.y}) scale(${zoom})`} style={{ transformOrigin: "480px 190px" }}>
+                {/* Grid Background Pattern */}
+                <g opacity="0.15">
                 {[...Array(12)].map((_, i) => (
                   <line
                     key={`grid-x-${i}`}
@@ -1318,6 +1398,7 @@ export default function StixCampaignGraph() {
                   </g>
                 );
               })}
+              </g>
             </svg>
           </div>
 
