@@ -537,7 +537,7 @@ export async function verifyCitizenSubmission(
     const res = await fetch(`${API_BASE}/api/v1/triage/verify`, {
       method: "POST",
       body: formData,
-      signal: AbortSignal.timeout(15000),
+      signal: AbortSignal.timeout(30000),
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
@@ -590,6 +590,8 @@ export async function verifyCitizenSubmission(
         input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
         execution_latency_ms: 120,
         model_engine: "Sovereign Client Heuristics (Offline Fallback)",
+        triage_tier_evaluated: "TIER_3_OFFLINE_FALLBACK",
+        tier_preemption_reason: "Client-side offline sovereign heuristics fallback",
         privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
       };
     }
@@ -617,6 +619,8 @@ export async function verifyCitizenSubmission(
         input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
         execution_latency_ms: 85,
         model_engine: "Sovereign Allowlist Registry (Offline Fast-Path)",
+        triage_tier_evaluated: "TIER_1_DETERMINISTIC",
+        tier_preemption_reason: "Client-side verified allowlist fast-path",
         privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
       };
     }
@@ -668,6 +672,8 @@ export async function verifyCitizenSubmission(
         input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
         execution_latency_ms: 65,
         model_engine: "Sovereign Deterministic Engine (NLP Heuristics)",
+        triage_tier_evaluated: "TIER_3_OFFLINE_FALLBACK",
+        tier_preemption_reason: "Client-side offline conversational heuristics",
         privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
       };
     }
@@ -696,6 +702,8 @@ export async function verifyCitizenSubmission(
       input_type_detected: file ? (file.type.includes("audio") ? "audio" : "image") : "text",
       execution_latency_ms: 95,
       model_engine: "Sovereign Client Heuristics (Offline Fallback)",
+      triage_tier_evaluated: "TIER_3_OFFLINE_FALLBACK",
+      tier_preemption_reason: "Client-side offline unverified link fallback",
       privacy_notice: "FR-4.1 Compliant: Zero citizen identifiers retained in memory or storage.",
     };
   }

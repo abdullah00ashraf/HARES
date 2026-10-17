@@ -173,14 +173,14 @@ class SovereignGuardrailsEngine:
         # Step 1: Input Rails
         input_verdict = self.process_input(text)
         if not input_verdict.allowed:
-            # Construct a safe rejection triage result
+            is_injection = input_verdict.blocked_reason == "prompt_injection_detected"
             fallback_triage = TextTriageInferenceResult(
                 is_impersonation=False,
                 impersonated_entity=None,
                 urgency_or_coercion=False,
                 financial_or_credential_demand=False,
-                confidence_score=0.00,
-                detected_tactics=["none"],
+                confidence_score=1.00 if is_injection else 0.00,
+                detected_tactics=["prompt_injection"] if is_injection else ["none"],
                 reasoning_summary=input_verdict.output_text or "Input blocked by programmable guardrail safety policy.",
             )
             input_verdict.triage_result = fallback_triage

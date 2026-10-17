@@ -38,6 +38,16 @@ asr_client = LocalASRClient()
 slm_client = LocalSLMClient()
 media_downloader = MediaDownloader()
 whatsapp_client = WhatsAppClient()
+from hares.services.triage_coordinator import TriageCoordinator
+
+triage_coordinator = TriageCoordinator(
+    allowlist_engine=allowlist_engine,
+    homograph_detector=homograph_detector,
+    entity_extractor=entity_extractor,
+    pii_scrubber=pii_scrubber,
+    verdict_synthesizer=verdict_synthesizer,
+    slm_client=slm_client,
+)
 
 
 def _get_active_allowlist_domains() -> set[str]:
@@ -166,70 +176,20 @@ def process_incoming_webhook(self, raw_payload: dict[str, Any]) -> dict[str, Any
                         elif msg_type == "text":
                             extracted_text = msg.get("text", {}).get("body", "")
 
-                        # 5. Text Sanitization, Entity Extraction & Deterministic Matching
+                        # 5. Text Sanitization, Entity Extraction & Deterministic Matching via Unified Coordinator
                         if not assigned_verdict and extracted_text:
-                            # Bound text length and scrub Class B PII (AUDIT-OBS-06, FR-4.2)
                             bounded_text = extracted_text[:4096]
-                            scrubbed_text = pii_scrubber.scrub(bounded_text)
-
-                            # Extract Class A threat entities
-                            entities = entity_extractor.extract(scrubbed_text)
-                            all_targets = list(dict.fromkeys(entities["urls"] + entities["domains"]))
-
-                            # 5.1 Check Homograph and Punycode Spoofs (Highest Precedence: RED)
-                            for target in all_targets:
-                                is_spoof, spoof_reason = homograph_detector.check_spoof(target, active_domains)
-                                if is_spoof:
-                                    assigned_verdict = verdict_synthesizer.build_red_verdict(
-                                        rule_triggered=spoof_reason,
-                                        reason=f"Detected deceptive domain spoof targeting UAE entities ({target})",
-                                        indicators=[target],
-                                    )
-                                    triggered_indicator = target
-                                    break
-
-                            # 5.2 Check Exact Registrable Domain Allowlist (GREEN)
-                            if not assigned_verdict and all_targets:
-                                allowlisted_match: str | None = None
-                                for target in all_targets:
-                                    if allowlist_engine.is_allowlisted(target):
-                                        allowlisted_match = allowlist_engine.extract_registrable_domain(target)
-                                        break
-
-                                if allowlisted_match:
-                                    assigned_verdict = verdict_synthesizer.build_green_verdict(
-                                        entity_name="Verified Official UAE Registry Entity",
-                                        verified_domain=allowlisted_match,
-                                        indicators=all_targets,
-                                    )
-                                else:
-                                    # External or novel links -> Default AMBER
-                                    assigned_verdict = verdict_synthesizer.build_amber_verdict(
-                                        reason="Extracted destination is not on the official UAE verified allowlist",
-                                        indicators=all_targets,
-                                    )
-
-                            # 5.3 Small Language Model (SLM) Social Engineering Intent Evaluation (FR-2.4)
-                            if not assigned_verdict or assigned_verdict.verdict == TriageVerdict.AMBER:
-                                slm_result = slm_client.triage_text(scrubbed_text)
-                                if (
-                                    slm_result.is_impersonation
-                                    and (slm_result.urgency_or_coercion or slm_result.financial_or_credential_demand)
-                                    and slm_result.confidence_score >= 0.70
-                                ):
-                                    assigned_verdict = verdict_synthesizer.build_red_verdict(
-                                        rule_triggered="slm_social_engineering_detected",
-                                        reason=f"{slm_result.reasoning_summary} ({', '.join(slm_result.detected_tactics)})",
-                                        indicators=all_targets or [f"text_lure:{msg_id[:8]}"],
-                                    )
-                                    triggered_indicator = (
-                                        all_targets[0] if all_targets else f"text_lure:{msg_id[:8]}"
-                                    )
-                                elif not assigned_verdict:
-                                    assigned_verdict = verdict_synthesizer.build_amber_verdict(
-                                        reason=slm_result.reasoning_summary,
-                                        indicators=all_targets,
-                                    )
+                            coord_res = triage_coordinator.coordinate_triage(
+                                bounded_text,
+                                active_domains=active_domains,
+                            )
+                            assigned_verdict = coord_res.verdict_result
+                            if coord_res.candidate_urls:
+                                triggered_indicator = coord_res.candidate_urls[0]
+                            elif coord_res.candidate_domains:
+                                triggered_indicator = coord_res.candidate_domains[0]
+                            else:
+                                triggered_indicator = f"text_lure:{msg_id[:8]}"
 
                         # Default fallback for unclassified inputs
                         if not assigned_verdict:

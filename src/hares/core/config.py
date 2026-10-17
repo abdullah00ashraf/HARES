@@ -55,6 +55,7 @@ class Settings(BaseSettings):
     # Hugging Face ZeroGPU Neural Engine Settings
     HF_SPACE_URL: str = "https://abdullahashraf122-hares-neural-engine.hf.space"
     HF_SPACE_API_NAME: str = "/triage"
+    HF_TOKEN: str | None = Field(default=None)
     HF_ZERO_GPU_ENABLED: bool = True
     HF_ZERO_GPU_TIMEOUT_SECONDS: float = 12.0
     ASR_MODEL_SIZE: str = "small"

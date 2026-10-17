@@ -838,6 +838,28 @@ export default function CitizenTriagePortal() {
                     <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
                       Rule: {result.rule_triggered}
                     </span>
+                    {result.triage_tier_evaluated && (
+                      <span
+                        title={result.tier_preemption_reason || "Evaluation engine tier"}
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded-full border cursor-help font-semibold ${
+                          result.triage_tier_evaluated === "TIER_1_DETERMINISTIC"
+                            ? "bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800"
+                            : result.triage_tier_evaluated.includes("TIER_2")
+                            ? "bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-800"
+                            : "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800"
+                        }`}
+                      >
+                        ⚡ {
+                          result.triage_tier_evaluated === "TIER_1_DETERMINISTIC"
+                            ? "Tier 1: Deterministic Engine"
+                            : result.triage_tier_evaluated === "TIER_2_NEURAL_ZEROGPU"
+                            ? "Tier 2: Neural ZeroGPU (A10G)"
+                            : result.triage_tier_evaluated === "TIER_2_NEURAL_LOCAL"
+                            ? "Tier 2: Local SLM Cluster"
+                            : "Tier 3: Offline Heuristics"
+                        }
+                      </span>
+                    )}
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700">
                       {getDetectedDialect(textInput || result.reason)}
                     </span>
@@ -851,6 +873,12 @@ export default function CitizenTriagePortal() {
                   <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-white mt-1">
                     {result.reason}
                   </h3>
+                  {result.tier_preemption_reason && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5 flex items-center gap-1">
+                      <span>↳</span>
+                      <span>{result.tier_preemption_reason}</span>
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -860,7 +888,11 @@ export default function CitizenTriagePortal() {
                   <div className="hidden sm:block text-right">
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-mono uppercase tracking-wider">Inference Engine</span>
                     <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
-                      {result.model_engine.includes("ZeroGPU") ? "ZeroGPU A10G" : "Sovereign Engine"}
+                      {result.triage_tier_evaluated === "TIER_2_NEURAL_ZEROGPU" || result.model_engine.includes("ZeroGPU")
+                        ? "ZeroGPU A10G"
+                        : result.triage_tier_evaluated === "TIER_1_DETERMINISTIC"
+                        ? "Deterministic Engine"
+                        : "Sovereign Heuristics"}
                     </span>
                   </div>
                 )}

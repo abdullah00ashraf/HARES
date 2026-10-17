@@ -55,6 +55,7 @@ node_modules/
 out/
 next-env.d.ts
 .turbo/
+*.tsbuildinfo
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

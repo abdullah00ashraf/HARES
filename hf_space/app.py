@@ -50,7 +50,7 @@ Return ONLY a valid JSON object matching this exact schema:
 }"""
 
 
-@spaces.GPU(duration=30)
+@spaces.GPU(duration=10)
 def triage_message(user_text: str):
     if not user_text or not user_text.strip():
         return (

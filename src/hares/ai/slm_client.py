@@ -48,6 +48,7 @@ class LocalSLMClient:
         self.hf_space_api_name = settings.HF_SPACE_API_NAME
         self.enable_hf_zerogpu = settings.HF_ZERO_GPU_ENABLED
         self.hf_timeout = settings.HF_ZERO_GPU_TIMEOUT_SECONDS
+        self.hf_token = getattr(settings, "HF_TOKEN", None)
         self._hf_client: Any = None
         self.last_provider_used: str = "offline_heuristics"
         self._outlines_generator: Any = None
@@ -55,23 +56,40 @@ class LocalSLMClient:
             SovereignGuardrailsEngine() if enable_guardrails else None
         )
 
+    def _get_hf_token(self) -> str | None:
+        """Resolves Hugging Face authentication token from instance, settings, env, or cache."""
+        if self.hf_token:
+            return self.hf_token
+        settings = get_settings()
+        if getattr(settings, "HF_TOKEN", None):
+            return settings.HF_TOKEN
+        import os
+        env_token = os.environ.get("HF_TOKEN")
+        if env_token:
+            return env_token
+        try:
+            import huggingface_hub
+            return huggingface_hub.get_token()
+        except Exception:
+            return None
+
     def _get_hf_client(self) -> Any:
         """Lazy-initializes and caches singleton gradio_client.Client for ZeroGPU Space."""
         if self._hf_client is None:
             try:
                 import gradio_client  # type: ignore
 
-                logger.info("Initializing Hugging Face Gradio client for %s...", self.hf_space_url)
-                self._hf_client = gradio_client.Client(self.hf_space_url)
+                token = self._get_hf_token()
+                logger.info("Initializing Hugging Face Gradio client for %s (token_present=%s)...", self.hf_space_url, bool(token))
+                self._hf_client = gradio_client.Client(self.hf_space_url, token=token)
             except Exception as exc:
                 logger.warning("Failed to initialize Hugging Face Gradio client: %s", str(exc))
                 raise
         return self._hf_client
 
-    def _query_hf_zerogpu(self, prompt: str) -> TextTriageInferenceResult:
+    def _parse_hf_json_response(self, raw_json_str: Any) -> TextTriageInferenceResult:
         """
-        Dispatches triage inference to Hugging Face ZeroGPU Space (Qwen2.5-3B + NVIDIA NeMo Guardrails).
-        Parses structured response, enforces schema typing, and handles edge cases.
+        Parses structured response from Hugging Face ZeroGPU Space, enforces schema typing, and handles edge cases.
         """
         valid_tactics_set = {
             "traffic_fine_lure",
@@ -84,16 +102,13 @@ class LocalSLMClient:
             "none",
         }
 
-        client = self._get_hf_client()
-        logger.info("Dispatching neural triage to Hugging Face ZeroGPU Space (%s)...", self.hf_space_url)
-        raw_result = client.predict(user_text=prompt, api_name=self.hf_space_api_name)
-
-        if not raw_result or len(raw_result) < 2:
-            raise ValueError(f"Unrecognized response tuple from ZeroGPU Space: {raw_result}")
-
-        raw_json_str = raw_result[1]
         data = json.loads(raw_json_str) if isinstance(raw_json_str, str) else raw_json_str
+        if not isinstance(data, dict):
+            raise ValueError(f"Expected dict from ZeroGPU JSON payload, got {type(data)}: {data}")
+
         analysis = data.get("analysis", {})
+        if not isinstance(analysis, dict):
+            analysis = {}
 
         is_impersonation = bool(analysis.get("is_impersonation", False))
         impersonated_entity = analysis.get("impersonated_entity")
@@ -123,19 +138,33 @@ class LocalSLMClient:
             elif "prompt" in t_str or "injection" in t_str or "override" in t_str:
                 sanitized_tactics.append("prompt_injection")
 
-        if not sanitized_tactics:
-            sanitized_tactics = ["none"]
-
-        urgency = bool(analysis.get("urgency_or_coercion", False))
-        financial = bool(analysis.get("financial_or_credential_demand", False))
-        confidence = float(data.get("risk_score", analysis.get("confidence_score", 0.5)))
-        confidence = max(0.0, min(1.0, round(confidence, 4)))
-
         reasoning = (
             analysis.get("reasoning_summary")
             or data.get("reason")
             or "Neural triage verification completed via Hugging Face ZeroGPU."
         )
+
+        if not sanitized_tactics or sanitized_tactics == ["none"]:
+            reasoning_lower = str(reasoning).lower()
+            inferred: list[TacticType] = []
+            if "traffic" in reasoning_lower or "fine" in reasoning_lower or "impound" in reasoning_lower:
+                inferred.append("traffic_fine_lure")
+            if "kyc" in reasoning_lower or "bank" in reasoning_lower:
+                inferred.append("banking_kyc_freeze")
+            if "delivery" in reasoning_lower or "post" in reasoning_lower or "courier" in reasoning_lower or "package" in reasoning_lower:
+                inferred.append("courier_delivery_fee")
+            if "lottery" in reasoning_lower or "prize" in reasoning_lower or "million" in reasoning_lower:
+                inferred.append("lottery_prize")
+            if "crypto" in reasoning_lower or "invest" in reasoning_lower:
+                inferred.append("crypto_investment")
+            if "suspend" in reasoning_lower or "block" in reasoning_lower:
+                inferred.append("account_suspension")
+            if "prompt" in reasoning_lower or "injection" in reasoning_lower or "jailbreak" in reasoning_lower:
+                inferred.append("prompt_injection")
+            if inferred:
+                sanitized_tactics = inferred
+            elif not sanitized_tactics:
+                sanitized_tactics = ["none"]
 
         return TextTriageInferenceResult(
             is_impersonation=is_impersonation,
@@ -146,6 +175,75 @@ class LocalSLMClient:
             detected_tactics=sanitized_tactics,
             reasoning_summary=reasoning,
         )
+
+    def _query_hf_zerogpu(self, prompt: str) -> TextTriageInferenceResult:
+        """
+        Dispatches triage inference to Hugging Face ZeroGPU Space via gradio_client (Protocol A).
+        """
+        client = self._get_hf_client()
+        logger.info("Dispatching neural triage to Hugging Face ZeroGPU Space (%s)...", self.hf_space_url)
+        raw_result = client.predict(user_text=prompt, api_name=self.hf_space_api_name)
+
+        if not raw_result or len(raw_result) < 2:
+            raise ValueError(f"Unrecognized response tuple from ZeroGPU Space: {raw_result}")
+
+        return self._parse_hf_json_response(raw_result[1])
+
+    def _query_hf_zerogpu_direct_http(self, prompt: str) -> TextTriageInferenceResult:
+        """
+        Dispatches triage inference directly via Gradio 5 HTTP REST SSE endpoint (Protocol B).
+        Bypasses gradio_client locks and communicates directly with Space webserver.
+        """
+        token = self._get_hf_token()
+        headers = {"Content-Type": "application/json"}
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+
+        api_name = self.hf_space_api_name.lstrip("/")
+        base_url = self.hf_space_url.rstrip("/")
+        call_url = f"{base_url}/gradio_api/call/{api_name}"
+
+        logger.info("Dispatching direct HTTP SSE triage to %s...", call_url)
+        with httpx.Client(timeout=self.hf_timeout) as client:
+            post_resp = client.post(call_url, json={"data": [prompt]}, headers=headers)
+            post_resp.raise_for_status()
+            post_data = post_resp.json()
+            event_id = post_data.get("event_id")
+            if not event_id:
+                raise ValueError(f"Missing event_id in Gradio call response: {post_data}")
+
+            stream_url = f"{call_url}/{event_id}"
+            get_resp = client.get(stream_url, headers=headers)
+            get_resp.raise_for_status()
+            stream_text = get_resp.text
+
+        lines = stream_text.strip().split("\n")
+        current_event = None
+        last_data_payload = None
+
+        for line in lines:
+            line = line.strip()
+            if line.startswith("event:"):
+                current_event = line.replace("event:", "").strip()
+            elif line.startswith("data:"):
+                raw_data = line.replace("data:", "", 1).strip()
+                if current_event == "error":
+                    raise RuntimeError(f"Gradio Space returned server-side error: {raw_data}")
+                if raw_data and raw_data != "null":
+                    try:
+                        last_data_payload = json.loads(raw_data)
+                    except json.JSONDecodeError:
+                        pass
+
+        if not last_data_payload:
+            raise ValueError(f"No valid data payload in SSE stream: {stream_text[:300]}")
+
+        if isinstance(last_data_payload, list) and len(last_data_payload) >= 2:
+            return self._parse_hf_json_response(last_data_payload[1])
+        elif isinstance(last_data_payload, dict):
+            return self._parse_hf_json_response(last_data_payload)
+        else:
+            raise ValueError(f"Unexpected Gradio data payload structure: {last_data_payload}")
 
     def triage_with_guardrails(self, text: str) -> GuardrailResult:
         """
@@ -196,15 +294,26 @@ class LocalSLMClient:
 
         # 2. Try Hugging Face ZeroGPU Space (Live NVIDIA A10G Hardware)
         if self.enable_hf_zerogpu:
+            # Protocol A: Gradio Client
             try:
                 res = self._query_hf_zerogpu(escaped_text)
-                self.last_provider_used = "hf_zerogpu_a10g"
+                self.last_provider_used = "hf_zerogpu_gradio"
                 return res
-            except Exception as exc:
+            except Exception as exc_gradio:
                 logger.warning(
-                    "Hugging Face ZeroGPU neural engine failed or timed out (%s), attempting local fallbacks",
-                    str(exc),
+                    "Hugging Face ZeroGPU gradio_client failed (%s), attempting direct HTTP SSE fallback",
+                    str(exc_gradio),
                 )
+                # Protocol B: Direct Gradio 5 HTTP REST SSE
+                try:
+                    res = self._query_hf_zerogpu_direct_http(escaped_text)
+                    self.last_provider_used = "hf_zerogpu_http"
+                    return res
+                except Exception as exc_http:
+                    logger.warning(
+                        "Hugging Face ZeroGPU direct HTTP failed (%s), attempting local fallbacks",
+                        str(exc_http),
+                    )
 
         # 3. Try Outlines Guided Generation if initialized
         try:

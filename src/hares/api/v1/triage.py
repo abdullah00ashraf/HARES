@@ -22,6 +22,7 @@ from hares.engine.homograph import HomographDetector
 from hares.engine.ocr import OCREngine
 from hares.engine.sanitizer import EntityExtractor, ExtractedEntities, PIIScrubber
 from hares.engine.verdict import TriageVerdict, VerdictResult, VerdictSynthesizer
+from hares.services.triage_coordinator import TriageCoordinator, TriageCoordinatorResult
 
 logger = logging.getLogger("hares.api.triage")
 
@@ -37,6 +38,14 @@ audio_classifier = AudioDeepfakeClassifier()
 asr_client = LocalASRClient()
 slm_client = LocalSLMClient()
 ocr_engine = OCREngine()
+triage_coordinator = TriageCoordinator(
+    allowlist_engine=allowlist_engine,
+    homograph_detector=homograph_detector,
+    entity_extractor=entity_extractor,
+    pii_scrubber=pii_scrubber,
+    verdict_synthesizer=verdict_synthesizer,
+    slm_client=slm_client,
+)
 
 
 async def _get_active_allowlist_domains_async() -> set[str]:
@@ -94,6 +103,14 @@ class TriageVerificationResponse(BaseModel):
     input_type_detected: str = "text"
     execution_latency_ms: float
     model_engine: str = "Hugging Face ZeroGPU (Qwen2.5-3B + NVIDIA NeMo Guardrails)"
+    triage_tier_evaluated: str = Field(
+        default="TIER_1_DETERMINISTIC",
+        description="The engine tier that rendered the verdict (TIER_1_DETERMINISTIC, TIER_2_NEURAL_ZEROGPU, TIER_2_NEURAL_LOCAL, TIER_3_OFFLINE_FALLBACK)",
+    )
+    tier_preemption_reason: str | None = Field(
+        default=None,
+        description="Detailed explanation of why deterministic preemption occurred or why fallback was engaged",
+    )
     privacy_notice: str = "FR-4.1 Compliant: Zero citizen identifiers or personal data retained in memory or storage."
 
 
@@ -211,14 +228,16 @@ async def verify_content(
         except Exception:
             pass
 
-    # 3. Deterministic Pipeline Execution
+    # 3. Multi-Tier Triage Pipeline Execution
     verdict_result: VerdictResult | None = None
     allowlist_match_data: dict[str, str] | None = None
     homograph_analysis_data: dict[str, Any] | None = None
     slm_analysis_data: dict[str, Any] | None = None
     risk_score = 0.5  # Baseline prior
+    triage_tier_evaluated = "TIER_1_DETERMINISTIC"
+    tier_preemption_reason = "Evaluated via Sovereign Deterministic Pipeline"
 
-    # 3.1 Audio Synthetic Media Check
+    # 3.1 Audio Synthetic Media Check (Conformal Acoustic Evaluation)
     if audio_analysis_data and audio_analysis_data.get("is_synthetic"):
         verdict_result = verdict_synthesizer.build_red_verdict(
             rule_triggered="audio_synthetic_deepfake_detected",
@@ -229,235 +248,10 @@ async def verify_content(
             indicators=["synthetic_voice_recording"],
         )
         risk_score = 0.98
-
-    # 3.2 IDN Homograph & Punycode Lookalike Check (FR-2.3)
-    if verdict_result is None:
-        for domain in candidate_domains:
-            is_spoof, spoof_reason = homograph_detector.check_spoof(domain, active_domains)
-            if is_spoof:
-                homograph_analysis_data = {
-                    "is_spoof": True,
-                    "domain": domain,
-                    "rule": spoof_reason,
-                }
-                verdict_result = verdict_synthesizer.build_red_verdict(
-                    rule_triggered="idn_homograph_spoof",
-                    reason=f"Detected fraudulent lookalike domain spoofing UAE entity: '{domain}' ({spoof_reason})",
-                    indicators=[domain],
-                )
-                risk_score = 0.99
-                break
-
-    # 3.3 Brand Impersonation Phishing Domain Check on Unofficial Domains
-    if verdict_result is None:
-        for domain in candidate_domains:
-            reg_d = allowlist_engine.extract_registrable_domain(domain)
-            if reg_d not in active_domains:
-                lower_d = domain.lower()
-                spoofed_target = None
-                if any(k in lower_d for k in ["police", "ecrime", "traffic"]):
-                    spoofed_target = "Dubai Police"
-                elif any(k in lower_d for k in ["salik", "salik-pay"]):
-                    spoofed_target = "Salik"
-                elif any(k in lower_d for k in ["dewa", "dewa-bill"]):
-                    spoofed_target = "DEWA"
-                elif any(k in lower_d for k in ["emiratespost", "post-delivery", "empost", "delivery-fee"]):
-                    spoofed_target = "Emirates Post"
-                elif any(k in lower_d for k in ["enbd", "adcb", "adib", "dib", "bank-auth", "banking-portal"]):
-                    spoofed_target = "UAE Banking Authority"
-                elif any(k in lower_d for k in ["crypto", "wealth", "invest", "lottery", "prize"]):
-                    spoofed_target = "Cryptocurrency & Investment Scheme"
-
-                if spoofed_target:
-                    verdict_result = verdict_synthesizer.build_red_verdict(
-                        rule_triggered="brand_impersonation_phishing_domain",
-                        reason=f"Detected fraudulent external destination '{domain}' impersonating {spoofed_target} on unverified TLD.",
-                        indicators=[domain],
-                    )
-                    risk_score = 0.96
-                    break
-
-    # 3.4 Database Known Malicious IoC Check
-    if verdict_result is None and (candidate_urls or candidate_domains):
-        try:
-            async with async_session_scope() as session:
-                for indicator in candidate_urls + candidate_domains:
-                    existing = await ThreatRepository.get_indicator_by_normalized_value_async(session, indicator)
-                    if existing and existing.verdict == "RED":
-                        verdict_result = verdict_synthesizer.build_red_verdict(
-                            rule_triggered="known_threat_ioc_match",
-                            reason=f"Indicator matched verified malicious threat database: '{indicator}'",
-                            indicators=[indicator],
-                        )
-                        risk_score = float(existing.risk_score or 0.95)
-                        break
-        except Exception as exc:
-            logger.debug("Database threat check skipped: %s", str(exc))
-
-    # 3.5 Exact Registrable Allowlist Verification (FR-2.2)
-    if verdict_result is None and (candidate_urls or candidate_domains):
-        all_targets = candidate_urls if candidate_urls else candidate_domains
-        all_match = True
-        matched_domain = ""
-        matched_entity = ""
-
-        for target in all_targets:
-            reg_domain = allowlist_engine.extract_registrable_domain(target)
-            if reg_domain and reg_domain in active_domains:
-                matched_domain = reg_domain
-                matched_entity = (
-                    "Dubai Government / UAE Verified Entity"
-                    if not matched_domain.startswith("ecrime")
-                    else "Dubai Police e-Crime"
-                )
-            else:
-                all_match = False
-
-        if all_match and matched_domain:
-            allowlist_match_data = {
-                "verified_domain": matched_domain,
-                "entity_name": matched_entity,
-            }
-            verdict_result = verdict_synthesizer.build_green_verdict(
-                entity_name=matched_entity,
-                verified_domain=matched_domain,
-                indicators=[matched_domain],
-            )
-            risk_score = 0.01
-
-    # 3.6 Local Small Language Model (SLM) Social Engineering Intent Evaluation (FR-2.4)
-    if verdict_result is None and combined_text:
-        scrubbed_text = pii_scrubber.scrub(combined_text)
-        slm_result = slm_client.triage_text(scrubbed_text)
-        slm_analysis_data = {
-            "is_impersonation": slm_result.is_impersonation,
-            "detected_tactics": slm_result.detected_tactics,
-            "confidence_score": slm_result.confidence_score,
-            "urgency_or_coercion": slm_result.urgency_or_coercion,
-            "financial_or_credential_demand": slm_result.financial_or_credential_demand,
-            "reasoning_summary": slm_result.reasoning_summary,
-        }
-
-        lower_comb = combined_text.lower()
-
-        # Check for anti-phishing advisory and civic awareness context (protects non-coercive syntax)
-        has_anti_phish_advisory = any(
-            w in lower_comb
-            for w in [
-                "never share your password", "never share your otp", "never share", "do not share", "don't share",
-                "لا تشارك", "لا تفصح", "عدم مشاركة", "تحذير أمني", "تنبيه أمني", "e-statement", "monthly statement",
-                "traffic awareness", "awareness advisory", "safety first", "safe following distance", "foggy morning",
-                "tzakkar teftah", "asharet el moroor", "le salametak", "neshabhat 3aleik"
-            ]
-        )
-
-        malicious_tactics = [
-            t for t in slm_result.detected_tactics
-            if t in [
-                "prompt_injection",
-                "lottery_prize",
-                "crypto_investment_fraud",
-                "banking_kyc_freeze",
-                "traffic_fine_lure",
-                "account_suspension",
-            ] and not (has_anti_phish_advisory and t in ["banking_kyc_freeze", "traffic_fine_lure", "account_suspension"])
-        ]
-
-        is_malicious = (
-            (
-                slm_result.is_impersonation
-                and (slm_result.urgency_or_coercion or slm_result.financial_or_credential_demand)
-                and slm_result.confidence_score >= 0.70
-                and not has_anti_phish_advisory
-            )
-            or bool(malicious_tactics)
-            or (slm_result.financial_or_credential_demand and slm_result.urgency_or_coercion and slm_result.confidence_score >= 0.70 and not has_anti_phish_advisory)
-        )
-
-        # Check for adversarial prompt injection in raw text
-        if not is_malicious and any(kw in lower_comb for kw in ["<|im_start|>", "ignore all previous instructions", "system override"]):
-            is_malicious = True
-            slm_result.reasoning_summary = "Adversarial prompt injection attempt detected and neutralized."
-            slm_result.detected_tactics = ["prompt_injection"]
-
-        # Check for crypto / prize scam markers
-        if not is_malicious and any(kw in lower_comb for kw in ["rabihit", "500,000 aed", "lottery", "crypto wealth", "18.5%", "300%", "usdt", "telegram", "t.me", "guaranteed returns"]):
-            is_malicious = True
-            slm_result.reasoning_summary = "Unregulated financial lottery / crypto investment lure."
-            slm_result.detected_tactics = ["lottery_prize" if any(p in lower_comb for p in ["rabihit", "lottery", "prize"]) else "crypto_investment"]
-
-        has_speculative_or_crypto = any(
-            kw in lower_comb for kw in [
-                "crypto", "bitcoin", "usdt", "invest", "returns", "wealth", "lottery",
-                "prize", "rabihit", "telegram", "t.me", "300%", "18.5%", "guaranteed", "million aed", "500,000"
-            ]
-        ) or any(t in slm_result.detected_tactics for t in ["crypto_investment", "lottery_prize"])
-
-        # Conversational and non-coercive benign markers (English, Arabizi, Gulf Arabic)
-        is_benign_conversational = any(
-            kw in lower_comb
-            for kw in [
-                # English
-                "hello", "hi", "how are you", "good morning", "good evening", "see you", "meeting",
-                "thank you", "thanks", "ok", "okay", "lunch", "dinner", "weekend", "family",
-                "welcome", "congratulations", "happy birthday", "traffic awareness", "safety first",
-                "monthly statement", "e-statement", "never share", "payment confirmed", "receipt",
-                # Arabizi
-                "salam", "marhaba", "kifak", "keifak", "ezayak", "shlonak", "shokran", "shukran",
-                "tamam", "mashy", "yalla", "inshallah", "habibi", "akhi", "neshabhat 3aleik",
-                "tam 5asm", "benaja7", "be naja7", "le sedad", "fatoorat", "el daf3a", "gayya fel tareeq",
-                # Arabic
-                "مرحبا", "أهلا", "السلام عليكم", "كيف الحال", "شكرا", "تمام", "إن شاء الله",
-                "صباح الخير", "مساء الخير", "مبروك", "عيد سعيد", "تم خصم", "تم استلام", "بنجاح"
-            ]
-        )
-
-        if is_malicious:
-            verdict_result = verdict_synthesizer.build_red_verdict(
-                rule_triggered="slm_social_engineering_detected",
-                reason=f"{slm_result.reasoning_summary} ({', '.join(slm_result.detected_tactics)})",
-                indicators=candidate_urls or candidate_domains,
-            )
-            risk_score = max(0.85, round(slm_result.confidence_score, 4))
-        elif (
-            (is_benign_conversational or not slm_result.is_impersonation)
-            and not slm_result.urgency_or_coercion
-            and not slm_result.financial_or_credential_demand
-            and not candidate_urls
-            and not candidate_domains
-            and not has_speculative_or_crypto
-            and slm_result.confidence_score <= 0.40
-        ):
-            # Benign conversation in English, Arabizi, or Gulf Arabic (eliminates alert fatigue)
-            verdict_result = verdict_synthesizer.build_green_verdict(
-                entity_name="Personal Benign Communication",
-                verified_domain=None,
-                indicators=[],
-                reason="No authority impersonation, financial demands, or malicious indicators detected.",
-                rule_triggered="benign_conversational_syntax",
-            )
-            risk_score = 0.05
-        else:
-            # Default sovereign fallback to Amber (caution)
-            if candidate_urls or candidate_domains:
-                reason = "External commercial or third-party web link detected without direct phishing indicators or government impersonation. Verify the sender independently before clicking or entering credentials."
-                rule = "unverified_source_fallback"
-            elif has_speculative_or_crypto:
-                reason = "Unverified speculative financial, lottery, or investment lure."
-                rule = "speculative_financial_lure"
-            else:
-                reason = "Submission does not match authenticated official allowlist; source authenticity cannot be proven."
-                rule = "unverified_source_fallback"
-
-            verdict_result = verdict_synthesizer.build_amber_verdict(
-                rule_triggered=rule,
-                reason=reason,
-                indicators=candidate_urls or candidate_domains,
-            )
-            risk_score = 0.45
-
-    # 3.7 Genuine Human Audio Recording Verification
-    if verdict_result is None and audio_analysis_data and not audio_analysis_data.get("is_synthetic"):
+        triage_tier_evaluated = "TIER_1_DETERMINISTIC"
+        tier_preemption_reason = "Synthetic voice conversion / deepfake artifacts detected via conformal acoustic evaluation"
+    elif audio_analysis_data and not audio_analysis_data.get("is_synthetic") and not combined_text:
+        # Genuine human audio recording without text
         verdict_result = verdict_synthesizer.build_green_verdict(
             entity_name="Verified Human Voice Recording",
             verified_domain=None,
@@ -466,6 +260,44 @@ async def verify_content(
             rule_triggered="genuine_human_voice_pass",
         )
         risk_score = 0.05
+        triage_tier_evaluated = "TIER_1_DETERMINISTIC"
+        tier_preemption_reason = "Acoustic evaluation verified natural human voice characteristics"
+    else:
+        # 3.2 Coordinate Unified Multi-Tier Triage
+        coord_res = triage_coordinator.coordinate_triage(
+            combined_text,
+            url=url,
+            active_domains=active_domains,
+        )
+        verdict_result = coord_res.verdict_result
+        risk_score = coord_res.risk_score
+        triage_tier_evaluated = coord_res.triage_tier_evaluated
+        tier_preemption_reason = coord_res.tier_preemption_reason
+        allowlist_match_data = coord_res.allowlist_match_data
+        homograph_analysis_data = coord_res.homograph_analysis_data
+        slm_analysis_data = coord_res.slm_analysis_data
+        extracted = coord_res.extracted_entities
+        candidate_urls = coord_res.candidate_urls
+        candidate_domains = coord_res.candidate_domains
+
+        # 3.3 Database Known Malicious IoC Check Override (if not already RED)
+        if verdict_result.verdict != TriageVerdict.RED and (candidate_urls or candidate_domains):
+            try:
+                async with async_session_scope() as session:
+                    for indicator in candidate_urls + candidate_domains:
+                        existing = await ThreatRepository.get_indicator_by_normalized_value_async(session, indicator)
+                        if existing and existing.verdict == "RED":
+                            verdict_result = verdict_synthesizer.build_red_verdict(
+                                rule_triggered="known_threat_ioc_match",
+                                reason=f"Indicator matched verified malicious threat database: '{indicator}'",
+                                indicators=[indicator],
+                            )
+                            risk_score = float(existing.risk_score or 0.95)
+                            triage_tier_evaluated = "TIER_1_DETERMINISTIC"
+                            tier_preemption_reason = f"Indicator matched verified malicious threat database: '{indicator}'"
+                            break
+            except Exception as exc:
+                logger.debug("Database threat check skipped: %s", str(exc))
 
     # 4. Final Fallback
     if verdict_result is None:
@@ -525,14 +357,12 @@ async def verify_content(
     elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
 
     # Determine inference engine provider label
-    if slm_analysis_data:
-        provider = getattr(slm_client, "last_provider_used", "hf_zerogpu_a10g")
-        if provider == "hf_zerogpu_a10g":
-            active_engine = "Hugging Face ZeroGPU (NVIDIA A10G • Qwen2.5-3B + NeMo Guardrails)"
-        elif provider in ["mock_heuristics", "offline_heuristics"]:
-            active_engine = "Sovereign Deterministic Engine (Offline NLP Heuristics)"
-        else:
-            active_engine = f"Project Hares Sovereign Engine ({provider})"
+    if triage_tier_evaluated == "TIER_2_NEURAL_ZEROGPU":
+        active_engine = "Hugging Face ZeroGPU (NVIDIA A10G • Qwen2.5-3B + NeMo Guardrails)"
+    elif triage_tier_evaluated == "TIER_2_NEURAL_LOCAL":
+        active_engine = "Local Sovereign SLM Cluster (Guided JSON Generation)"
+    elif triage_tier_evaluated == "TIER_3_OFFLINE_FALLBACK":
+        active_engine = "Sovereign Deterministic Engine (Offline NLP Heuristics Fallback)"
     elif audio_analysis_data:
         active_engine = "Sovereign Acoustic Engine (Conformal Spectral Anomaly + Whisper ASR)"
     elif homograph_analysis_data:
@@ -540,7 +370,7 @@ async def verify_content(
     elif allowlist_match_data:
         active_engine = "Deterministic UAE Government Exact Domain Allowlist"
     else:
-        active_engine = "Project Hares Sovereign Triage Engine"
+        active_engine = "Project Hares Sovereign Deterministic Engine"
 
     # Render 512MB RAM Protection & Memory Hygiene (Milestone 52)
     if "file_bytes" in locals():
@@ -569,4 +399,6 @@ async def verify_content(
         input_type_detected=input_type,
         execution_latency_ms=elapsed_ms,
         model_engine=active_engine,
+        triage_tier_evaluated=triage_tier_evaluated,
+        tier_preemption_reason=tier_preemption_reason,
     )

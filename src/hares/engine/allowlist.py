@@ -17,6 +17,18 @@ class AllowlistEngine:
             if domain and domain.strip()
         }
 
+    @property
+    def active_domains(self) -> set[str]:
+        """Returns the set of active allowlist domains, falling back to official seed domains if empty."""
+        if not self._active_domains:
+            from hares.db.seed_data import OFFICIAL_UAE_DOMAINS_SEED
+            self._active_domains = {s["domain"].lower().strip() for s in OFFICIAL_UAE_DOMAINS_SEED}
+        return set(self._active_domains)
+
+    def get_active_domains(self) -> set[str]:
+        """Retrieves a copy of the active allowlisted domains."""
+        return self.active_domains
+
     def update_domains(self, domains: set[str]) -> None:
         """Atomically updates the active allowlist cache."""
         self._active_domains = {

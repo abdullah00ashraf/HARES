@@ -131,6 +131,8 @@ export interface TriageVerificationResponse {
   input_type_detected: "text" | "url" | "audio" | "image";
   execution_latency_ms: number;
   model_engine?: string;
+  triage_tier_evaluated?: "TIER_1_DETERMINISTIC" | "TIER_2_NEURAL_ZEROGPU" | "TIER_2_NEURAL_LOCAL" | "TIER_3_OFFLINE_FALLBACK" | string;
+  tier_preemption_reason?: string | null;
   privacy_notice: string;
 }
 

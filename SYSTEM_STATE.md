@@ -1,8 +1,8 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Production Verified; Milestone 55 Executed: Benchmark Certification Hardening & Auditor Reconciliation Complete (Meta CyberSecEval Reconciled 10% Refusal / 90% Benign / 0% ASR; ASVspoof DF Re-baselined <=20% In-The-Wild EER / min t-DCF 0.2187 / Log Loss 1.3134; Dialect Arbiter Calibrated to 0.00% FPR for English/Arabizi with 0.8523 Disparity Ratio; DESC ISR Two-Tier Scope Disambiguated); All 4 Cryptographic Attestation Certificates Cryptographically Verified via Keyed HMAC-SHA256
+**Current Status:** Production Verified; Milestone 56 Executed: Neural Engine Parity & Multi-Tier Triage Coordination Complete (Root-cause parity failure resolved; TriageCoordinator unified between Web API & Celery worker; Dual-Protocol Gradio/HTTP SSE ZeroGPU gateway active; Tier attribution telemetry sealed; ZeroGPU duration tuned to 10s to preserve quota)
 **Last Updated:** 2026-10-17  
-**Version:** 2.9.2-milestone-55-auditor-reconciliation-sealed  
+**Version:** 2.9.3-milestone-56-neural-engine-parity-unified  
 
 ---
 
@@ -111,6 +111,15 @@ SLM_MODEL_NAME="llama3.2:3b-instruct-q4_K_M"
 AUDIO_MODEL_CHECKPOINT_PATH="/models/audio/aasist_opus_calibrated.pt"
 AUDIO_CONFORMAL_THRESHOLD=0.85
 MAX_AUDIO_DURATION_SECONDS=120
+
+# ==========================================
+# Hugging Face ZeroGPU Neural Engine Settings
+# ==========================================
+HF_SPACE_URL="https://abdullahashraf122-hares-neural-engine.hf.space"
+HF_SPACE_API_NAME="/triage"
+HF_TOKEN="<optional-user-token-for-dedicated-quota>"
+HF_ZERO_GPU_ENABLED=true
+HF_ZERO_GPU_TIMEOUT_SECONDS=12.0
 ```
 
 ---
@@ -552,4 +561,36 @@ The benchmark evaluation framework evaluates genuine deployed infrastructure and
    - **Calibrated Policy Arbiter:** Expanded in [`src/hares/ai/slm_client.py`](file:///c:/HARES/src/hares/ai/slm_client.py) and [`src/hares/api/v1/triage.py`](file:///c:/HARES/src/hares/api/v1/triage.py) to protect official UAE portals (`.gov.ae`, `.ae`), utility/toll billing, and anti-phishing reminders (`"never share your password"`, `"never share your OTP"`).
    - **Parity Metrics:** Emirati Gulf Arabic (100.0% recall, 0.00% FPR), MSA (97.73% recall, 10.81% FPR), Expat English (95.45% recall, 0.00% FPR), Arabizi (85.23% recall, 0.00% FPR).
    - **Demographic Disparity Ratio:** **0.8523** ($\ge 0.80$, PASSED under EEOC Four-Fifths Rule).
+
+---
+
+## 20. Neural Engine Parity & Multi-Tier Triage Coordinator (Milestone 56)
+
+Milestone 56 eliminated cross-surface divergence between the Citizen Verification Portal and the Hugging Face ZeroGPU Space (`abdullahashraf122/hares-neural-engine`). All triage ingress paths now enforce identical multi-tier evaluation precedence and emit transparent tier attribution telemetry:
+
+### 20.1 Three-Tier Evaluation Hierarchy
+
+1. **Tier 1: Deterministic Engine (`TIER_1_DETERMINISTIC`):**
+   - **Allowlist Preemption:** Exact registrable domain verification (`AllowlistEngine`) against authenticated UAE registries (`.gov.ae`, `ecrime.ae`, `salik.ae`). Emits instant `GREEN` (<10ms).
+   - **IDN Homograph Detector:** Punycode lookalike detection (`HomographDetector`) targeting UAE entities. Emits instant `RED` with Dubai Police 901 escalation (<15ms).
+   - **Brand Impersonation Phishing Guard:** Flags known municipal keyword lures (`police`, `salik-pay`, `dewa-bill`, `emiratespost`, `enbd`) on unverified foreign TLDs (`.cc`, `.top`, `.xyz`). Emits instant `RED` (<15ms).
+   - **Known Malicious IoC Repository:** Matches against verified threat indicators persisted in PostgreSQL.
+
+2. **Tier 2: Neural ZeroGPU Engine (`TIER_2_NEURAL_ZEROGPU`):**
+   - **Dual-Protocol Gateway:** Interfaced via `LocalSLMClient` supporting:
+     - **Protocol A:** `gradio_client.Client` singleton with authenticated Hugging Face token support.
+     - **Protocol B:** Direct Gradio 5 HTTP REST SSE (`POST /gradio_api/call/triage` -> `GET /gradio_api/call/triage/{event_id}`) bypassing client session locks.
+   - **ZeroGPU Quota Tuning:** Tuned `@spaces.GPU(duration=10)` in `hf_space/app.py` to preserve quota and allow high concurrency within free allocation.
+   - **Target Model:** Fine-tuned `Qwen2.5-3B-Instruct` on NVIDIA A10G with NVIDIA NeMo Guardrails Colang 2.0.
+
+3. **Tier 3: Sovereign Offline Fallback (`TIER_3_OFFLINE_FALLBACK`):**
+   - **Cascading Fallbacks:** Engaged if ZeroGPU quota is exhausted, Space is restarting, or local vLLM daemon is offline.
+   - **Deterministic NLP Heuristics:** Evaluates social engineering lures, conversational syntax, dialect idioms, and anti-phishing advisories locally with zero downtime.
+
+### 20.2 Attribution Telemetry Contracts
+
+- **API Contract:** Added `triage_tier_evaluated` (`TIER_1_DETERMINISTIC`, `TIER_2_NEURAL_ZEROGPU`, `TIER_2_NEURAL_LOCAL`, `TIER_3_OFFLINE_FALLBACK`) and `tier_preemption_reason` to `TriageVerificationResponse`.
+- **Frontend Portal:** Rendered tier attribution badge (`Tier 1: Deterministic Engine`, `Tier 2: Neural ZeroGPU (A10G)`, `Tier 3: Offline Heuristics`) and preemption reason in `CitizenTriagePortal.tsx`.
+- **Client Timeout:** Extended fetch abort timeout from 15s to 30s in `frontend/src/lib/api.ts` to accommodate ZeroGPU cold-start latency.
+
 
