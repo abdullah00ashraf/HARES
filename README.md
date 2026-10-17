@@ -15,6 +15,9 @@
 [![Dialect Equity](https://img.shields.io/badge/Dialect_Equity-Disparity_0.8523-blue?style=flat-square)](audit/certificates/COMPLIANCE_DOSSIER_AND_CERTIFICATES.md)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=flat-square)](LICENSE)
 
+> [!NOTE]
+> **Operational Maintenance Notice (Milestone 57):** The Acoustic Deepfake Forensics Pipeline is currently in a scheduled **Maintenance & Retraining Lockdown** to incorporate expanded UAE regional dialect corpora and optimize cross-dataset EER. The Voice Note input tab in the Citizen Portal and the Synthetic Audio Lab in the SOC Hub display transparent locked-state overlays, and the API gateway returns HTTP 503 for audio uploads. **Text and Link Triage via the Multi-Tier Triage Coordinator remain 100% operational.**
+
 ---
 
 ## 💡 The 30-Second Layman's Primer: What is Project Hares?

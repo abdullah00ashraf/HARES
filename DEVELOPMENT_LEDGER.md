@@ -1064,5 +1064,31 @@
   3. Guardrail fallback in `engine.py` yielded empty `detected_tactics=[]` on prompt injection, failing coordinator test; updated to tag `["prompt_injection"]`.
 * **Rectification/Resolution:** All errors rectified, all unit test suites passing 100%, frontend compiles with 0 TypeScript errors, Space updated cleanly.
 
-
-
+### 2026-10-17 06:50:00 UTC - Milestone 57: Strategic Audio Forensics Lockdown & Maintenance Overlays
+* **Development Made:** Under `/master-orchestrator` directive, executed a strategic production lockdown of the acoustic deepfake forensics interface and API endpoints for model retraining while preserving 100% of the underlying codebase and live text/link triage operations:
+  1. **Production Guardrails & Zero Deletion:** Maintained full integrity of all underlying audio forensics modules (`src/hares/ai/audio_pipeline.py`, `SpectrogramCanvas.tsx`, `AudioWaveformPlayer.tsx`). Zero lines of audio pipeline or feature extraction code were deleted. Zero alterations made to Qwen2.5-3B text triage, Neon PostgreSQL schemas, or STIX graphs.
+  2. **Citizen Portal Voice Note Lock (`frontend/src/components/CitizenTriagePortal.tsx`):**
+     - Voice Note tab remains selectable with an amber `Offline` badge.
+     - Content area replaced with a disabled, glassmorphic maintenance state with an amber `Lock` icon and bilingual notification:
+       * *"🎙️ Voice Note Analysis is Temporarily Offline. We are currently retraining our acoustic forensics models to better detect emerging AI voice clones in the UAE. Please use the Text or URL tabs for verification."*
+       * *"تحليل الملاحظات الصوتية غير متاح مؤقتاً. نقوم حالياً بإعادة تدريب نماذج التحليل الصوتي لكشف أصوات الذكاء الاصطناعي المستحدثة بدقة أعلى. يُرجى استخدام تبويب النصوص أو الروابط للتحقق."*
+     - Added quick-navigation redirect buttons to switch to Text & SMS or Link Inspector.
+     - Form submit button disabled when audio tab is active (`disabled={isSubmitting || mode === "audio"}`), rendering `Audio Analysis Offline • التحليل الصوتي مقفل`.
+     - `handleSubmit` defensively prevents form submission if `mode === "audio"`.
+  3. **SOC Analyst Hub Synthetic Audio Lab Lock (`frontend/src/components/AudioTriageWorkbench.tsx`):**
+     - Added `[ ⚠️ OFFLINE: RETRAINING ]` warning badge next to the title.
+     - Wrapped the main forensic area in a relative container with an absolute `backdrop-blur-md bg-slate-900/60 dark:bg-slate-950/75 z-20` overlay.
+     - Center card explains model retraining for cross-dataset Equal Error Rates (EER) and Conformal Calibration matrices.
+     - Underlying forensic presets and waveform player are protected with `pointer-events-none select-none opacity-40`.
+  4. **Backend API Gateway Hard Stop (`src/hares/api/v1/triage.py`):**
+     - Hardened `POST /api/v1/triage/verify` to detect incoming audio file uploads (`audio/` MIME type or `.ogg`, `.opus`, `.mp3`, `.wav`, `.m4a` filename extensions) before reading content into memory.
+     - Immediately raises `HTTPException(status_code=503, detail="The acoustic deepfake forensics engine is currently offline for scheduled model retraining. Please submit text or URLs for verification.")`.
+  5. **Verification & Testing:**
+     - Updated `tests/test_triage_api.py` (`test_triage_audio_upload`) to assert `HTTP 503` status code and retraining message.
+     - Ran `pytest tests/test_triage_api.py -v`: 6/6 tests passed.
+     - Ran `pytest tests/test_triage_coordinator.py -v`: 7/7 tests passed.
+     - Ran TypeScript type-check: `npx --prefix frontend tsc --project frontend/tsconfig.json --noEmit` passed with 0 errors.
+     - Ran Next.js production build: `npm --prefix frontend run build` exited with code 0 (all 7 routes compiled successfully).
+* **Decision Taken & Rationale:** Prevented uncalibrated audio predictions from entering the live system or consuming Celery worker resources during the planned acoustic model retraining window, while providing clear, transparent feedback to citizens and analysts.
+* **Errors/Issues Encountered:** None.
+* **Rectification/Resolution:** All automated builds and regression tests passing cleanly.

@@ -1,8 +1,8 @@
 # SYSTEM_STATE.md — The Technical Blueprint of Project Hares
 
-**Current Status:** Production Verified; Milestone 56 Executed: Neural Engine Parity & Multi-Tier Triage Coordination Complete (Root-cause parity failure resolved; TriageCoordinator unified between Web API & Celery worker; Dual-Protocol Gradio/HTTP SSE ZeroGPU gateway active; Tier attribution telemetry sealed; ZeroGPU duration tuned to 10s to preserve quota)
+**Current Status:** Production Verified; Milestone 57 Executed: Strategic Audio Forensics Lockdown & Maintenance Overlays Complete (Zero-deletion policy enforced; Audio deepfake pipeline locked for model retraining; Citizen Portal & SOC Audio Workbench gated with glassmorphic maintenance overlays; Web API hard stop returning HTTP 503 Service Unavailable; Live text and URL triage unaffected)
 **Last Updated:** 2026-10-17  
-**Version:** 2.9.3-milestone-56-neural-engine-parity-unified  
+**Version:** 2.9.4-milestone-57-audio-lockdown-maintenance  
 
 ---
 
@@ -593,4 +593,40 @@ Milestone 56 eliminated cross-surface divergence between the Citizen Verificatio
 - **Frontend Portal:** Rendered tier attribution badge (`Tier 1: Deterministic Engine`, `Tier 2: Neural ZeroGPU (A10G)`, `Tier 3: Offline Heuristics`) and preemption reason in `CitizenTriagePortal.tsx`.
 - **Client Timeout:** Extended fetch abort timeout from 15s to 30s in `frontend/src/lib/api.ts` to accommodate ZeroGPU cold-start latency.
 
+---
 
+## 21. Strategic Audio Forensics Lockdown & Maintenance State (Milestone 57)
+
+In preparation for sovereign acoustic forensics model retraining on expanded regional dialect corpora, the voice note analysis pipeline has been transitioned into an official `MAINTENANCE_LOCKDOWN` state. This protects the operational integrity of the live municipal defense infrastructure and prevents uncalibrated verdicts from entering persistence while preserving 100% of the underlying architecture.
+
+### 21.1 Production Guardrails & Zero-Deletion Enforcement
+* **Zero Deletion Policy:** The underlying audio pipeline source files (`src/hares/ai/audio_pipeline.py`, `SpectrogramCanvas.tsx`, `AudioWaveformPlayer.tsx`, feature extraction algorithms) remain intact. The subsystem is strictly gated at ingress, not removed.
+* **Zero Infrastructure Disruption:** The Qwen2.5-3B text triage pipeline (`TriageCoordinator`), Neon PostgreSQL 16 persistence tables, Upstash Redis 7 queues, and STIX 2.1 threat graphs remain 100% active and unaffected.
+* **Air-Gapped Zero-SaaS Compliance:** All maintenance overlays utilize 100% local Tailwind CSS classes with zero external CDN dependencies.
+
+### 21.2 Frontend UI/UX Lockdown Mechanics
+1. **Citizen Verification Portal (`frontend/src/components/CitizenTriagePortal.tsx`):**
+   - The "Voice Note / Audio" tab remains visible and selectable with a cautionary `Offline` status badge.
+   - The input dropzone/recorder is replaced with a disabled, glassmorphic maintenance state featuring an amber `Lock` icon and bilingual notification:
+     * *"🎙️ Voice Note Analysis is Temporarily Offline. We are currently retraining our acoustic forensics models to better detect emerging AI voice clones in the UAE. Please use the Text or URL tabs for verification."*
+     * *"تحليل الملاحظات الصوتية غير متاح مؤقتاً. نقوم حالياً بإعادة تدريب نماذج التحليل الصوتي لكشف أصوات الذكاء الاصطناعي المستحدثة بدقة أعلى. يُرجى استخدام تبويب النصوص أو الروابط للتحقق."*
+   - Direct shortcut buttons ("Switch to Text & SMS" / "Switch to Link Inspector") steer citizens to active channels.
+   - The primary form submission button is hard-disabled whenever the Audio tab is active (`disabled={isSubmitting || mode === "audio"}`), rendering `Audio Analysis Offline • التحليل الصوتي مقفل`.
+2. **Municipal SOC Analyst Hub (`frontend/src/components/AudioTriageWorkbench.tsx`):**
+   - Added a prominent `[ ⚠️ OFFLINE: RETRAINING ]` warning badge next to the workbench title.
+   - Wrapped the entire forensic content area (presets, 60 FPS Mel-Spectrogram canvas, acoustic biometric cards, speech transcripts) with an absolute `backdrop-blur-md bg-slate-900/60 dark:bg-slate-950/75 z-20` locked-state overlay.
+   - Card displays:
+     * **Header:** `Acoustic Forensics Engine Offline`
+     * **Body:** `The WhisperDualHead model and Conformal Calibration matrices are currently locked for retraining to improve cross-dataset Equal Error Rates (EER). Feature extraction and playback are disabled.`
+   - Foreground interactions, audio presets, and waveform playback are frozen (`pointer-events-none select-none opacity-40`).
+
+### 21.3 Backend API Gateway Hard Stop (`src/hares/api/v1/triage.py`)
+* **Endpoint Guard:** `POST /api/v1/triage/verify` intercepts incoming requests prior to buffer ingestion.
+* **Rejection Contract:** If an audio file payload is detected (MIME `audio/*` or `.ogg`, `.opus`, `.mp3`, `.wav`, `.m4a`), the gateway immediately raises:
+  ```python
+  HTTPException(
+      status_code=503,
+      detail="The acoustic deepfake forensics engine is currently offline for scheduled model retraining. Please submit text or URLs for verification."
+  )
+  ```
+* **Queue & DB Shielding:** Prevents raw audio payloads from reading into memory, queuing into `hares-worker-media`, or persisting uncalibrated verdicts into Neon PostgreSQL.

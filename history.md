@@ -794,4 +794,39 @@ Addressed and remediated all 4 critical auditor challenges across the certificat
 3. **Space Quota Optimization:** Tuned `@spaces.GPU(duration=10)` in [`hf_space/app.py`](file:///c:/HARES/hf_space/app.py) reducing GPU quota burn by 78%, and uploaded update directly to `abdullahashraf122/hares-neural-engine`.
 4. **Verification:** Authored `tests/test_triage_coordinator.py` (7/7 tests passing) and validated `tests/test_triage_api.py` (6/6 passing) and `tests/test_unseen_benchmark_metrics.py` (7/7 passing).
 
+---
 
+## 23. Session 21: Strategic Audio Forensics Lockdown & Maintenance Overlays (Milestone 57)
+
+### A. Operational Guardrails & Zero-Deletion Mandate
+Under `/master-orchestrator` directive, executed a strategic production lockdown of the acoustic deepfake forensics interface and API endpoints for model retraining while strictly adhering to three production guardrails:
+1. **Zero Deletion Policy:** Fully preserved all audio pipeline code (`src/hares/ai/audio_pipeline.py`, `SpectrogramCanvas.tsx`, `AudioWaveformPlayer.tsx`, etc.). No pipeline code or model classes were removed.
+2. **Zero Infrastructure Disruption:** Kept Qwen2.5-3B text triage, PostgreSQL 16 persistence tables, Celery workers, and STIX 2.1 graphs completely active and unaffected.
+3. **Air-Gapped Zero-SaaS Compliance:** Implemented maintenance overlays using 100% local Tailwind CSS without external CDNs.
+
+### B. Frontend Maintenance Overlays (Citizen Portal & SOC Hub)
+1. **Citizen Portal Voice Note Lock ([`frontend/src/components/CitizenTriagePortal.tsx`](file:///c:/HARES/frontend/src/components/CitizenTriagePortal.tsx)):**
+   - The "Voice Note / Audio" tab displays an amber `Offline` badge but remains selectable.
+   - Replaced audio input/dropzone with a disabled, glassmorphic maintenance card featuring an amber `Lock` icon and bilingual notification:
+     * *"🎙️ Voice Note Analysis is Temporarily Offline. We are currently retraining our acoustic forensics models to better detect emerging AI voice clones in the UAE. Please use the Text or URL tabs for verification."*
+     * *"تحليل الملاحظات الصوتية غير متاح مؤقتاً. نقوم حالياً بإعادة تدريب نماذج التحليل الصوتي لكشف أصوات الذكاء الاصطناعي المستحدثة بدقة أعلى. يُرجى استخدام تبويب النصوص أو الروابط للتحقق."*
+   - Added fast redirection buttons to switch immediately to Text & SMS or Link Inspector.
+   - Disabled the "Analyze Threat" submit button whenever the Audio tab is active (`disabled={isSubmitting || mode === "audio"}`), rendering `Audio Analysis Offline • التحليل الصوتي مقفل`.
+   - Prevented form submission in `handleSubmit` if `mode === "audio"`.
+2. **SOC Analyst Hub Synthetic Audio Lab Lock ([`frontend/src/components/AudioTriageWorkbench.tsx`](file:///c:/HARES/frontend/src/components/AudioTriageWorkbench.tsx)):**
+   - Added a `[ ⚠️ OFFLINE: RETRAINING ]` warning badge next to the workbench title.
+   - Wrapped presets, 60 FPS Spectrogram Canvas, acoustic metrics, and transcripts in an absolute `backdrop-blur-md bg-slate-900/60 dark:bg-slate-950/75 z-20` locked-state overlay.
+   - Centered locked card informs analysts that WhisperDualHead and Conformal Calibration matrices are locked for retraining to improve cross-dataset Equal Error Rates (EER).
+   - Applied `pointer-events-none select-none opacity-40` to freeze background audio controls and playback.
+
+### C. Backend API Gateway Hard Stop
+1. **Gateway Interception ([`src/hares/api/v1/triage.py`](file:///c:/HARES/src/hares/api/v1/triage.py)):**
+   - In `verify_content`, checks if the uploaded file is an audio file (via MIME type `audio/*` or file extensions `.ogg`, `.opus`, `.mp3`, `.wav`, `.m4a`).
+   - Immediately raises `HTTPException(status_code=503, detail="The acoustic deepfake forensics engine is currently offline for scheduled model retraining. Please submit text or URLs for verification.")`.
+   - Prevents uncalibrated audio from consuming Celery worker resources or entering Neon PostgreSQL.
+
+### D. Comprehensive Verification
+1. **Unit & API Testing:** Updated `tests/test_triage_api.py` (`test_triage_audio_upload`) to assert `HTTP 503` and the retraining message. Full test suite `pytest tests/test_triage_api.py -v` passed (6/6).
+2. **Coordinator Regression:** `pytest tests/test_triage_coordinator.py -v` passed (7/7).
+3. **Frontend Compilation:** `npx --prefix frontend tsc --project frontend/tsconfig.json --noEmit` passed with 0 errors.
+4. **Production Build:** `npm --prefix frontend run build` completed cleanly with exit code 0 across all 7 routes.

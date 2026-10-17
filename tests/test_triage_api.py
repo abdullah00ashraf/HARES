@@ -77,7 +77,7 @@ def test_triage_image_upload():
 
 
 def test_triage_audio_upload():
-    """Submitting a synthetic or audio file triggers acoustic classifier."""
+    """Submitting an audio file triggers HTTP 503 during model retraining lockdown."""
     import struct
     import math
 
@@ -108,11 +108,10 @@ def test_triage_audio_upload():
         "/api/v1/triage/verify",
         files={"file": ("voicenote.wav", wav_bytes, "audio/wav")},
     )
-    assert response.status_code == 200
+    assert response.status_code == 503
     data = response.json()
-    assert data["input_type_detected"] == "audio"
-    assert data["audio_analysis"] is not None
-    assert "spectral_anomaly_score" in data["audio_analysis"]
+    assert "retraining" in data["detail"].lower()
+    assert "offline" in data["detail"].lower()
 
 
 def test_triage_empty_request():

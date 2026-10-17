@@ -18,6 +18,7 @@ import {
   Play,
   RotateCcw,
   Scale,
+  Lock,
 } from "lucide-react";
 import { soundFx } from "../lib/audioSoundFx";
 
@@ -150,26 +151,63 @@ export default function AudioTriageWorkbench() {
       {/* Top Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Mic className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            <span>Synthetic Voice Note Forensic Workbench (FR-1.x)</span>
-            <span className="text-xs text-slate-500 font-normal">/ مختبر كشف التزييف الصوتي المتقدم</span>
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Mic className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              <span>Synthetic Voice Note Forensic Workbench (FR-1.x)</span>
+            </h2>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/40 animate-pulse">
+              [ ⚠️ OFFLINE: RETRAINING ]
+            </span>
+          </div>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Acoustic anomaly detection, AASIST deepfake classification, pitch jitter/shimmer forensics, and non-parametric conformal calibration.
+            <span className="ml-1 text-slate-400 font-arabic">/ مختبر كشف التزييف الصوتي المتقدم</span>
           </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono">
-          <span className="px-3 py-1 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800 flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-purple-500" />
-            <span>Inference: Local PyTorch (Zero Offshore)</span>
+          <span className="px-3 py-1 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1.5">
+            <Lock className="w-3.5 h-3.5 text-amber-500" />
+            <span>Forensics State: Retraining Lockdown</span>
           </span>
         </div>
       </div>
 
-      {/* Audio Sample Presets Selector Bar */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur p-4 shadow-sm">
+      {/* Main Content Area Wrapped with Maintenance Lockdown Overlay */}
+      <div className="relative rounded-2xl overflow-hidden">
+        {/* Absolute Backdrop Blur Maintenance Overlay */}
+        <div className="absolute inset-0 z-20 backdrop-blur-md bg-slate-900/60 dark:bg-slate-950/75 flex items-center justify-center p-6 text-center">
+          <div className="max-w-lg p-6 sm:p-8 rounded-2xl bg-white/95 dark:bg-slate-900/95 border border-amber-500/40 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+              <Lock className="w-7 h-7" />
+            </div>
+
+            <div className="space-y-2">
+              <span className="inline-block px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-[11px] font-mono font-bold uppercase tracking-wider">
+                ⚠️ Scheduled Model Calibration
+              </span>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Acoustic Forensics Engine Offline
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                The WhisperDualHead model and Conformal Calibration matrices are currently locked for retraining to improve cross-dataset Equal Error Rates (EER). Feature extraction and playback are disabled.
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-arabic leading-relaxed pt-1">
+                محرك البصمة الصوتية قيد إعادة التدريب والمعايرة حالياً لتحسين دقة كشف التزييف الصوتي عبر اللهجات المتعددة. تم إيقاف الاستخراج والتشغيل مؤقتاً.
+              </p>
+            </div>
+
+            <div className="pt-2 text-[11px] font-mono text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800">
+              Sovereign Model Retraining Track • Moro Hub me-central-1
+            </div>
+          </div>
+        </div>
+
+        {/* Existing Workbench Content (Interaction disabled underneath overlay) */}
+        <div className="space-y-6 pointer-events-none select-none opacity-40">
+          {/* Audio Sample Presets Selector Bar */}
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 backdrop-blur p-4 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <Sliders className="w-4 h-4 text-purple-600 dark:text-purple-400" />
@@ -550,6 +588,8 @@ export default function AudioTriageWorkbench() {
               {selectedSample.verdict} VERDICT
             </span>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>

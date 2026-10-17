@@ -139,6 +139,17 @@ async def verify_content(
             headers={"Retry-After": str(rl_result.reset_seconds)},
         )
 
+    # Phase 2: Strategic Audio Forensics Lockdown Hard Stop (Milestone 57)
+    if file is not None and file.filename:
+        filename_lower = file.filename.lower()
+        if any(filename_lower.endswith(ext) for ext in [".ogg", ".opus", ".mp3", ".wav", ".m4a"]) or (
+            file.content_type and "audio" in file.content_type.lower()
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="The acoustic deepfake forensics engine is currently offline for scheduled model retraining. Please submit text or URLs for verification.",
+            )
+
     start_time = time.perf_counter()
     request_id = str(uuid.uuid4())
     active_domains = await _get_active_allowlist_domains_async()

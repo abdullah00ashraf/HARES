@@ -320,6 +320,11 @@ export default function CitizenTriagePortal() {
     e.preventDefault();
     setErrorMsg(null);
 
+    if (mode === "audio") {
+      setErrorMsg("Voice Note analysis is temporarily offline for scheduled model retraining. Please use the Text or URL tabs.");
+      return;
+    }
+
     const hasText = textInput.trim().length > 0;
     const hasUrl = urlInput.trim().length > 0;
     const hasFile = selectedFile !== null;
@@ -474,6 +479,7 @@ export default function CitizenTriagePortal() {
           >
             <Mic className="w-4 h-4" />
             <span>Voice Note / Audio</span>
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30">Offline</span>
             <span className="text-[10px] font-normal opacity-70">/ تسجيل صوتي</span>
           </button>
 
@@ -553,62 +559,51 @@ export default function CitizenTriagePortal() {
             </div>
           )}
 
-          {/* Mode 3: Voice Note / Audio Input */}
+          {/* Mode 3: Voice Note / Audio Input (Maintenance Lockdown) */}
           {mode === "audio" && (
             <div className="space-y-4">
-              <div className="p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 text-center space-y-4">
-                <div className="flex items-center justify-center gap-4">
-                  {/* Record Button */}
-                  {!isRecording ? (
-                    <button
-                      type="button"
-                      onClick={startVoiceRecording}
-                      className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition"
-                    >
-                      <Mic className="w-4 h-4" />
-                      <span>Record Voice Note • تسجيل صوتي</span>
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={stopVoiceRecording}
-                      className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition animate-pulse"
-                    >
-                      <div className="w-3 h-3 rounded-full bg-white animate-ping" />
-                      <span>Stop Recording ({recordingSeconds}s)</span>
-                    </button>
-                  )}
-
-                  <span className="text-xs text-slate-400 font-semibold">OR / أو</span>
-
-                  {/* Upload Audio File Button */}
-                  <label className="px-5 py-3 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs cursor-pointer flex items-center gap-2 transition">
-                    <Upload className="w-4 h-4" />
-                    <span>Upload Opus / Audio File</span>
-                    <input
-                      type="file"
-                      accept="audio/*,.ogg,.opus,.mp3,.wav,.m4a"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
+              <div className="p-8 sm:p-10 rounded-2xl bg-slate-100/80 dark:bg-slate-950/70 border border-amber-500/40 backdrop-blur-md text-center space-y-4 relative overflow-hidden shadow-inner">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 mb-1 shadow-inner">
+                  <Lock className="w-8 h-8" />
+                </div>
+                
+                <div className="space-y-2 max-w-xl mx-auto">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs font-mono font-bold tracking-wide uppercase">
+                    <span>⚠️ Offline for Scheduled Model Retraining</span>
+                  </div>
+                  
+                  <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                    🎙️ Voice Note Analysis is Temporarily Offline
+                  </h3>
+                  
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    We are currently retraining our acoustic forensics models to better detect emerging AI voice clones in the UAE. Please use the <strong>Text &amp; SMS</strong> or <strong>Link &amp; Domain</strong> tabs for verification.
+                  </p>
+                  
+                  <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-arabic leading-relaxed pt-1">
+                    تحليل الملاحظات الصوتية غير متاح مؤقتاً. نعمل حالياً على إعادة تدريب نماذج البصمة الصوتية للتعرف على أحدث أصوات الذكاء الاصطناعي في دولة الإمارات. يرجى استخدام تبويب النص أو الروابط للتحقق.
+                  </p>
                 </div>
 
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
-                  Audio files are analyzed using conformal acoustic anomaly detection and Whisper ASR. Supports WhatsApp Opus .ogg notes up to 120 seconds.
-                </p>
+                <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => handleModeSwitch("text")}
+                    className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold transition flex items-center gap-2 shadow-sm"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Switch to Text &amp; SMS / فحص الرسائل</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleModeSwitch("url")}
+                    className="px-4 py-2 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100 text-xs font-bold transition flex items-center gap-2 shadow-sm"
+                  >
+                    <LinkIcon className="w-3.5 h-3.5" />
+                    <span>Switch to Link Inspector / فحص الروابط</span>
+                  </button>
+                </div>
               </div>
-
-              {/* Integrated Waveform Player */}
-              {selectedFile && (
-                <AudioWaveformPlayer
-                  audioBlob={selectedFile}
-                  title={`Attached: ${selectedFile.name}`}
-                  isSynthetic={result?.audio_analysis?.is_synthetic}
-                  spectralScore={result?.audio_analysis?.spectral_anomaly_score}
-                  pValue={result?.audio_analysis?.p_value}
-                />
-              )}
             </div>
           )}
 
@@ -768,13 +763,22 @@ export default function CitizenTriagePortal() {
 
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-md shadow-emerald-600/20 disabled:opacity-50 transition flex items-center gap-2"
+              disabled={isSubmitting || mode === "audio"}
+              className={`px-6 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+                mode === "audio"
+                  ? "bg-slate-300 dark:bg-slate-800 text-slate-500 dark:text-slate-500 cursor-not-allowed opacity-60"
+                  : "bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 disabled:opacity-50"
+              }`}
             >
               {isSubmitting ? (
                 <>
                   <Activity className="w-4 h-4 animate-spin" />
                   <span>Scanning Sovereign Engines...</span>
+                </>
+              ) : mode === "audio" ? (
+                <>
+                  <Lock className="w-4 h-4" />
+                  <span>Audio Analysis Offline • التحليل الصوتي مقفل</span>
                 </>
               ) : (
                 <>

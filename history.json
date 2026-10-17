@@ -2,9 +2,9 @@
   "project_metadata": {
     "name": "Project Hares",
     "arabic_name": "مشروع حارس",
-    "version": "1.1.0-PROD-MASTER",
+    "version": "1.2.0-PROD-MASTER-AUDIO-LOCKDOWN",
     "history_schema_version": "2.7.0-master-verified",
-    "last_updated": "2026-10-17T05:50:00Z",
+    "last_updated": "2026-10-17T06:55:00Z",
     "status": "PRODUCTION_VERIFIED_AND_DEPLOYED",
     "classification": "Sovereign Multi-Modal Automated Fraud Triage & Threat Intelligence System",
     "target_jurisdiction": "Emirate of Dubai & United Arab Emirates",
@@ -1426,6 +1426,25 @@
       ],
       "resolutions": [
         "Reduced GPU duration to 10s, added `get_active_domains()` with seed fallback, calibrated guardrail fallback, and verified 100% test pass rate."
+      ]
+    },
+    {
+      "id": "milestone-63",
+      "timestamp": "2026-10-17 06:50:00 UTC",
+      "title": "Milestone 57: Strategic Audio Forensics Lockdown & Maintenance Overlays",
+      "developments": [
+        "Under `/master-orchestrator` directive, executed a strategic production lockdown of the acoustic deepfake forensics interface and API endpoints for model retraining while strictly adhering to zero deletion and zero infrastructure disruption policies.",
+        "Citizen Portal Voice Note Lock (`frontend/src/components/CitizenTriagePortal.tsx`): rendered disabled glassmorphic maintenance state with Lock icon and bilingual notification, added fast switches to Text and Link tabs, and hard-disabled submit button when audio mode is selected.",
+        "SOC Analyst Hub Synthetic Audio Lab Lock (`frontend/src/components/AudioTriageWorkbench.tsx`): added `[ ⚠️ OFFLINE: RETRAINING ]` warning badge and wrapped the entire forensic area in a backdrop-blur overlay with locked-state card and pointer-events freezing.",
+        "Backend API Gateway Hard Stop (`src/hares/api/v1/triage.py`): immediate `HTTPException(status_code=503)` fast rejection upon detecting audio uploads, preventing uncalibrated verdicts from entering database or worker queues.",
+        "Automated Verification: updated `tests/test_triage_api.py` to assert HTTP 503 maintenance message (6/6 passing); verified coordinator tests (7/7 passing); verified Next.js production build (`npm run build`) exited with code 0."
+      ],
+      "decisions": [
+        "Enforced strict zero deletion: preserved all audio pipeline code and model definitions while cleanly gating access at ingress during the planned retraining lifecycle."
+      ],
+      "issues": [],
+      "resolutions": [
+        "Clean compilation and 100% test pass rate across backend and frontend."
       ]
     }
   ]
