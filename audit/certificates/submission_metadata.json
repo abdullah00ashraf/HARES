@@ -4,6 +4,6 @@
   "track": "ASVspoof 2021 DF Track",
   "codec": "16kHz Mono Opus (WhatsApp Business API Standard)",
   "total_predictions": 500,
-  "evaluation_date_utc": "2026-10-12 03:39:09 UTC",
-  "sha256_checksum": "d15a294d05a572511ad49806da5c3b0549f77f7fecee295df485eb2721bc1689"
+  "evaluation_date_utc": "2026-10-17 04:03:23 UTC",
+  "sha256_checksum": "f0acc3bf83c80855a8ecb8e266e63305a6ea0822538032d870bd8e58ee0da3a6"
 }

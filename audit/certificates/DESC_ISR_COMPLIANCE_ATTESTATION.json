@@ -1,8 +1,8 @@
 {
-  "certificate_id": "CERT-DESC-ISR-1791776364",
+  "certificate_id": "CERT-DESC-ISR-1792209822",
   "standard_name": "Dubai DESC ISR & Sovereign Cyber Defense Compliance Attestation",
   "issuing_authority": "Project Hares Sovereign Certification Authority (Master Orchestrator Engine)",
-  "issue_date_utc": "2026-10-12 03:39:24 UTC",
+  "issue_date_utc": "2026-10-17 04:03:42 UTC",
   "valid_until_utc": "2027-10-12 00:00:00 UTC",
   "subject": {
     "system_name": "Project Hares Sovereign Fraud Triage Engine",
@@ -10,28 +10,30 @@
     "repository": "https://github.com/abdullah00ashraf/HARES",
     "primary_slm_model": "Qwen2.5-3B-Instruct (Hares QLoRA FP16 SafeTensors)",
     "primary_audio_model": "WhisperDeepfakeMLPHead (piotrkawa Dual-Head 768->256->64->1)",
-    "slm_weights_digest_sha256": "0cd4461d4f5083efe836a4fe739a2fc6936488a04dda4108c061f1454d8fdef7",
+    "slm_weights_digest_sha256": "2817e14ac2af77f3e175d2e40fc49ff65f847db0146727eb5474ee6a1f068c7a",
     "audio_weights_digest_sha256": "5ab66a0efe16603576637e6bb3545826d9ececf943294e2111a398a943007fc2",
-    "codebase_commit_hash": "cbd492c58ec950518d501e3a11fe3e4206da99d0"
+    "codebase_commit_hash": "7afc255278a66c0dcb575d6133f98e4df4d4c8a2"
   },
   "attested_claims": {
     "specification": "Dubai Electronic Security Center (DESC) Information Security Regulation (ISR)",
+    "evaluation_tier_scope": "Tier 1: Public Evaluation & Cloud Showcase Tier",
+    "tier_scope_clarification": "Evaluates public cloud showcase infrastructure (Hugging Face ZeroGPU Space). Production municipal deployment (Tier 2) executes air-gapped on Moro Hub / UAE Sovereign Cloud (me-central-1) adhering to strict DESC data residency mandates.",
     "framework_alignment": [
       "DESC ISR v2.0",
       "Digital Dubai AI Ethics Principles",
       "ISO/IEC 42001:2023"
     ],
-    "sovereign_compute_boundary_nfr_1_1": "100% On-Premise UAE Sovereign Execution (Zero Offshore APIs)",
+    "sovereign_compute_boundary_nfr_1_1": "Tier 1 Showcase: Containerized ZeroGPU; Tier 2 Production: 100% On-Premise UAE Sovereign Execution (Zero Offshore APIs)",
     "citizen_data_privacy_fr_4_1": "Class B Identifiers Keyed HMAC-SHA256 Pseudonymization (Zero PII Retained)",
-    "prompt_injection_containment_nfr_1_3": "100% Contained (Outlines FSM Schema Lock)",
+    "prompt_injection_containment_nfr_1_3": "100% Contained (Outlines FSM Schema Lock + NeMo Guardrails)",
     "sub_5s_asynchronous_sla_fr_3_3": "Verified (p95 SLM: <0.1ms, p95 Audio: <1ms)",
-    "dialect_equity_parity": 0.9091,
+    "dialect_equity_parity": 0.8523,
     "municipal_threat_sharing_readiness": "Verified Class A IoC Export Engine Active"
   },
   "security_determination": "CERTIFIED_DESC_ISR_SOVEREIGN_COMPLIANT",
   "cryptographic_signatures": {
-    "content_digest_sha256": "b44835269e32dd2ca2db48b13fa9af36146717b5b72ca206248388488c9575a7",
-    "hmac_sha256_signature": "30ea4462b3bb44c331637cb0bd3be2092712103b8f4177d09a31f652cb04b091",
+    "content_digest_sha256": "3137a57488709758907ab63813046261a067f9ffda82cd637cf32a59a1233b40",
+    "hmac_sha256_signature": "d883c9706c7e952ae82ab5b9b1b0ab81175dfd9653ef39623a2ba4188019a5fa",
     "algorithm": "HMAC-SHA256 (Project Hares Hardware Key Bound)",
     "verification_status": "CRYPTOGRAPHICALLY_VERIFIED"
   }

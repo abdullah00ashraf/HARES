@@ -36,7 +36,7 @@ class AudioDeepfakeClassifier:
 
         # 2. Extract Acoustic Artifact Scores from 16kHz PCM
         anomaly_score = self._extract_acoustic_anomaly_score(pcm_bytes)
-        hint_lower = filename_hint.lower()
+        hint_lower = (filename_hint or "voice.ogg").lower()
         if any(k in hint_lower for k in ["syn_", "deepfake", "synthetic", "clone"]):
             anomaly_score = max(0.92, anomaly_score)
         elif any(k in hint_lower for k in ["gen_", "genuine", "authentic"]):

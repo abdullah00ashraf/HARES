@@ -1,8 +1,8 @@
 {
-  "certificate_id": "CERT-CONFORMAL-FPR-1791776364",
+  "certificate_id": "CERT-CONFORMAL-FPR-1792209822",
   "standard_name": "Non-Parametric Conformal Statistical Safety Guarantee (FPR <= 0.1%)",
   "issuing_authority": "Project Hares Sovereign Certification Authority (Master Orchestrator Engine)",
-  "issue_date_utc": "2026-10-12 03:39:24 UTC",
+  "issue_date_utc": "2026-10-17 04:03:42 UTC",
   "valid_until_utc": "2027-10-12 00:00:00 UTC",
   "subject": {
     "system_name": "Project Hares Sovereign Fraud Triage Engine",
@@ -10,9 +10,9 @@
     "repository": "https://github.com/abdullah00ashraf/HARES",
     "primary_slm_model": "Qwen2.5-3B-Instruct (Hares QLoRA FP16 SafeTensors)",
     "primary_audio_model": "WhisperDeepfakeMLPHead (piotrkawa Dual-Head 768->256->64->1)",
-    "slm_weights_digest_sha256": "0cd4461d4f5083efe836a4fe739a2fc6936488a04dda4108c061f1454d8fdef7",
+    "slm_weights_digest_sha256": "2817e14ac2af77f3e175d2e40fc49ff65f847db0146727eb5474ee6a1f068c7a",
     "audio_weights_digest_sha256": "5ab66a0efe16603576637e6bb3545826d9ececf943294e2111a398a943007fc2",
-    "codebase_commit_hash": "cbd492c58ec950518d501e3a11fe3e4206da99d0"
+    "codebase_commit_hash": "7afc255278a66c0dcb575d6133f98e4df4d4c8a2"
   },
   "attested_claims": {
     "specification": "Distribution-Free Non-Parametric Conformal Prediction (NFR-3.1, FR-1.4)",
@@ -28,8 +28,8 @@
   },
   "security_determination": "CERTIFIED_CONFORMAL_SAFETY_BOUND",
   "cryptographic_signatures": {
-    "content_digest_sha256": "2d8b449a4a747aeddf5f4fd975919413b7ef9c040136d98c6f9ec0de7ab56b08",
-    "hmac_sha256_signature": "75f17dc448c64ad116e92c7644360b64b959b7829cc74b01c4b759626bb704c0",
+    "content_digest_sha256": "2555f26f449e2fc796469c67859fafff01e208c79858fea79ef397ecf25328da",
+    "hmac_sha256_signature": "25d6170d69c4231ca10d843b096cd254edbc4c1d8ac5a78d1a6d37d13ec477e5",
     "algorithm": "HMAC-SHA256 (Project Hares Hardware Key Bound)",
     "verification_status": "CRYPTOGRAPHICALLY_VERIFIED"
   }

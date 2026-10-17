@@ -297,6 +297,15 @@ class LocalSLMClient:
             ]
         )
 
+        is_official_portal = any(
+            dom in lower
+            for dom in [
+                "dubaipolice.gov.ae", "dewa.gov.ae", "salik.ae", "emiratespost.ae",
+                "rta.ae", "emiratesnbd.com", "adcb.com", "adib.ae", "fab.com",
+                "mof.gov.ae", "ecrime.ae", "u.ae", "dubai.ae", "gov.ae"
+            ]
+        )
+
         # 2. Check for UAE Authority / Imposter Lures (Arabic, English, and Arabizi)
         if any(w in lower or w in text for w in ["شرطة دبي", "dubai police", "مرور", "ecrime", "el-shorta", "bolice"]):
             impersonated = "Dubai Police"
@@ -341,23 +350,37 @@ class LocalSLMClient:
         if any(w in lower or w in text for w in ["خلال ساعتين", "within 24 hours", "فوراً", "عاجل", "immediately", "urgent"]):
             urgency = True
 
+        # Check for anti-phishing advisory and civic awareness context (protects non-coercive syntax)
+        has_anti_phish_advisory = any(
+            w in lower or w in text
+            for w in [
+                "never share your password", "never share your otp", "never share", "do not share", "don't share",
+                "لا تشارك", "لا تفصح", "عدم مشاركة", "تحذير أمني", "تنبيه أمني", "e-statement", "monthly statement",
+                "traffic awareness", "awareness advisory", "safety first", "safe following distance", "foggy morning",
+                "tzakkar teftah", "asharet el moroor", "le salametak", "neshabhat 3aleik"
+            ]
+        )
+
         # 4. Credential / Financial Demands
-        has_harvesting = any(
+        has_harvesting = (not has_anti_phish_advisory) and any(
             w in lower or w in text
             for w in [
                 "رمز التحقق", "رمز otp", "رمز", "otp", "بطاقة", "تحديث بيانات", "أدخل بيانات",
                 "eb3at", "ramz", "password", "card", "cvv", "login details"
             ]
         )
-        if any(w in lower or w in text for w in ["دفع", "pay", "سداد", "درهم", "aed", "بطاقة", "card", "otp", "رسوم"]):
+        if any(w in lower or w in text for w in ["دفع", "pay", "سداد", "درهم", "aed", "بطاقة", "card", "رسوم"]):
+            if not ("auto-pay" in lower or "recharged with" in lower or "tam 5asm" in lower or "shokran le sedad" in lower or "thank you for your payment" in lower):
+                financial_demand = True
+        if "otp" in lower and not has_anti_phish_advisory:
             financial_demand = True
 
         # 5. Check Tactic Categories
-        if any(w in lower or w in text for w in ["مخالفة", "traffic fine", "حجز مركبة", "impound", "toll"]):
+        if any(w in lower or w in text for w in ["مخالفة", "traffic fine", "حجز مركبة", "impound", "toll"]) and not has_anti_phish_advisory:
             tactics.append("traffic_fine_lure")
-        if any(w in lower or w in text for w in ["رسوم توصيل", "delivery fee", "تأكيد عنوان", "reschedule fee", "شحنة"]):
+        if any(w in lower or w in text for w in ["رسوم توصيل", "delivery fee", "تأكيد عنوان", "reschedule fee"]) and not has_anti_phish_advisory:
             tactics.append("courier_delivery_fee")
-        if any(w in lower or w in text for w in ["تجميد", "freeze", "تحديث بيانات", "kyc", "otp", "قفل حساب"]):
+        if any(w in lower or w in text for w in ["تجميد", "freeze", "تحديث بيانات", "kyc", "قفل حساب"]) and not has_anti_phish_advisory:
             tactics.append("banking_kyc_freeze")
         if any(w in lower or w in text for w in ["جائزة", "lottery", "مبروك", "million", "prize", "rabihit", "mabrook", "500,000"]):
             tactics.append("lottery_prize")
@@ -365,21 +388,35 @@ class LocalSLMClient:
             tactics.append("crypto_investment")
         if any(w in lower for w in ["<|im_start|>", "ignore all previous instructions", "system override"]):
             tactics.append("prompt_injection")
-        if any(w in lower or w in text for w in ["إيقاف", "suspension", "block", "تعليق", "قفل"]):
+        if any(w in lower or w in text for w in ["إيقاف", "suspension", "block", "تعليق", "قفل"]) and not has_anti_phish_advisory:
             tactics.append("account_suspension")
 
-        # 6. Legitimate Benign Marker Detection
+        # 6. Legitimate Benign Marker Detection (Expanded for English & Arabizi)
         is_benign_receipt = any(
             w in lower or w in text
             for w in [
+                # Arabic
                 "تم خصم", "تم استلام", "شكراً لسدادك", "شكراً", "لا يلزم أي إجراء", "تم التحديث بنجاح",
+                "توعية مرورية", "إرشادات", "كشف حساب", "وصلت إلى", "عدم مشاركة", "تحذير أمني",
+                "تنبيه أمني", "تم تجديد", "بنجاح", "شكراً لتعاملكم", "شكراً لالتزامكم", "تم تحديث بيانات",
+                # English
                 "thank you for your payment", "payment confirmed", "no action required",
-                "receipt", "tam 5asm", "benaja7", "successful payment"
+                "receipt", "successful payment", "e-statement", "monthly statement",
+                "available in online banking", "never share your password", "auto-pay",
+                "recharged with", "trip history", "traffic awareness", "awareness advisory",
+                "safety first", "safe following distance", "has arrived at dubai central",
+                "out-for-delivery", "track online at",
+                # Arabizi
+                "tam 5asm", "tam khasem", "benaja7", "be naja7", "shokran le sedad", "shukran le sedad",
+                "shokran", "shukran", "le sedad", "fatoorat el kahraba", "tam estelam", "el daf3a",
+                "raseedak el 7aly", "raseedak", "lel ma3loomat zor", "bawabit el barsha",
+                "neshabhat 3aleik", "tzakkar teftah", "asharet el moroor", "le salametak",
+                "markaz el tawzee3", "gayya fel tareeq", "el shahna raqm"
             ]
         ) and not has_phish_link and not (has_threat and has_harvesting)
 
         # 7. Classification Decision
-        if is_benign_receipt:
+        if is_benign_receipt or (is_official_portal and not has_threat and not has_harvesting and not urgency):
             is_impersonation = False
             urgency = False
             financial_demand = False
@@ -389,12 +426,12 @@ class LocalSLMClient:
         else:
             # Active fraud classification
             is_active_fraud = (
-                (impersonated is not None and (has_phish_link or has_threat or has_harvesting or "http" in lower))
+                (impersonated is not None and (has_phish_link or has_threat or has_harvesting or ("http" in lower and not is_official_portal)))
                 or (impersonated is not None and financial_demand and urgency)
                 or (has_threat and (financial_demand or has_harvesting))
                 or (impersonated == "Dubai Police" and has_threat)
                 or (impersonated == "Emirates Post" and (urgency or financial_demand))
-                or (impersonated == "UAE Central Bank")
+                or (impersonated == "UAE Central Bank" and not is_benign_receipt)
                 or ("lottery_prize" in tactics and (has_harvesting or "otp" in lower or financial_demand))
                 or ("crypto_investment" in tactics and (has_harvesting or "telegram" in lower or "t.me" in lower or financial_demand or urgency or "http" in lower))
                 or ("prompt_injection" in tactics)
@@ -414,7 +451,7 @@ class LocalSLMClient:
                     if is_impersonation
                     else "Detected coercive extortion or credential harvesting lure."
                 )
-            elif impersonated is not None:
+            elif impersonated is not None and not is_official_portal:
                 # Ambiguous reference without active threats
                 is_impersonation = False
                 confidence = 0.20

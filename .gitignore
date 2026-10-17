@@ -67,4 +67,5 @@ models/**/*.safetensors
 models/**/*.zip
 colab_packages/
 scratch/
-
+# Unseen benchmark evaluation datasets
+unseen/
